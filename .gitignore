@@ -1,0 +1,7 @@
+# Frontend
+Recallr/node_modules
+Recallr/.env
+
+# Backend
+server/node_modules
+server/.env
