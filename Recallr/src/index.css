@@ -1,0 +1,265 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+.home-container {
+  display: flex;
+  width: 100%;
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 2rem;
+  gap: 2rem;
+  align-items: center;
+}
+
+.content-section {
+  flex: 1;
+  padding: 2rem;
+}
+
+.content-section h1 {
+  font-size: 2.5rem;
+  font-weight: 700;
+  color: #1e293b;
+  margin-bottom: 1.5rem;
+  background: linear-gradient(135deg, #1e293b 0%, #667eea 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.content-section p {
+  font-size: 1.1rem;
+  color: #475569;
+  margin-bottom: 2rem;
+  line-height: 1.6;
+}
+
+.features-list {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  margin-bottom: 2rem;
+}
+
+.feature-item {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.feature-icon {
+  width: 36px;
+  height: 36px;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 18px;
+  background: linear-gradient(
+    135deg,
+    rgba(102, 126, 234, 0.1) 0%,
+    rgba(118, 75, 162, 0.1) 100%
+  );
+}
+
+.feature-text {
+  font-size: 1rem;
+  font-weight: 500;
+  color: #1e293b;
+}
+
+.cta-button {
+  padding: 12px 24px;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  border: none;
+  border-radius: 8px;
+  font-weight: 600;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 20px rgba(102, 126, 234, 0.3);
+}
+
+.cta-button:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 25px rgba(102, 126, 234, 0.4);
+}
+
+.animation-section {
+  flex: 1;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+.animation-container {
+  width: 300px;
+  height: 300px;
+  position: relative;
+  background: linear-gradient(135deg, #ffffff 0%, #f8fafc 100%);
+  border-radius: 16px;
+  overflow: hidden;
+  box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.1), 0 10px 30px rgba(0, 0, 0, 0.1),
+    inset 0 1px 0 rgba(255, 255, 255, 0.1);
+}
+
+.bg-particle {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  background: rgba(102, 126, 234, 0.3);
+  border-radius: 50%;
+  animation: float 8s ease-in-out infinite;
+}
+
+.processing-hub {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 80px;
+  height: 80px;
+  z-index: 100;
+}
+
+.hub-outer-ring {
+  position: absolute;
+  width: 80px;
+  height: 80px;
+  border: 2px solid rgba(102, 126, 234, 0.2);
+  border-radius: 50%;
+  animation: rotate 20s linear infinite;
+}
+
+.hub-inner-ring {
+  position: absolute;
+  top: 10px;
+  left: 10px;
+  width: 60px;
+  height: 60px;
+  border: 1px solid rgba(118, 75, 162, 0.3);
+  border-radius: 50%;
+  animation: rotate 15s linear infinite reverse;
+}
+
+.recallr-core {
+  position: absolute;
+  top: 15px;
+  left: 15px;
+  width: 50px;
+  height: 50px;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 18px;
+  font-weight: 800;
+  color: white;
+  box-shadow: 0 0 20px rgba(102, 126, 234, 0.4),
+    inset 0 2px 10px rgba(255, 255, 255, 0.2);
+  animation: coreSequence 20s infinite;
+}
+
+.pdf-document {
+  position: absolute;
+  width: 24px;
+  height: 30px;
+  background: white;
+  border-radius: 4px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  animation: pdfFloat 4s ease-in-out infinite;
+}
+
+.pdf-icon {
+  font-size: 12px;
+  font-weight: bold;
+  color: #e53e3e;
+}
+
+.source-platform {
+  position: absolute;
+  width: 24px;
+  height: 24px;
+  font-size: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 6px;
+  background: white;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  animation: platformFloat 6s ease-in-out infinite;
+}
+
+.output-card {
+  position: absolute;
+  background: white;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  border-radius: 8px;
+  padding: 8px;
+  font-size: 10px;
+  animation: cardAppear 1s ease-out forwards;
+}
+
+.card-header {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-bottom: 6px;
+}
+
+.card-icon {
+  font-size: 12px;
+}
+
+.card-title {
+  font-weight: 600;
+  font-size: 10px;
+}
+
+.summary-output {
+  width: 120px;
+  height: 80px;
+  top: 30px;
+  right: 30px;
+}
+
+.quiz-output {
+  width: 140px;
+  height: 90px;
+  top: 30px;
+  left: 30px;
+}
+
+.dashboard-output {
+  width: 100px;
+  bottom: 30px;
+  left: 50%;
+  transform: translateX(-50%);
+}
+
+/* Animations remain the same but with adjusted values */
+@keyframes float {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-10px);
+  }
+}
+
+@keyframes rotate {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* Other animations should be similarly adjusted */
