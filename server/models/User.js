@@ -25,6 +25,12 @@ const userSchema = new mongoose.Schema({
     type: Date,
     default: Date.now,
   },
+  pdfs:[
+    {
+      type:mongoose.Schema.Types.ObjectId,
+      ref:'PDF'
+    }
+  ]
 });
 
 const User=mongoose.model("User",userSchema);
