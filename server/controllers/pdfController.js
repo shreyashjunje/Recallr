@@ -2,6 +2,8 @@ const PDF = require("../models/Pdf");
 const pdfParse = require("pdf-parse");
 const axios = require("axios");
 const User = require("../models/User");
+const cloudinary = require("cloudinary").v2;
+
 
 const uploadPdf = async (req, res) => {
   try {
@@ -67,6 +69,7 @@ const deletePdf = async (req, res) => {
 
   try {
     const user = await User.findById(userId);
+    const pdf = await PDF.findById(pdfId);
 
     if (!user.pdfs.includes(pdfId)) {
       return res
@@ -76,9 +79,17 @@ const deletePdf = async (req, res) => {
 
     //delete pdf
     const deletedPDF = await PDF.findByIdAndDelete(pdfId);
-    if (deletedPDF) {
-      return res.status(400).json({ message: "PDF not found" });
+    if (!deletedPDF) {
+      return res.status(404).json({ message: "PDF not found" });
     }
+
+    
+      if (pdf && pdf.cloudinaryPublicId) {
+        await cloudinary.uploader.destroy(pdf.cloudinaryId, {
+          resource_type: "raw",
+        });
+      }
+    
 
     user.pdfs.pull(pdfId);
     await user.save();
@@ -134,9 +145,8 @@ const getPdfDetail = async (req, res) => {
   // const pdfId = req.params.id;
   // const userId = req.user._id;
 
-  const pdfId='6895109468d925e56de481b3'
-  const userId='6891d415c8cd6309b50acd01'
-  
+  const pdfId = "6895109468d925e56de481b3";
+  const userId = "6891d415c8cd6309b50acd01";
 
   try {
     const pdf = await PDF.findById(pdfId);
@@ -159,7 +169,7 @@ const getPdfDetail = async (req, res) => {
 
 const getAllPdfs = async (req, res) => {
   // const userId = req.user._id;
-  const userId="6891d415c8cd6309b50acd01"
+  const userId = "6891d415c8cd6309b50acd01";
 
   if (!userId) {
     return res.status(400).json({ message: "userId not found" });
@@ -171,11 +181,10 @@ const getAllPdfs = async (req, res) => {
     res
       .status(200)
       .json({ message: "Pdfs fetched successfully", pdfs: userpdfs });
-
   } catch (err) {
     console.log("Error: ", err);
     res.status(500).json({ message: "server error" });
   }
 };
 
-module.exports = { uploadPdf, deletePdf, editPdf, getPdfDetail ,getAllPdfs};
+module.exports = { uploadPdf, deletePdf, editPdf, getPdfDetail, getAllPdfs };
