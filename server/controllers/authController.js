@@ -41,9 +41,18 @@ const registerUser = async (req, res) => {
 
     await newUser.save();
 
-    const token = jwt.sign({ id: newUser._id }, process.env.JWT_SECRET, {
-      expiresIn: "7d",
-    });
+    const token = jwt.sign(
+      {
+        id: newUser._id,
+        userName: newUser.userName,
+        email: newUser.email,
+        phoneNumber: newUser.phoneNumber,
+      },
+      process.env.JWT_SECRET,
+      {
+        expiresIn: "7d",
+      }
+    );
 
     res.status(201).json({
       message: "User registered successfully",
@@ -88,7 +97,12 @@ const loginUser = async (req, res) => {
 
     // Create token
     const token = jwt.sign(
-      { id: user._id }, // Payload: minimal info
+      {
+        id: user._id,
+        userName: user.userName,
+        email: user.email,
+        phoneNumber: user.phoneNumber, // Include phone number in the token
+      }, // Payload: minimal info
       process.env.JWT_SECRET, // Secret key (you'll store in .env)
       { expiresIn: "7d" } // Token expiry
     );
@@ -99,15 +113,13 @@ const loginUser = async (req, res) => {
   } catch (err) {}
 };
 
-const logoutUser =async (req,res) => {
-  try{
-      res.status(200).json({ message: "Logged out successfully" });
-    
-
-  }catch(err){
-    console.log("Error:",err);
-    return res.status(500).json({message:"Server error"})
+const logoutUser = async (req, res) => {
+  try {
+    res.status(200).json({ message: "Logged out successfully" });
+  } catch (err) {
+    console.log("Error:", err);
+    return res.status(500).json({ message: "Server error" });
   }
-}
+};
 
-module.exports = { registerUser, loginUser,logoutUser };
+module.exports = { registerUser, loginUser, logoutUser };

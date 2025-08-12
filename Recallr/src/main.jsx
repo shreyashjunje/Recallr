@@ -5,10 +5,14 @@ import App from "./App.jsx";
 import { BrowserRouter } from "react-router-dom";
 import "react-toastify/dist/ReactToastify.css";
 import { ToastContainer } from "react-toastify";
+import { AuthProvider } from "./context/AuthContext";
 
 createRoot(document.getElementById("root")).render(
   <BrowserRouter>
+    <AuthProvider>
+
     <App />
+    </AuthProvider>
     <ToastContainer
       position="top-right"
       toastClassName="custom-toast"

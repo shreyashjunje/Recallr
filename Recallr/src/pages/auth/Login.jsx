@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { Eye, EyeOff } from "lucide-react";
-import loginIMG from "../../assets/auth/loginIMG.png";
+// import loginIMG from "../../assets/auth/loginIMG.png";/
 import LoginAnimation from "../../components/auth/LoginAnimation";
 import axios from "axios";
 import { useNavigate } from "react-router";
@@ -41,7 +41,7 @@ export default function LoginPage() {
     // if (!loginId && !password) {
     //   toast.error("Please enter both LoginId and password.");
     //   return;
-      
+
     // }
     const errors = {};
     if (!loginId) errors.loginId = "Login ID is required";
@@ -58,7 +58,7 @@ export default function LoginPage() {
 
       console.log(res.data);
 
-      if (res.status == 200) {
+      if (res.status === 200) {
         localStorage.setItem("token", res.data.token);
         toast.success("User login successfully..!");
         navigate("/dashboard");
@@ -74,6 +74,21 @@ export default function LoginPage() {
       // toast.error(err.message);
     } finally {
       setLoading(false);
+    }
+  };
+
+  const googleLoginHandler = async () => {
+    const token = localStorage.getItem("token");
+
+    if (token) {
+      console.log("inbackendcall....");
+      toast.success("Successfully logged in!");
+      setSuccess(true);
+      setTimeout(() => {
+        navigate("/dashboard");
+      }, 1000); // 1 second
+    } else {
+      window.location.href = `${import.meta.env.VITE_API_URL}/auth/google`;
     }
   };
 
@@ -104,7 +119,11 @@ export default function LoginPage() {
                     autoComplete="loginId"
                     onChange={(e) => setloginId(e.target.value)}
                     className={`w-full px-4 py-2 sm:py-3 border rounded-lg focus:ring-2 outline-none transition-colors 
-                    ${formErrors.loginId ? 'border-red-500 focus:ring-red-500' : 'border-gray-300 focus:ring-blue-500'}`}
+                    ${
+                      formErrors.loginId
+                        ? "border-red-500 focus:ring-red-500"
+                        : "border-gray-300 focus:ring-blue-500"
+                    }`}
                     placeholder="email/phone/username"
                   />
                   {formErrors.loginId && (
@@ -127,7 +146,11 @@ export default function LoginPage() {
                       onChange={(e) => setPassword(e.target.value)}
                       placeholder="Enter your password"
                       className={`w-full px-4 py-2 sm:py-3 border rounded-lg focus:ring-2 outline-none transition-colors pr-12
-                      ${formErrors.password ? 'border-red-500 focus:ring-red-500' : 'border-gray-300 focus:ring-blue-500'}`}
+                      ${
+                        formErrors.password
+                          ? "border-red-500 focus:ring-red-500"
+                          : "border-gray-300 focus:ring-blue-500"
+                      }`}
                     />
                     <button
                       type="button"
@@ -210,7 +233,10 @@ export default function LoginPage() {
                       />
                     </svg>
                   </button>
-                  <button className="flex-1 border border-gray-300 rounded-lg py-2 sm:py-3 px-4 hover:bg-gray-50 transition-colors flex items-center justify-center">
+                  <button
+                    onClick={googleLoginHandler}
+                    className="flex-1 border border-gray-300 rounded-lg py-2 sm:py-3 px-4 hover:bg-gray-50 transition-colors flex items-center justify-center"
+                  >
                     <svg className="w-5 h-5" viewBox="0 0 24 24">
                       <path
                         fill="#4285F4"

@@ -1,10 +1,14 @@
 const express = require("express");
 const app = express();
 const connectDb = require("./config/db");
+const passport = require("passport");
+const session = require("express-session");
 const authRoutes = require("./routes/authRoutes");
 const pdfRoutes = require("./routes/pdfRoutes");
 const userRoutes = require("./routes/userRoute");
 require("dotenv").config();
+require("./config/passport");
+
 let cors = require("cors");
 
 
@@ -21,6 +25,11 @@ app.use(
 
 app.use(express.json());
 
+// Session (required for Passport)
+app.use(session({ secret: "yoursecret", resave: false, saveUninitialized: false }));
+app.use(passport.initialize());
+app.use(passport.session());
+
 app.use("/api/auth", authRoutes);
 app.use("/api/pdf", pdfRoutes);
 app.use("/api/user", userRoutes)
@@ -29,7 +38,7 @@ app.get("/", (req, res) => {
   res.send("Hello, World!");
 });
 
-const PORT = process.env.PORT || 5000;
+const PORT = process.env.PORT;
 
 app.listen(PORT, () => {
   console.log(`Server is running on port ${PORT}`);

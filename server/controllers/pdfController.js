@@ -168,8 +168,10 @@ const getPdfDetail = async (req, res) => {
 };
 
 const getAllPdfs = async (req, res) => {
-  // const userId = req.user._id;
-  const userId = "6891d415c8cd6309b50acd01";
+  console.log("inthe getAllPdfs function");
+    const userId = req.query.userId; // 🔹 grab from query
+  console.log("User ID:", userId);
+  // const userId = "6891d415c8cd6309b50acd01";
 
   if (!userId) {
     return res.status(400).json({ message: "userId not found" });
