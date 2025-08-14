@@ -34,6 +34,8 @@ import { AuthContext } from "@/context/AuthContext";
 import { jwtDecode } from "jwt-decode";
 import axios from "axios";
 import { useNavigate } from "react-router";
+import PDFUploadModal from "../components/modals/PdfUploadModal";
+import { toast } from "react-toastify";
 const API_URL = import.meta.env.VITE_API_URL;
 
 const MyLibrary = () => {
@@ -45,10 +47,12 @@ const MyLibrary = () => {
   const [showModal, setShowModal] = useState(false);
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
   const [pdfToDelete, setPdfToDelete] = useState(null);
-    const navigate = useNavigate();
+  const navigate = useNavigate();
   const { user } = useContext(AuthContext);
   const [PDFS, setPDFS] = useState([]);
   const [loading, setLoading] = useState(false);
+  const [isModalOpen, setIsModalOpen] = useState(false);
+
 
   // Color generator based on title hash
   const getColorFromTitle = (title) => {
@@ -194,7 +198,7 @@ const MyLibrary = () => {
 
   // Handle PDF actions
   const handlePdfAction = (action, pdf) => {
-    console.log("pdf::::::::::",pdf)
+    console.log("pdf::::::::::", pdf);
     switch (action) {
       case "view":
         navigate("/view", { state: { pdfUrl: pdf.cloudinaryUrl } });
@@ -206,6 +210,7 @@ const MyLibrary = () => {
       case "delete":
         setPdfToDelete(pdf);
         setShowDeleteConfirm(true);
+
         break;
       case "download":
         console.log("Download PDF:", pdf);
@@ -217,18 +222,34 @@ const MyLibrary = () => {
 
   // Confirm delete
   const confirmDelete = async () => {
+    if (!pdfToDelete) return;
+
+    const token = localStorage.getItem("token");
+    if (!token) {
+      toast.error("You are not logged in");
+      return;
+    }
+
+    const decodedToken = jwtDecode(token);
+    const userID = decodedToken.id;
+
+    // Optimistic update
+    const oldPDFs = [...PDFS];
+    setPDFS((prev) => prev.filter((p) => p._id !== pdfToDelete._id));
+    setShowDeleteConfirm(false);
+    setPdfToDelete(null);
+
     try {
-      const token = localStorage.getItem("token");
-      await axios.delete(`${API_URL}/pdf/${pdfToDelete._id}`, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
+      await axios.delete(`${API_URL}/pdf/delete-pdf`, {
+        headers: { Authorization: `Bearer ${token}` },
+        data: { userId: userID, pdfId: pdfToDelete._id },
       });
-      setPDFS(PDFS.filter((pdf) => pdf._id !== pdfToDelete._id));
-      setShowDeleteConfirm(false);
-      setPdfToDelete(null);
+
+      toast.success("PDF deleted successfully");
     } catch (error) {
       console.error("Error deleting PDF:", error);
+      setPDFS(oldPDFs); // rollback if deletion failed
+      toast.error("Failed to delete PDF");
     }
   };
 
@@ -250,7 +271,7 @@ const MyLibrary = () => {
             </div>
             <button
               className="flex items-center space-x-2 px-6 py-3 bg-gradient-to-r from-blue-600 to-blue-700 text-white rounded-xl font-medium hover:from-blue-700 hover:to-blue-800 transition-all duration-200 shadow-lg hover:shadow-blue-500/25 hover:scale-[1.02] active:scale-95"
-              onClick={() => setShowModal(true)}
+              onClick={() => setIsModalOpen(true)}
             >
               <Upload className="w-5 h-5" />
               <span>Upload New PDF</span>
@@ -479,8 +500,11 @@ const MyLibrary = () => {
                   <button
                     className="flex-1 flex items-center justify-center space-x-2 px-4 py-3 bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white rounded-xl font-medium transition-all duration-200 hover:shadow-lg hover:shadow-blue-500/25"
                     // onClick={() => handlePdfAction("view", pdf)}
-                            onClick={() => navigate("/view", { state: { pdfUrl:pdf.cloudinaryUrl } })}
-
+                    onClick={() =>
+                      navigate("/view", {
+                        state: { pdfUrl: pdf.cloudinaryUrl },
+                      })
+                    }
                   >
                     <Eye className="w-4 h-4" />
                     <span>Read</span>
@@ -796,6 +820,11 @@ const MyLibrary = () => {
           </div>
         </div>
       )}
+
+      <PDFUploadModal
+        isOpen={isModalOpen}
+        onClose={() => setIsModalOpen(false)}
+      />
     </div>
   );
 };

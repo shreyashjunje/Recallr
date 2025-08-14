@@ -61,15 +61,21 @@ const uploadPdf = async (req, res) => {
 };
 
 const deletePdf = async (req, res) => {
-  // const userId = req.user._id;
-  // const pdfId = req.params.id;
+  const userId = req.body.userId; // 🔹 grab from body
+  const pdfId = req.body.pdfId; // 🔹 grab from body
 
-  const userId = "6891d415c8cd6309b50acd01";
-  const pdfId = req.body.id;
+  console.log("User ID::::::", userId);
+  console.log("PDF ID:", pdfId);
+
+  if (!userId || !pdfId) {
+    return res.status(400).json({ message: "userId and pdfId are required" });
+  }
 
   try {
     const user = await User.findById(userId);
     const pdf = await PDF.findById(pdfId);
+    console.log("User:", user);
+    console.log("PDF:", pdf);
 
     if (!user.pdfs.includes(pdfId)) {
       return res
@@ -83,9 +89,11 @@ const deletePdf = async (req, res) => {
       return res.status(404).json({ message: "PDF not found" });
     }
 
+
+
     
       if (pdf && pdf.cloudinaryPublicId) {
-        await cloudinary.uploader.destroy(pdf.cloudinaryId, {
+        await cloudinary.uploader.destroy(pdf.cloudinaryPublicId, {
           resource_type: "raw",
         });
       }

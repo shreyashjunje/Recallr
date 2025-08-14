@@ -33,7 +33,19 @@ const userSchema = new mongoose.Schema(
         ref: "PDF",
       },
     ],
+
+    // Telegram fields
+    telegramChatId: { type: String, default: null },
+    telegramLinkToken: {
+      token: { type: String },
+      expiresAt: { type: Date },
+    },
+    // // Telegram integration fields
+    // telegramChatId: { type: String, default: null },
+    // telegramLinkToken: { type: String, default: null },
+    // telegramLinkedAt: { type: Date, default: null },
   },
+
   { timestamps: true }
 );
 

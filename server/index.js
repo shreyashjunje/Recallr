@@ -6,10 +6,12 @@ const session = require("express-session");
 const authRoutes = require("./routes/authRoutes");
 const pdfRoutes = require("./routes/pdfRoutes");
 const userRoutes = require("./routes/userRoute");
+const botRoutes = require("./routes/botRoutes");
 require("dotenv").config();
 require("./config/passport");
 
 let cors = require("cors");
+
 
 
 
@@ -33,6 +35,7 @@ app.use(passport.session());
 app.use("/api/auth", authRoutes);
 app.use("/api/pdf", pdfRoutes);
 app.use("/api/user", userRoutes)
+app.use("/api/bot", botRoutes);
 
 app.get("/", (req, res) => {
   res.send("Hello, World!");
