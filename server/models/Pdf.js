@@ -34,11 +34,12 @@ const pdfSchemas = new mongoose.Schema({
   summary: {
     type: String,
   },
-  quiz: [
+ quiz: [
     {
       question: String,
       options: [String],
       answer: String,
+      difficulty: { type: String, enum: ["easy", "medium", "hard"] },
     },
   ],
   uploadedAt: {
@@ -48,10 +49,10 @@ const pdfSchemas = new mongoose.Schema({
   textExtracted: {
     type: String,
   },
-  flashcards: [
+ flashcards: [
     {
-      front: String,
-      back: String,
+      question: String,
+      answer: String,
     },
   ],
   fileHash:{
@@ -111,6 +112,30 @@ const pdfSchemas = new mongoose.Schema({
       type: Date,
     },
   },
+
+  
+  // NEW: async pipeline status
+  status: { 
+    type: String, 
+    enum: ["UPLOADED", "PROCESSING", "READY", "FAILED"], 
+    default: "UPLOADED" 
+  },
+  processing: {
+    progress: { type: Number, default: 0 },   // 0..100
+    startedAt: { type: Date },
+    finishedAt: { type: Date },
+    error: { type: String },
+  },
+
+  // NEW: metadata for tracing
+  uploadedVia: { type: String, enum: ["web", "telegram"], default: "web" },
+  originalName: { type: String },
+  mimeType: { type: String },
 });
+
+
+pdfSchemas.index({ user: 1, fileHash: 1 }, { unique: true, sparse: true });
+pdfSchemas.index({ user: 1, createdAt: -1 });
+pdfSchemas.index({ user: 1, tags: 1 });
 
 module.exports=mongoose.model("PDF",pdfSchemas)

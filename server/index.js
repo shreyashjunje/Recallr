@@ -7,6 +7,7 @@ const authRoutes = require("./routes/authRoutes");
 const pdfRoutes = require("./routes/pdfRoutes");
 const userRoutes = require("./routes/userRoute");
 const botRoutes = require("./routes/botRoutes");
+const bot =require("./bot")
 require("dotenv").config();
 require("./config/passport");
 

@@ -1,50 +1,100 @@
+require("dotenv").config();
 const TelegramBot = require("node-telegram-bot-api");
-const mongoose = require("mongoose");
+// const axios = require("axios");
+// const FormData = require("form-data");
 const User = require("./models/User");
-const dotenv = require("dotenv");
+const axios = require("axios");
+const FormData = require("form-data");
 
-// Load env
-dotenv.config();
+const { TELEGRAM_BOT_TOKEN, API_BASE_URL, BOT_SHARED_SECRET } = process.env;
 
-const token = process.env.TELEGRAM_BOT_TOKEN;
-console.log("TELEGRAM_BOT_TOKEN:", token);
-if (!token) {
-  console.error("TELEGRAM_BOT_TOKEN is not set in .env file");
+const bot = new TelegramBot(TELEGRAM_BOT_TOKEN, { polling: true });
+
+console.log("Telegram Bot started...");
+
+// Document Handler
+bot.on("document", async (msg) => {
+  console.log("in the document handler");
+
+  const chatId = msg.chat.id;
+  const doc = msg.document;
+
+  console.log("Received document:", doc);
+  console.log("chatId:", chatId);
+
+  try {
+    console.log("in the try block");
+    // 1. Validate PDF
+    if (!doc.mime_type?.includes("pdf") && !doc.file_name?.endsWith(".pdf")) {
+      return bot.sendMessage(chatId, "❌ Please send a PDF file.");
+    }
+
+    console.log("1. PDF validated");
+
+    // 1) Resolve Telegram direct file URL
+    const file = await bot.getFile(doc.file_id); // has file_path
+    const fileUrl = `https://api.telegram.org/file/bot${process.env.TELEGRAM_BOT_TOKEN}/${file.file_path}`;
+
+    console.log("2. File URL resolved:", fileUrl);
+    console.log("file:", file);
+
+    // 2) Stream it to your backend as multipart/form-data
+
+    const fileResp = await axios.get(fileUrl, { responseType: "arraybuffer" });
+    // console.log("fileResp:", fileResp.data);
+
+    const fileBuffer = Buffer.from(fileResp.data);
+
+    console.log("3. File downloaded as buffer");
+
+    console.log("fileBuffer:", fileBuffer);
+    // console.log("telegrmamChatId:", chatId);
+    console.log("fileurl:", fileUrl);
+
+    const form = new FormData();
+    form.append("telegramChatId", String(chatId));
+    form.append("pdf", fileBuffer, {
+      filename: doc.file_name,
+      contentType: doc.mime_type,
+    });
+
+    // form.append("pdf", fileResp.data, {
+    //   filename: doc.file_name,
+    //   contentType: doc.mime_type,
+    // });
+    // console.log("chatId:", chatId);
+    // console.log("form:::", form);
+
+    // console.log("form::::::   ", form);
+    // console.log("form headers::::::   ", form.getHeaders());
+
+    const res=await axios.post(
+      `${process.env.API_BASE_URL}/api/bot/upload-telegram`,
+      form,
+      {
+        headers: {
+          ...form.getHeaders(),
+          "x-bot-secret": process.env.BOT_SHARED_SECRET,
+        },
+        maxBodyLength: Infinity,
+      }
+    );
+
+    if (res.status === 200) {
+  bot.sendMessage(
+    chatId,
+    "📚 *Your PDF has been uploaded and processed successfully!*\n\n" +
+    "You can now view the pdf info in the My library section. 🚀",
+    { parse_mode: "Markdown" }
+  );
 }
 
-// // Connect MongoDB
-// mongoose.connect(process.env.MONGO_URI)
-//   .then(() => console.log("MongoDB Connected"))
-//   .catch(err => console.log("Mongo Error:", err));
 
-// Create bot (polling mode)
-const bot = new TelegramBot(token, { polling: true });
+  } catch (error) {
+    // console.error("Bot error:", error);
 
-// Handle /start with optional token
-bot.onText(/\/start(?:\s+(.+))?/, async (msg, match) => {
-  const chatId = msg.chat.id;
-  const token = match[1]; // token from URL if exists
-
-  if (!token) {
-    return bot.sendMessage(chatId, "Hi! Please connect your account from the website first.");
+    bot.sendMessage(chatId, "❌ Processing failed. Please try again.");
   }
-
-  // Find user with matching token
-  const user = await User.findOne({
-    "telegramLinkToken.token": token,
-    "telegramLinkToken.expiresAt": { $gt: new Date() }
-  });
-
-  if (!user) {
-    return bot.sendMessage(chatId, "❌ Invalid or expired link. Please try again from the website.");
-  }
-
-  // Save chatId and remove token
-  user.telegramChatId = chatId;
-  user.telegramLinkToken = undefined;
-  await user.save();
-
-  bot.sendMessage(chatId, `✅ Your account is now linked! You can send PDFs anytime.`);
 });
 
 module.exports = bot;
