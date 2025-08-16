@@ -1,5 +1,7 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import logo from "../../assets/logoR.png";
+
 
 import {
   Home,
@@ -158,19 +160,20 @@ export default function Sidebar() {
 
       {/* Header */}
       <div className="p-6 relative z-10">
-        <div className="flex items-center space-x-4">
+        <div className="flex items-center space-x-1 ">
           <div className="relative">
-            <div className="w-12 h-12 bg-gradient-to-r from-blue-600 to-purple-600 rounded-2xl flex items-center justify-center shadow-lg">
-              <BookOpen className="w-7 h-7 text-white" />
+            <div className="w-14 h-12 pb-4  rounded-2xl flex items-center justify-center shadow-lg">
+              {/* <BookOpen className="w-7 h-7 text-white" /> */}
+              <img src={logo} alt="" />
             </div>
-            <div className="absolute -top-1 -right-1 w-4 h-4 bg-gradient-to-r from-green-400 to-emerald-500 rounded-full animate-pulse"></div>
+            {/* <div className="absolute -top-1 -right-1 w-4 h-4 bg-gradient-to-r from-green-400 to-emerald-500 rounded-full animate-pulse"></div> */}
           </div>
-          <div>
+          <div className="">
             <h1 className="font-bold text-xl text-gray-900 bg-gradient-to-r from-gray-900 to-gray-700 bg-clip-text">
-              AI-Powered
+              Recallr
             </h1>
             <div className="flex items-center space-x-2">
-              <p className="text-sm text-gray-600">Learning</p>
+              <p className="text-sm text-gray-600">Don’t store. Recall</p>
               <div className="flex space-x-0.5">
                 <div className="w-1 h-1 bg-gradient-to-r from-yellow-400 to-orange-500 rounded-full animate-pulse"></div>
                 <div className="w-1 h-1 bg-gradient-to-r from-pink-400 to-rose-500 rounded-full animate-pulse delay-100"></div>

@@ -36,6 +36,8 @@ import axios from "axios";
 import { useNavigate } from "react-router";
 import PDFUploadModal from "../components/modals/PdfUploadModal";
 import { toast } from "react-toastify";
+import PdfReaderModal from "../components/helper/PdfReaderModal";
+import PdfReader from "../components/helper/PdfReaderModal";
 const API_URL = import.meta.env.VITE_API_URL;
 
 const MyLibrary = () => {
@@ -53,6 +55,22 @@ const MyLibrary = () => {
   const [loading, setLoading] = useState(false);
   const [isModalOpen, setIsModalOpen] = useState(false);
 
+  const [title, setTitle] = useState("");
+  const [category, setCategory] = useState("");
+  const [tags, setTags] = useState("");
+
+  // When opening modal, preload values from selectedPdf
+  useEffect(() => {
+    if (selectedPdf) {
+      setTitle(selectedPdf.title || "");
+      setCategory(selectedPdf.category || "");
+      setTags(selectedPdf.tags?.join(", ") || "");
+    } else {
+      setTitle("");
+      setCategory("");
+      setTags("");
+    }
+  }, [selectedPdf]);
 
   // Color generator based on title hash
   const getColorFromTitle = (title) => {
@@ -213,7 +231,9 @@ const MyLibrary = () => {
 
         break;
       case "download":
-        console.log("Download PDF:", pdf);
+        // console.log("Download PDF:", pdf);
+        setSelectedPdf(pdf);
+
         break;
       default:
         break;
@@ -250,6 +270,79 @@ const MyLibrary = () => {
       console.error("Error deleting PDF:", error);
       setPDFS(oldPDFs); // rollback if deletion failed
       toast.error("Failed to delete PDF");
+    }
+  };
+
+  const handleRead = async (pdf) => {
+    const pdfUrl = pdf.cloudinaryUrl; // Use cloudinaryUrl or direct URL
+    try {
+      const response = await fetch(pdfUrl);
+      const blob = await response.blob();
+      const reader = new FileReader();
+      reader.onload = function () {
+        window.open(reader.result, "_blank"); // data URL
+      };
+      reader.readAsDataURL(blob);
+    } catch (err) {
+      console.error("Failed to open PDF:", err);
+    }
+  };
+  // Edit handler
+  const editHandler = async (pdfData) => {
+    if (!selectedPdf) return;
+
+    const token = localStorage.getItem("token");
+    if (!token) {
+      toast.error("You are not logged in");
+      return;
+    }
+
+    const decodedToken = jwtDecode(token);
+    const userID = decodedToken.id;
+
+    console.log("selectedpdfF", selectedPdf);
+    console.log("userID", userID);
+
+    try {
+      const pdfData = {
+        title,
+        category,
+        tags: tags.split(",").map((t) => t.trim()),
+      };
+
+      const res = await axios.patch(
+        `${API_URL}/pdf/edit-pdf`,
+        { userId: userID, pdfId: selectedPdf._id, ...pdfData },
+        { headers: { Authorization: `Bearer ${token}` } }
+      );
+
+      if (res.status === 200) {
+        toast.success("PDF details updated successfully");
+      }
+
+      setShowModal(false);
+      setSelectedPdf(null);
+      fetchPdfs(); // refresh list
+    } catch (error) {
+      console.error("Error updating PDF:", error);
+      toast.error("Failed to update PDF details");
+    }
+  };
+
+  const handledownload = async (pdfUrl) => {
+    try {
+      const response = await fetch(pdfUrl);
+      const blob = await response.blob();
+      const url = window.URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = "myfile.pdf"; // You can also dynamically name the file here
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+      window.URL.revokeObjectURL(url);
+    } catch (err) {
+      console.error("Download failed:", err);
     }
   };
 
@@ -410,7 +503,15 @@ const MyLibrary = () => {
                           </button>
                           <button
                             className="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 w-full text-left"
-                            onClick={() => handlePdfAction("download", pdf)}
+                            // onClick={() => handlePdfAction("download", pdf)
+                            //    handledownload(pdf) // Uncomment if you want to use the download function
+                            // }
+                            // // onClick={handledownload(pdf)}
+
+                            onClick={() => {
+                              handledownload(pdf.cloudinaryUrl);
+                              // setSelectedPdf(pdf);
+                            }}
                           >
                             <Download className="w-4 h-4 mr-2" />
                             Download
@@ -500,18 +601,26 @@ const MyLibrary = () => {
                   <button
                     className="flex-1 flex items-center justify-center space-x-2 px-4 py-3 bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white rounded-xl font-medium transition-all duration-200 hover:shadow-lg hover:shadow-blue-500/25"
                     // onClick={() => handlePdfAction("view", pdf)}
-                    onClick={() =>
-                      navigate("/view", {
-                        state: { pdfUrl: pdf.cloudinaryUrl },
-                      })
-                    }
+                    onClick={() => handleRead(pdf)}
                   >
                     <Eye className="w-4 h-4" />
                     <span>Read</span>
                   </button>
+                  {/* <button
+                    className="p-3 bg-gray-100 hover:bg-gray-200 text-gray-600 rounded-xl transition-all duration-200 hover:scale-105"
+                    // onClick={() => handlePdfAction("download", pdf)}
+                    onClick={() => {
+                      handledownload(pdf);
+                      // setSelectedPdf(pdf);
+                    }}
+                  >
+                    <Download className="w-4 h-4" />
+                  </button> */}
                   <button
                     className="p-3 bg-gray-100 hover:bg-gray-200 text-gray-600 rounded-xl transition-all duration-200 hover:scale-105"
-                    onClick={() => handlePdfAction("download", pdf)}
+                    onClick={() => {
+                      handledownload(pdf.cloudinaryUrl);
+                    }}
                   >
                     <Download className="w-4 h-4" />
                   </button>
@@ -590,9 +699,7 @@ const MyLibrary = () => {
 
                       <button
                         className="flex items-center space-x-1 px-3 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg text-sm font-medium transition-colors"
-                        onClick={() =>
-                          handlePdfAction("view", pdf.cloudinaryUrl)
-                        }
+                        onClick={() => handleRead(pdf)}
                       >
                         <Eye className="w-4 h-4" />
                         <span>Read</span>
@@ -716,7 +823,8 @@ const MyLibrary = () => {
                   </label>
                   <input
                     type="text"
-                    defaultValue={selectedPdf?.title || ""}
+                    value={title}
+                    onChange={(e) => setTitle(e.target.value)}
                     className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                   />
                 </div>
@@ -726,7 +834,8 @@ const MyLibrary = () => {
                     Category
                   </label>
                   <select
-                    defaultValue={selectedPdf?.category || ""}
+                    value={category}
+                    onChange={(e) => setCategory(e.target.value)}
                     className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                   >
                     <option value="">Select category</option>
@@ -746,25 +855,11 @@ const MyLibrary = () => {
                   </label>
                   <input
                     type="text"
-                    defaultValue={selectedPdf?.tags?.join(", ") || ""}
+                    value={tags}
+                    onChange={(e) => setTags(e.target.value)}
                     className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                   />
                 </div>
-
-                {!selectedPdf && (
-                  <div className="border-2 border-dashed border-gray-300 rounded-lg p-6 text-center">
-                    <Upload className="w-10 h-10 text-gray-400 mx-auto mb-3" />
-                    <p className="text-sm text-gray-600 mb-3">
-                      Drag & drop your PDF here or click to browse
-                    </p>
-                    <button
-                      type="button"
-                      className="px-4 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200"
-                    >
-                      Select File
-                    </button>
-                  </div>
-                )}
               </div>
 
               <div className="flex justify-end space-x-3 mt-6">
@@ -777,7 +872,10 @@ const MyLibrary = () => {
                 >
                   Cancel
                 </button>
-                <button className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700">
+                <button
+                  onClick={editHandler}
+                  className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
+                >
                   {selectedPdf ? "Save Changes" : "Upload"}
                 </button>
               </div>
@@ -820,6 +918,16 @@ const MyLibrary = () => {
           </div>
         </div>
       )}
+
+      {/* PDF Reader Modal */}
+      {/* {selectedPdf && (
+        <PdfReaderModal
+          pdfUrl={selectedPdf}
+          onClose={() => setSelectedPdf(null)}
+        />
+      )} */}
+
+      {selectedPdf && <PdfReader pdfUrl={selectedPdf} />}
 
       <PDFUploadModal
         isOpen={isModalOpen}

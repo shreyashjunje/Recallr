@@ -60,6 +60,9 @@ const pdfSchemas = new mongoose.Schema({
     
    
   },
+  filename:{
+    type:String,
+  },
 
   isFlashcardGenerated: {
     type: Boolean,

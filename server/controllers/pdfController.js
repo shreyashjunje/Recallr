@@ -4,10 +4,10 @@ const axios = require("axios");
 const User = require("../models/User");
 const cloudinary = require("cloudinary").v2;
 
-
 const uploadPdf = async (req, res) => {
   try {
     const file = req.file;
+    console.log("File received:", file);
     if (!file) {
       return res.status(400).json({ message: "No file uploaded" });
     }
@@ -41,6 +41,7 @@ const uploadPdf = async (req, res) => {
       title,
       category,
       tags: normalizedTags,
+      filename: file.originalname, // Store original filename
       cloudinaryUrl: file.path, // uploaded file URL
       cloudinaryPublicId: file.filename, // public_id in Cloudinary
       uploadedAt: Date.now(),
@@ -89,15 +90,11 @@ const deletePdf = async (req, res) => {
       return res.status(404).json({ message: "PDF not found" });
     }
 
-
-
-    
-      if (pdf && pdf.cloudinaryPublicId) {
-        await cloudinary.uploader.destroy(pdf.cloudinaryPublicId, {
-          resource_type: "raw",
-        });
-      }
-    
+    if (pdf && pdf.cloudinaryPublicId) {
+      await cloudinary.uploader.destroy(pdf.cloudinaryPublicId, {
+        resource_type: "raw",
+      });
+    }
 
     user.pdfs.pull(pdfId);
     await user.save();
@@ -110,13 +107,17 @@ const deletePdf = async (req, res) => {
 };
 
 const editPdf = async (req, res) => {
-  // const pdfId = req.params.id;
-  // const userId = req.user._id;
+  const userId = req.body.userId; // 🔹 grab from body
+  const pdfId = req.body.pdfId; // 🔹 grab from body
+  console.log("selectedpdfF", req.body);
 
-  const pdfId = "6894b9fe70361535e7601039";
-  const userId = "6891d415c8cd6309b50acd01";
+  console.log("User ID-->::::::", userId);
+  console.log("PDF ID-->:", pdfId);
 
-  const { title, category, tags } = req.body;
+  if (!userId || !pdfId) {
+    return res.status(400).json({ message: "userId and pdfId are required" });
+  }
+  const { title, category, tags } = req.body; // 🔹 grab from body
 
   try {
     const user = await User.findById(userId);
@@ -177,7 +178,7 @@ const getPdfDetail = async (req, res) => {
 
 const getAllPdfs = async (req, res) => {
   console.log("inthe getAllPdfs function");
-    const userId = req.query.userId; // 🔹 grab from query
+  const userId = req.query.userId; // 🔹 grab from query
   console.log("User ID:", userId);
   // const userId = "6891d415c8cd6309b50acd01";
 
@@ -197,4 +198,53 @@ const getAllPdfs = async (req, res) => {
   }
 };
 
-module.exports = { uploadPdf, deletePdf, editPdf, getPdfDetail, getAllPdfs };
+const downloadPdf = async (req, res) => {
+  try {
+    const { cloudinaryUrl, filename } = req.body;
+
+    console.log("Cloudinary URL:", cloudinaryUrl);
+    console.log("Filename:", filename);
+
+    if (!cloudinaryUrl) {
+      return res.status(400).json({ error: "Cloudinary URL is required" });
+    }
+
+    // ensure it ends with .pdf (Cloudinary sometimes skips extension in raw URLs)
+    const pdfUrl = cloudinaryUrl.endsWith(".pdf")
+      ? cloudinaryUrl
+      : cloudinaryUrl + ".pdf";
+
+    console.log("1");
+
+    // fetch from cloudinary
+    const response = await axios({
+      method: "get",
+      url: pdfUrl,
+      responseType: "stream",
+    });
+    console.log("2");
+    // set headers to force download
+    res.setHeader(
+      "Content-Disposition",
+      `attachment; filename=${filename || "document.pdf"}`
+    );
+    console.log("3");
+    res.setHeader("Content-Type", "application/pdf");
+
+    console.log("4");
+
+    res.send(response.data);
+  } catch (error) {
+    console.error("Error downloading PDF:", error.message);
+    res.status(500).json({ error: "Failed to download PDF" });
+  }
+};
+
+module.exports = {
+  uploadPdf,
+  deletePdf,
+  editPdf,
+  getPdfDetail,
+  getAllPdfs,
+  downloadPdf,
+};

@@ -127,6 +127,8 @@ const PDFUploadForm = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    console.log("Submitting PDF upload...");
+    // alert("Submitting PDF upload...");
 
     if (!selectedFile) {
       toast.error("Please select a file to upload");
@@ -146,16 +148,11 @@ const PDFUploadForm = () => {
 
     try {
       // Using fetch instead of axios
-      const response = await fetch(`${API_URL}/pdf/upload-pdf`, {
-        method: "POST",
-        body: formData,
+      const response = await axios.post(`${API_URL}/pdf/upload-pdf`, formData, {
+        headers: { "Content-Type": "multipart/form-data" },
       });
 
-      if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`);
-      }
-
-      const result = await response.json();
+      const result = response.data;
       console.log("Upload response:", result);
       toast.success("File uploaded successfully!");
 
@@ -246,7 +243,7 @@ const PDFUploadForm = () => {
               </h2>
             </div>
 
-            <div onSubmit={handleSubmit}>
+            <form onSubmit={handleSubmit}>
               {/* Title Input */}
               <div className="mb-6">
                 <label className="block text-sm font-medium text-gray-700 mb-2">
@@ -429,7 +426,7 @@ const PDFUploadForm = () => {
               >
                 Upload PDF
               </button>
-            </div>
+            </form>
           </div>
 
           {/* Telegram Bot Section */}
