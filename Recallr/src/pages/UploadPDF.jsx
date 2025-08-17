@@ -130,6 +130,14 @@ const PDFUploadForm = () => {
     console.log("Submitting PDF upload...");
     // alert("Submitting PDF upload...");
 
+    const token = localStorage.getItem("token");
+    if (!token) return;
+
+    const decodedToken = jwtDecode(token);
+    const userID = decodedToken.id;
+
+
+
     if (!selectedFile) {
       toast.error("Please select a file to upload");
       return;
@@ -145,6 +153,8 @@ const PDFUploadForm = () => {
     formData.append("title", title);
     formData.append("category", selectedCategory);
     formData.append("tags", tags.join(","));
+    formData.append("userID", userID); // add userID in body
+
 
     try {
       // Using fetch instead of axios

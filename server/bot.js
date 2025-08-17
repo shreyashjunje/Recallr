@@ -5,12 +5,28 @@ const TelegramBot = require("node-telegram-bot-api");
 const User = require("./models/User");
 const axios = require("axios");
 const FormData = require("form-data");
+// const { linkTelegramAccount } = require("./controllers/botController");
+// const  linkTelegramAccount  = require("./controllers/botController");
+
+const controller = require("./controllers/botController");
+console.log("controller exports:", controller);
 
 const { TELEGRAM_BOT_TOKEN, API_BASE_URL, BOT_SHARED_SECRET } = process.env;
 
 const bot = new TelegramBot(TELEGRAM_BOT_TOKEN, { polling: true });
 
 console.log("Telegram Bot started...");
+
+bot.onText(/\/start (.+)/, async (msg, match) => {
+  const chatId = msg.chat.id;
+  const token = match[1]; // The token passed after /start
+
+  console.log("Link attempt with token:", token, "from chatId:", chatId);
+
+  const result = await controller.linkTelegramAccount(chatId, token);
+  console.log("Link result:", result);
+  bot.sendMessage(chatId, result.message);
+});
 
 // Document Handler
 bot.on("document", async (msg) => {
@@ -68,7 +84,8 @@ bot.on("document", async (msg) => {
     // console.log("form::::::   ", form);
     // console.log("form headers::::::   ", form.getHeaders());
 
-    const res=await axios.post(
+    console.log("4. Sending file to backend...");
+    const res = await axios.post(
       `${process.env.API_BASE_URL}/api/bot/upload-telegram`,
       form,
       {
@@ -80,16 +97,16 @@ bot.on("document", async (msg) => {
       }
     );
 
+    // console.log("4. File sent to backend:", res.data);
+
     if (res.status === 200) {
-  bot.sendMessage(
-    chatId,
-    "📚 *Your PDF has been uploaded and processed successfully!*\n\n" +
-    "You can now view the pdf info in the My library section. 🚀",
-    { parse_mode: "Markdown" }
-  );
-}
-
-
+      bot.sendMessage(
+        chatId,
+        "📚 *Your PDF has been uploaded and processed successfully!*\n\n" +
+          "You can now view the pdf info in the My library section. 🚀",
+        { parse_mode: "Markdown" }
+      );
+    }
   } catch (error) {
     // console.error("Bot error:", error);
 

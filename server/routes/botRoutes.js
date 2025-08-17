@@ -10,6 +10,7 @@ const { uploadTelegram } = require("../middlewares/upload");
 const router = express.Router();
 
 router.post("/link", authMiddleware, generateTelegramLink);
+
 router.post("/upload-telegram", uploadTelegram.single('pdf'),uploadTelegramPDF);
 
 

@@ -11,7 +11,7 @@ import { Upload } from "lucide-react";
 import UploadPDF from "./pages/UploadPDF";
 import Layout from "./components/layouts/Layout";
 import MyLibrary from "./pages/MyLibrary";
-import PDFViewer from "./pages/ViewPdf";
+import PDFViewer from "./components/helper/PdfViewer";
 import {
   ComingSoon,
   InDevelopment,

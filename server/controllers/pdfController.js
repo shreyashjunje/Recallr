@@ -5,6 +5,9 @@ const User = require("../models/User");
 const cloudinary = require("cloudinary").v2;
 
 const uploadPdf = async (req, res) => {
+    // const userId = req.body; // 🔹 grab from body
+    // console.log("User ID--->:", userId);
+
   try {
     const file = req.file;
     console.log("File received:", file);
@@ -13,6 +16,8 @@ const uploadPdf = async (req, res) => {
     }
 
     const { title, category, tags } = req.body;
+    const userId = req.body.userID; // 🔹 grab from body
+    console.log("userId======:", userId);
     if (!title || !category || !tags) {
       return res
         .status(400)
@@ -34,7 +39,17 @@ const uploadPdf = async (req, res) => {
     // // ✅ Parse the PDF to count pages
     // const data = await pdfParse(buffer);
     // const pages = data.numpages;
-    const userId = "6891d415c8cd6309b50acd01"; // Replace with your MongoDB user _id
+    // const userId = "6891d415c8cd6309b50acd01"; // Replace with your MongoDB user _id
+
+
+     // ✅ generate public delivery URL for PDF
+    const pdfUrl = cloudinary.url(file.filename, {
+      resource_type: "raw",
+      format: "pdf",
+    });
+
+    console.log("PDF URL//////////:", pdfUrl);
+    console.log
 
     const newPdf = new PDF({
       user: userId,
@@ -42,8 +57,8 @@ const uploadPdf = async (req, res) => {
       category,
       tags: normalizedTags,
       filename: file.originalname, // Store original filename
-      cloudinaryUrl: file.path, // uploaded file URL
-      cloudinaryPublicId: file.filename, // public_id in Cloudinary
+      cloudinaryUrl: pdfUrl, // uploaded file URL
+      cloudinaryPublicId:file.filename , // public_id in Cloudinary
       uploadedAt: Date.now(),
     });
 

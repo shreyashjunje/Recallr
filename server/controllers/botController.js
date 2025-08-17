@@ -21,7 +21,7 @@ const generateTelegramLink = async (req, res) => {
   try {
     console.log("reached the backedn controller...");
     const userId = req.user.id; // Assuming you have auth middleware
-    // console.log("userId:", userId);
+    console.log("userId:", userId);
 
     // Create token
     const token = crypto.randomBytes(16).toString("hex");
@@ -52,9 +52,10 @@ const generateTelegramLink = async (req, res) => {
 };
 
 // Called from bot when /start <token> is used
-const linkTelegramAccount = async (chatId, token) => {
+exports.linkTelegramAccount = async (chatId, token) => {
   try {
-    const user = await User.findOne({ telegramLinkToken: token });
+    console.log("token received:", token, "from chatId:", chatId);
+    const user = await User.findOne({ "telegramLinkToken.token": token });
     if (!user) {
       return { success: false, message: "Invalid or expired token." };
     }
@@ -72,17 +73,19 @@ const linkTelegramAccount = async (chatId, token) => {
   }
 };
 
-
 const uploadTelegramPDF = async (req, res) => {
   console.log("Uploading PDF from Telegram...");
 
   try {
+    console.log("in the try block of uploadTelegramPDF");
     const telegramChatId = req.body.telegramChatId;
     if (!telegramChatId) {
       return res.status(400).json({ error: "telegramChatId is required" });
     }
+    console.log("telegramChatId:", telegramChatId);
 
     const userFound = await User.findOne({ telegramChatId });
+    console.log("userFound:", userFound);
     if (!userFound) {
       return res.status(404).json({ error: "User not found" });
     }
@@ -90,8 +93,12 @@ const uploadTelegramPDF = async (req, res) => {
     if (!req.file) {
       return res.status(400).json({ error: "No file uploaded" });
     }
+    console.log("req.file::::::::", req.file);
 
-    console.log(`Receiving file: ${req.file.originalname}`);
+    console.log(`Receiving file:----> ${req.file.originalname}`);
+
+    console.log("1. PDF validated");
+
     const buffer = req.file.buffer;
 
     // Cloudinary upload as promise
@@ -100,6 +107,7 @@ const uploadTelegramPDF = async (req, res) => {
         {
           resource_type: "raw",
           folder: "recallr",
+          access_mode: "public",
           public_id: `pdf_${Date.now()}_${telegramChatId}`,
         },
         (err, result) => (err ? reject(err) : resolve(result))
@@ -127,9 +135,17 @@ const uploadTelegramPDF = async (req, res) => {
 
     console.log("AI processing results:", aiResults);
 
+    // Generate hash from file buffer
+    const fileBuffer = req.file.buffer; // assuming Multer memoryStorage
+    const fileHash = crypto
+      .createHash("sha256")
+      .update(fileBuffer)
+      .digest("hex");
+
     // Save DB entry
     const pdf = await PDF.create({
       user: userFound._id,
+      fileHash,
       cloudinaryUrl: cloudResult.secure_url,
       cloudinaryPublicId: cloudResult.public_id,
       originalName: req.file.originalname,
@@ -161,6 +177,5 @@ const uploadTelegramPDF = async (req, res) => {
 
 module.exports = {
   generateTelegramLink,
-  linkTelegramAccount,
   uploadTelegramPDF,
 };

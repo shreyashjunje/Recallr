@@ -36,8 +36,10 @@ import axios from "axios";
 import { useNavigate } from "react-router";
 import PDFUploadModal from "../components/modals/PdfUploadModal";
 import { toast } from "react-toastify";
-import PdfReaderModal from "../components/helper/PdfReaderModal";
-import PdfReader from "../components/helper/PdfReaderModal";
+// import PdfReaderModal from "../components/helper/PdfReaderModal";
+import PdfReader from "../components/helper/PdfViewer";
+import PdfViewer from "../components/helper/PdfViewer";
+// import PDFViewer from "./ViewPdf";
 const API_URL = import.meta.env.VITE_API_URL;
 
 const MyLibrary = () => {
@@ -54,6 +56,7 @@ const MyLibrary = () => {
   const [PDFS, setPDFS] = useState([]);
   const [loading, setLoading] = useState(false);
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [showViewer, setShowViewer] = useState(null);
 
   const [title, setTitle] = useState("");
   const [category, setCategory] = useState("");
@@ -274,18 +277,10 @@ const MyLibrary = () => {
   };
 
   const handleRead = async (pdf) => {
-    const pdfUrl = pdf.cloudinaryUrl; // Use cloudinaryUrl or direct URL
-    try {
-      const response = await fetch(pdfUrl);
-      const blob = await response.blob();
-      const reader = new FileReader();
-      reader.onload = function () {
-        window.open(reader.result, "_blank"); // data URL
-      };
-      reader.readAsDataURL(blob);
-    } catch (err) {
-      console.error("Failed to open PDF:", err);
-    }
+  //  console.log("Reading PDF url:", pdf.cloudinaryUrl);
+  //  setShowViewer(pdf.cloudinaryUrl)
+  //  console.log("Show viewer set to:", showViewer);
+    navigate("/view", { state: { url: pdf.cloudinaryUrl } });
   };
   // Edit handler
   const editHandler = async (pdfData) => {
@@ -602,6 +597,9 @@ const MyLibrary = () => {
                     className="flex-1 flex items-center justify-center space-x-2 px-4 py-3 bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white rounded-xl font-medium transition-all duration-200 hover:shadow-lg hover:shadow-blue-500/25"
                     // onClick={() => handlePdfAction("view", pdf)}
                     onClick={() => handleRead(pdf)}
+                    //   onClick={() =>
+                    //   <PdfViewer fileUrl={pdf.cloudinaryUrl} />}
+                    // onClick={() => setShowViewer(true)}
                   >
                     <Eye className="w-4 h-4" />
                     <span>Read</span>
@@ -700,6 +698,11 @@ const MyLibrary = () => {
                       <button
                         className="flex items-center space-x-1 px-3 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg text-sm font-medium transition-colors"
                         onClick={() => handleRead(pdf)}
+                        // onClick={() => setShowViewer(true)}
+
+                        // onClick={() => (
+                        //   <PDFViewer fileUrl={pdf.cloudinaryUrl} />
+                        // )}
                       >
                         <Eye className="w-4 h-4" />
                         <span>Read</span>
@@ -926,6 +929,11 @@ const MyLibrary = () => {
           onClose={() => setSelectedPdf(null)}
         />
       )} */}
+
+    
+
+      {/* {showViewer && <PdfViewer url={`${showViewer}.pdf`} />} */}
+      {showViewer && <PdfViewer url={showViewer} />}
 
       {selectedPdf && <PdfReader pdfUrl={selectedPdf} />}
 

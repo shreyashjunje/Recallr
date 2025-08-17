@@ -29,10 +29,10 @@ const storage = new CloudinaryStorage({
       return {
         folder: "recallr",
         resource_type: "raw", // important for PDFs
-        // format: 'pdf',
+        type: "upload",
         use_filename: true,
         unique_filename: false,
-        format: "pdf", 
+        format: "pdf",
       };
     }
 
@@ -40,6 +40,8 @@ const storage = new CloudinaryStorage({
     return {
       folder: "recallr",
       allowed_formats: ["jpg", "png", "jpeg", "svg", "webp"],
+      type: "upload",
+
       resource_type: "image",
       use_filename: true,
       unique_filename: false,
