@@ -2,7 +2,6 @@ import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import logo from "../../assets/logoR.png";
 
-
 import {
   Home,
   Upload,
@@ -42,7 +41,7 @@ export default function Sidebar() {
     "My Library": "/library",
     Search: "/search",
     "AI Summaries": "/ai-summaries",
-    "Quiz Generator": "/quiz-generator",
+    "Quiz Master": "/quizmaster",
     Flashcards: "/flashcards",
     "Voice Assistant": "/voice-assistant",
     "Study Groups": "/study-groups",
@@ -95,7 +94,7 @@ export default function Sidebar() {
           special: true,
         },
         {
-          name: "Quiz Generator",
+          name: "Quiz Master",
           icon: FileQuestion,
           color: "from-yellow-500 to-amber-500",
           bgAccent: "bg-gradient-to-r from-yellow-50 to-amber-50",

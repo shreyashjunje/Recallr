@@ -7,6 +7,7 @@ const authRoutes = require("./routes/authRoutes");
 const pdfRoutes = require("./routes/pdfRoutes");
 const userRoutes = require("./routes/userRoute");
 const botRoutes = require("./routes/botRoutes");
+const quizRoutes = require("./routes/quizRoutes");
 const bot =require("./bot")
 require("dotenv").config();
 require("./config/passport");
@@ -37,6 +38,7 @@ app.use("/api/auth", authRoutes);
 app.use("/api/pdf", pdfRoutes);
 app.use("/api/user", userRoutes)
 app.use("/api/bot", botRoutes);
+app.use("/api/quiz", quizRoutes);
 
 app.get("/", (req, res) => {
   res.send("Hello, World!");

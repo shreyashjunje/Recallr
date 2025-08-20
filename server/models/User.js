@@ -33,6 +33,8 @@ const userSchema = new mongoose.Schema(
         ref: "PDF",
       },
     ],
+    quizzes: [{ type: mongoose.Schema.Types.ObjectId, ref: "Quiz" }],
+    attempts: [{ type: mongoose.Schema.Types.ObjectId, ref: "QuizResult" }],
 
     // Telegram fields
     telegramChatId: { type: String, default: null },

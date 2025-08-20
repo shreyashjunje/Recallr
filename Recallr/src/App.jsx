@@ -17,6 +17,10 @@ import {
   InDevelopment,
   LaunchingSoon,
 } from "./components/maincomponent/StatusComponent";
+import QuizMasterHome from "./components/QuizMaster/QuizMasterHome";
+import QuizSetup from "./components/QuizMaster/QuizSettings";
+import LogoLoader from "./components/ui/LogoLoader";
+import QuizInfoPage from "./components/QuizMaster/QuizInfoPage";
 
 function App() {
   return (
@@ -35,11 +39,12 @@ function App() {
           <Route
             path="dashboard"
             element={
-              <LaunchingSoon
-                title="Dashboard"
-                message="All your PDFs, beautifully organized in one place."
-                estimatedDate="Next Week"
-              />
+              // <LaunchingSoon
+              //   title="Dashboard"
+              //   message="All your PDFs, beautifully organized in one place."
+              //   estimatedDate="Next Week"
+              // />
+              <LogoLoader/>
             }
           />
           <Route path="upload" element={<UploadPDF />} />
@@ -58,14 +63,21 @@ function App() {
           />
 
           <Route
-            path="quiz-generator"
+            path="quizmaster"
             element={
-              <InDevelopment
-                title="QUIZ Generator"
-                message="Test yourself instantly."
-                estimatedDate="AUG 2025"
-                progress={20}
-              />
+              // <InDevelopment
+              //   title="QUIZ Generator"
+              //   message="Test yourself instantly."
+              //   estimatedDate="AUG 2025"
+              //   progress={20}
+              // />
+              <QuizMasterHome />
+            }
+          />
+          <Route
+            path="quizmaster/quizsettings"
+            element={
+              <QuizSetup/>
             }
           />
           <Route
@@ -127,6 +139,11 @@ function App() {
             }
           />
         </Route>
+        <Route
+          path="/quiz-master/quiz-info"
+          element={
+            <QuizInfoPage />
+          }/>
       </Routes>
 
       {/* </BrowserRouter> */}
