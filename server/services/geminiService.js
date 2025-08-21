@@ -174,13 +174,174 @@ IMPORTANT: Return PURE JSON only, without any surrounding text or markdown forma
     const jsonStart = responseText.indexOf("{");
     const jsonEnd = responseText.lastIndexOf("}") + 1;
     return JSON.parse(responseText.slice(jsonStart, jsonEnd));
-
-
-    
   } catch (error) {
     console.error("❌ Gemini Processing Error:", error);
     throw new Error("Failed to process quiz with Gemini: " + error.message);
   }
 }
 
-module.exports = { processWithGemini, processQuizWithGemini };
+async function processSummaryWithGemini(file, customPrompt) {
+  try {
+    console.log("in the gemini function to generate summary");
+    // 1. Upload file to Gemini
+    const uploadResp = await fileManager.uploadFile(file.buffer, {
+      mimeType: "application/pdf", // e.g. application/pdf
+      displayName: file.originalname, // e.g. "React Hooks.pdf"
+      inline: true,
+    });
+
+    //  const uploadResult = await fileManager.uploadFile(file.buffer, {
+    //   mimeType: "application/pdf",
+    //   displayName: "quiz.pdf",
+    //   inline: true,
+    // });
+
+    console.log("✅ File uploaded to Gemini:", uploadResp.file);
+
+    // 2. Base summarization rules
+    const basePrompt = `
+You are an AI that summarizes documents in a clean and structured way.
+
+Read the given file and generate a structured summary in **JSON format only** (no extra text).  
+Follow this structure:
+
+{
+  "title": "A short and catchy title for the document",
+  "tags": ["tag1", "tag2", "tag3"], 
+  "summary": [
+    "Use bullet points for key insights",
+    "Summarize important sections clearly",
+    "Keep sentences concise and meaningful"
+  ],
+  "category": "Choose a single category that best fits (e.g., Programming, Cloud, AI, Web Development)"
+}
+
+Rules:
+- The summary must be 4–6 bullet points, each capturing an important idea.
+- Tags should be relevant keywords (3–5 words max each).
+- Category must be a single word or short phrase.
+- Do not include anything outside of the JSON object.
+    `;
+
+    // 3. Merge base + custom prompt
+    const finalPrompt = `
+${basePrompt}
+
+Additional user instructions: 
+${customPrompt}
+    `;
+
+    // 4. Get Gemini model
+    const model = genAI.getGenerativeModel({
+      model: "gemini-2.5-pro", // or "gemini-1.5-flash" for faster responses
+    });
+
+    console.log("sending to the gemini");
+
+    // 5. Generate content
+    const result = await model.generateContent([
+      {
+        fileData: {
+          mimeType: uploadResp.file.mimeType,
+          fileUri: uploadResp.file.uri,
+        },
+      },
+      { text: finalPrompt },
+    ]);
+
+    console.log("getting response from the gemini");
+    console.log("Response text:", result);
+
+    // 5️⃣ Parse JSON
+    const responseText = result.response.text();
+    const jsonStart = responseText.indexOf("{");
+    const jsonEnd = responseText.lastIndexOf("}") + 1;
+    return JSON.parse(responseText.slice(jsonStart, jsonEnd));
+  } catch (err) {
+    console.error("❌ Error in processSummaryWithGemini:", err);
+    throw err;
+  }
+}
+
+async function processFlashcardsWithGemini(file, settings) {
+  try {
+    console.log("📌 In Gemini function to generate flashcards");
+
+    // 1. Upload file to Gemini
+    const uploadResp = await fileManager.uploadFile(file.buffer, {
+      mimeType: "application/pdf",
+      displayName: file.originalname,
+      inline: true,
+    });
+
+    console.log("✅ File uploaded to Gemini:", uploadResp.file);
+
+    // 2. Base instructions for flashcards
+    const basePrompt = `
+You are an AI that creates **educational flashcards** from documents.  
+
+Generate output in **strict JSON format only** (no extra text).  
+The structure must be:
+
+{
+  "title": "Short and clear title of the document",
+  "tags": ["keyword1", "keyword2", "keyword3"],
+  "category": "Choose one category (e.g., Programming, AI, Cloud)",
+  "flashcards": [
+    {
+      "question": "Write a ${settings.questionType} type question",
+      "answer": "Provide the correct answer here",
+      "difficulty": "${settings.difficulty}"
+    }
+  ]
+}
+
+Rules:
+- Generate exactly **${settings.numCards} flashcards**.
+- Title should be 3–6 words max.
+- Tags must be 3–5 short keywords (no long sentences).
+- Category must be a single word or short phrase.
+- Questions must be clear, concise, and based only on the document.
+- Answers must be accurate and unambiguous.
+- Difficulty for all flashcards should match: "${settings.difficulty}".
+- Output valid JSON only, no explanations or extra text.
+    `;
+
+    // 3. Get Gemini model
+    const model = genAI.getGenerativeModel({
+      model: "gemini-2.5-pro",
+    });
+
+    console.log("📤 Sending request to Gemini");
+
+    // 4. Generate flashcards
+    const result = await model.generateContent([
+      {
+        fileData: {
+          mimeType: uploadResp.file.mimeType,
+          fileUri: uploadResp.file.uri,
+        },
+      },
+      { text: basePrompt },
+    ]);
+
+    console.log("📥 Got response from Gemini");
+
+    // 5. Parse JSON safely
+    const responseText = result.response.text();
+    const jsonStart = responseText.indexOf("{");
+    const jsonEnd = responseText.lastIndexOf("}") + 1;
+    return JSON.parse(responseText.slice(jsonStart, jsonEnd));
+  } catch (err) {
+    console.error("❌ Error in processFlashcardsWithGemini:", err);
+    throw err;
+  }
+}
+
+
+module.exports = {
+  processWithGemini,
+  processQuizWithGemini,
+  processSummaryWithGemini,
+  processFlashcardsWithGemini
+};

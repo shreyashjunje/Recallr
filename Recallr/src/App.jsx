@@ -21,6 +21,10 @@ import QuizMasterHome from "./components/QuizMaster/QuizMasterHome";
 import QuizSetup from "./components/QuizMaster/QuizSettings";
 import LogoLoader from "./components/ui/LogoLoader";
 import QuizInfoPage from "./components/QuizMaster/QuizInfoPage";
+import AiSummaryHome from "./pages/aisummary/AiSummaryHome";
+import FlashcardGenerator from "./pages/aiflashcards/AiFlashcardsHome";
+import FlashcardHome from "./pages/aiflashcards/AiFlashcardsHome";
+import FlashcardsSettings from "./pages/aiflashcards/AiFlashcardsSettings";
 
 function App() {
   return (
@@ -29,12 +33,13 @@ function App() {
       {/* <Navbar /> */}
 
       <Routes>
-        <Route path="/" element={<Home />} />
         <Route path="/login" element={<LoginPage />} />
         <Route path="/register" element={<SignUpPage />} />
         <Route path="/view" element={<PDFViewer />} />
 
         <Route path="/" element={<Layout />}>
+          <Route path="/" element={<Home />} />
+
           {/* <Route path="dashboard" element={<Dashboard />} /> */}
           <Route
             path="dashboard"
@@ -44,7 +49,7 @@ function App() {
               //   message="All your PDFs, beautifully organized in one place."
               //   estimatedDate="Next Week"
               // />
-              <LogoLoader/>
+              <LogoLoader />
             }
           />
           <Route path="upload" element={<UploadPDF />} />
@@ -53,14 +58,18 @@ function App() {
           <Route
             path="ai-summaries"
             element={
-              <InDevelopment
-                title="AI Summaries"
-                message="Read less. Learn more."
-                estimatedDate="AUG 2025"
-                progress={75}
-              />
+              // <InDevelopment
+              //   title="AI Summaries"
+              //   message="Read less. Learn more."
+              //   estimatedDate="AUG 2025"
+              //   progress={75}
+              // />
+              <AiSummaryHome />
             }
           />
+
+          <Route path="flashcards" element={<FlashcardHome />} />
+          <Route path="flashcards/settings" element={<FlashcardsSettings />} />
 
           <Route
             path="quizmaster"
@@ -74,34 +83,7 @@ function App() {
               <QuizMasterHome />
             }
           />
-          <Route
-            path="quizmaster/quizsettings"
-            element={
-              <QuizSetup/>
-            }
-          />
-          <Route
-            path="flashcards"
-            element={
-              <InDevelopment
-                title="Flashcards"
-                message="Revise smarter"
-                estimatedDate="AUG 2025"
-                progress={40}
-              />
-            }
-          />
-          <Route
-            path="search"
-            element={
-              <InDevelopment
-                title="Search"
-                message="Find it. Fast."
-                estimatedDate="AUG 2025"
-                progress={10}
-              />
-            }
-          />
+          <Route path="quizmaster/quizsettings" element={<QuizSetup />} />
 
           <Route
             path="study-groups"
@@ -139,11 +121,7 @@ function App() {
             }
           />
         </Route>
-        <Route
-          path="/quiz-master/quiz-info"
-          element={
-            <QuizInfoPage />
-          }/>
+        <Route path="/quiz-master/quiz-info" element={<QuizInfoPage />} />
       </Routes>
 
       {/* </BrowserRouter> */}

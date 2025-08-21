@@ -73,13 +73,13 @@ export default function Sidebar() {
           bgAccent: "bg-gradient-to-r from-purple-50 to-violet-50",
           badge: "24",
         },
-        {
-          name: "Search",
-          icon: Search,
-          color: "from-orange-500 to-red-500",
-          bgAccent: "bg-gradient-to-r from-orange-50 to-red-50",
-          badge: null,
-        },
+        // {
+        //   name: "Search",
+        //   icon: Search,
+        //   color: "from-orange-500 to-red-500",
+        //   bgAccent: "bg-gradient-to-r from-orange-50 to-red-50",
+        //   badge: null,
+        // },
       ],
     },
     {

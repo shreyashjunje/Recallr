@@ -53,6 +53,7 @@ const pdfSchemas = new mongoose.Schema({
     {
       question: String,
       answer: String,
+      difficulty:String
     },
   ],
   fileHash:{
