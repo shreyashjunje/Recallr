@@ -10,6 +10,7 @@ const botRoutes = require("./routes/botRoutes");
 const quizRoutes = require("./routes/quizRoutes");
 const summaryRoutes= require("./routes/summaryRoutes")
 const flashcardsRoutes= require("./routes/flashcardsRoutes")
+const helperRoutes= require("./routes/helperRoutes")
 const bot =require("./bot")
 require("dotenv").config();
 require("./config/passport");
@@ -43,6 +44,7 @@ app.use("/api/bot", botRoutes);
 app.use("/api/quiz", quizRoutes);
 app.use("/api/summary",summaryRoutes);
 app.use("/api/flashcards",flashcardsRoutes);
+app.use("/api/helper",helperRoutes)
 
 
 app.get("/", (req, res) => {

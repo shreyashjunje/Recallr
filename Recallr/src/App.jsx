@@ -5,7 +5,7 @@ import Home from "./pages/Home";
 import LoginPage from "./pages/auth/Login";
 import { Router, Routes } from "react-router";
 import Navbar from "./components/Navabar";
-import { Dashboard } from "./pages/Dashboard";
+// import { Dashboard } from "./pages/Dashboard";
 import SignUpPage from "./pages/auth/Register";
 import { Upload } from "lucide-react";
 import UploadPDF from "./pages/UploadPDF";
@@ -25,6 +25,7 @@ import AiSummaryHome from "./pages/aisummary/AiSummaryHome";
 import FlashcardGenerator from "./pages/aiflashcards/AiFlashcardsHome";
 import FlashcardHome from "./pages/aiflashcards/AiFlashcardsHome";
 import FlashcardsSettings from "./pages/aiflashcards/AiFlashcardsSettings";
+import Dashboard from "./pages/Dashboard";
 
 function App() {
   return (
@@ -49,7 +50,7 @@ function App() {
               //   message="All your PDFs, beautifully organized in one place."
               //   estimatedDate="Next Week"
               // />
-              <LogoLoader />
+              <Dashboard />
             }
           />
           <Route path="upload" element={<UploadPDF />} />

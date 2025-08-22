@@ -34,7 +34,7 @@ const pdfSchemas = new mongoose.Schema({
   summary: {
     type: String,
   },
- quiz: [
+  quiz: [
     {
       question: String,
       options: [String],
@@ -49,20 +49,18 @@ const pdfSchemas = new mongoose.Schema({
   textExtracted: {
     type: String,
   },
- flashcards: [
+  flashcards: [
     {
       question: String,
       answer: String,
-      difficulty:String
+      difficulty: String,
     },
   ],
-  fileHash:{
-    type:String,
-    
-   
+  fileHash: {
+    type: String,
   },
-  filename:{
-    type:String,
+  filename: {
+    type: String,
   },
 
   isFlashcardGenerated: {
@@ -89,11 +87,11 @@ const pdfSchemas = new mongoose.Schema({
     type: Number,
     default: 0,
   },
-  pdfSize:{
-    type:Number,
+  pdfSize: {
+    type: Number,
   },
-  pages:{
-    type:Number,
+  pages: {
+    type: Number,
   },
   progress: {
     currentPage: {
@@ -117,15 +115,18 @@ const pdfSchemas = new mongoose.Schema({
     },
   },
 
-  
+  quizGeneratedAt: { type: Date, default: null },
+  flashcardsGeneratedAt: { type: Date, default: null },
+  summaryGeneratedAt: { type: Date, default: null },
+
   // NEW: async pipeline status
-  status: { 
-    type: String, 
-    enum: ["UPLOADED", "PROCESSING", "READY", "FAILED"], 
-    default: "UPLOADED" 
+  status: {
+    type: String,
+    enum: ["UPLOADED", "PROCESSING", "READY", "FAILED"],
+    default: "UPLOADED",
   },
   processing: {
-    progress: { type: Number, default: 0 },   // 0..100
+    progress: { type: Number, default: 0 }, // 0..100
     startedAt: { type: Date },
     finishedAt: { type: Date },
     error: { type: String },
@@ -137,9 +138,8 @@ const pdfSchemas = new mongoose.Schema({
   mimeType: { type: String },
 });
 
-
 pdfSchemas.index({ user: 1, fileHash: 1 }, { unique: true, sparse: true });
 pdfSchemas.index({ user: 1, createdAt: -1 });
 pdfSchemas.index({ user: 1, tags: 1 });
 
-module.exports=mongoose.model("PDF",pdfSchemas)
+module.exports = mongoose.model("PDF", pdfSchemas);

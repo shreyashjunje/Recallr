@@ -26,8 +26,10 @@ import SidebarUserNav from "../dashboard/helper/SidebarUserNav";
 export default function Sidebar() {
   const { user } = useAuth();
   const token = localStorage.getItem("token");
+  if(!token) return;
 
   const decodedToken = jwtDecode(token);
+
   console.log("Decoded Token:", decodedToken);
 
   console.log("User in Sidebar:", user);
