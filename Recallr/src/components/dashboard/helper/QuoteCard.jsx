@@ -2,6 +2,7 @@ import axios from "axios";
 import { RefreshCcw } from "lucide-react";
 import { useEffect, useState } from "react";
 const API_URL = import.meta.env.VITE_API_URL;
+import {motion} from "framer-motion"
 
 export default function QuoteCard() {
   const [quote, setQuote] = useState("");
@@ -15,14 +16,14 @@ export default function QuoteCard() {
       setLoading(true);
       setError(null);
       const response = await axios.get(`${API_URL}/helper/get-motivation`);
-      console.log("res=>", response);
+      // console.log("res=>", response);
 
       // With Axios, data is in response.data (no need for response.json())
       setImgUrl(response.data.image);
       setQuote(response.data.quote);
       setAuthor(response.data.author);
     } catch (err) {
-      console.error("Error fetching quote:", err);
+      // console.error("Error fetching quote:", err);
       setError("Failed to load quote. Please try again.");
       // Set fallback quote
       setQuote(
@@ -64,7 +65,14 @@ export default function QuoteCard() {
             </div>
           ) : (
             <>
-              <p className="text-xl italic font-semibold">"{quote}"</p>
+              <motion.p
+                className="text-xl italic font-semibold"
+                initial={{ opacity: 0, y: 20 }} // start invisible & slightly below
+                animate={{ opacity: 1, y: 0 }} // fade in & move up
+                transition={{ duration: 0.8, ease: "easeOut" }}
+              >
+                "{quote}"
+              </motion.p>{" "}
               <p className="mt-2 text-sm">— {author}</p>
             </>
           )}

@@ -15,6 +15,8 @@ import {
 import logo from "../../assets/logoR.png";
 import { jwtDecode } from "jwt-decode";
 import axios from "axios";
+import { toast } from "react-toastify";
+import { useNavigate } from "react-router";
 const API_URL = import.meta.env.VITE_API_URL;
 
 const AiSummaryHome = () => {
@@ -52,6 +54,7 @@ const AiSummaryHome = () => {
   const [summary, setSummary] = useState("");
   const [showSummary, setShowSummary] = useState(false);
   const fileInputRef = useRef(null);
+  const navigate=useNavigate();
 
   const promptTemplates = [
     "Create a concise summary highlighting the main points and key takeaways",
@@ -88,41 +91,7 @@ const AiSummaryHome = () => {
 
     setIsGenerating(true);
 
-    //     // Simulate API call to Gemini
-    //     try {
-    //       await new Promise((resolve) => setTimeout(resolve, 3000));
-
-    //       const mockSummary = `Based on your request "${customPrompt}", here's the generated summary:
-
-    // **Key Highlights:**
-    // • The document presents comprehensive insights into the subject matter with detailed analysis and supporting evidence.
-    // • Multiple perspectives are explored, providing a balanced view of the topic at hand.
-    // • Critical findings suggest significant implications for future research and practical applications.
-
-    // **Main Sections:**
-    // 1. **Introduction & Background**: Establishes context and framework for the discussion
-    // 2. **Core Analysis**: Deep dive into the primary subject matter with data-driven insights
-    // 3. **Findings & Results**: Presents key discoveries and their significance
-    // 4. **Conclusions**: Synthesizes information and provides actionable recommendations
-
-    // **Key Takeaways:**
-    // The document effectively communicates its central thesis through well-structured arguments and supporting evidence. The analysis reveals important trends and patterns that could inform future decision-making processes.
-
-    // **Recommendations:**
-    // - Consider implementing the suggested strategies for optimal results
-    // - Further research may be beneficial in specific areas highlighted
-    // - Regular review and updates should be considered based on evolving circumstances
-
-    // This summary captures the essential elements while maintaining clarity and focus on the most important aspects of the content.`;
-
-    //       setSummary(mockSummary);
-    //       setShowSummary(true);
-    //     } catch (error) {
-    //       alert("Error generating summary. Please try again.");
-    //     } finally {
-    //       setIsGenerating(false);
-    //     }
-
+   
     const token = localStorage.getItem("token");
     if (!token) return;
 
@@ -141,6 +110,13 @@ const AiSummaryHome = () => {
         headers: { "Content-Type": "multipart/form-data" },
       }
     );
+
+    console.log("id:",res.data.data._id)
+
+    if(res.status==200){
+      navigate(`/summary/${res.data.data._id}`,{state :{summary:res.data}})
+      toast.success("summary generated successfully")
+    }
 
     console.log("res:", res.data);
 

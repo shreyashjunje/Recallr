@@ -35,6 +35,9 @@ import {
 } from "lucide-react";
 import QuoteCard from "../components/dashboard/helper/QuoteCard";
 import DashboardHeader from "@/components/dashboard/helper/DashboardHeader";
+import axios from "axios";
+import { jwtDecode } from "jwt-decode";
+const API_URL = import.meta.env.VITE_API_URL;
 
 // interface TodoItem {
 //   id: string;
@@ -79,37 +82,40 @@ const Dashboard = () => {
   const [showReminder, setShowReminder] = useState(false);
   const [studyTime, setStudyTime] = useState("");
   const [activeTab, setActiveTab] = useState("uploads");
-  const [todos, setTodos] = useState([
-    {
-      id: "1",
-      text: "Review Machine Learning notes",
-      completed: false,
-      priority: "high",
-    },
-    {
-      id: "2",
-      text: "Complete Python assignment",
-      completed: true,
-      priority: "medium",
-    },
-    {
-      id: "3",
-      text: "Prepare for upcoming exam",
-      completed: false,
-      priority: "high",
-    },
-    {
-      id: "4",
-      text: "Read React documentation",
-      completed: false,
-      priority: "low",
-    },
-  ]);
+  // const [todos, setTodos] = useState([
+  //   {
+  //     id: "1",
+  //     text: "Review Machine Learning notes",
+  //     completed: false,
+  //     priority: "high",
+  //   },
+  //   {
+  //     id: "2",
+  //     text: "Complete Python assignment",
+  //     completed: true,
+  //     priority: "medium",
+  //   },
+  //   {
+  //     id: "3",
+  //     text: "Prepare for upcoming exam",
+  //     completed: false,
+  //     priority: "high",
+  //   },
+  //   {
+  //     id: "4",
+  //     text: "Read React documentation",
+  //     completed: false,
+  //     priority: "low",
+  //   },
+  // ]);
   const [newTodo, setNewTodo] = useState("");
   const [newTodoPriority, setNewTodoPriority] = useState("low");
   const [editingTodo, setEditingTodo] = useState(null);
   const [editText, setEditText] = useState("");
   const [todoFilter, setTodoFilter] = useState("all");
+
+  const [tasks, setTasks] = useState([]);
+  const [pdfs, setPdfs] = useState([]);
 
   useEffect(() => {
     const today = new Date().toDateString();
@@ -127,19 +133,141 @@ const Dashboard = () => {
     }
   }, []);
 
+  const fetchTasks = async () => {
+    try {
+      const token = localStorage.getItem("token");
+      const res = await axios.get(`${API_URL}/task/get-tasks`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+
+      const tasks = res.data.data;
+      console.log("tasks:", tasks);
+      setTasks(tasks);
+    } catch (err) {
+      console.log("err=>", err.message);
+    }
+  };
+
+  const fetchPdfs = async () => {
+    const token = localStorage.getItem("token");
+    if (!token) return;
+
+    const decodedToken = jwtDecode(token);
+    const userId = decodedToken.id;
+
+    try {
+      const res = await axios.get(`${API_URL}/pdf/pdfs`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+        params: { userId: userId },
+      });
+
+      console.log("pdfs-->", res.data.pdfs);
+
+      setPdfs(res.data.pdfs);
+    } catch (err) {
+      console.log("err", err);
+    }
+  };
+
+  useEffect(() => {
+    fetchTasks();
+    fetchPdfs();
+  }, []);
+
+  const addTask = async () => {
+    try {
+      const taskData = {
+        title: newTodo,
+        priority: newTodoPriority,
+        status: "active",
+      };
+      console.log("taskdata:", taskData);
+      const token = localStorage.getItem("token");
+
+      const res = await axios.post(`${API_URL}/task/create-task`, taskData, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+
+      console.log("res->", res.data);
+      setTasks([...tasks, res.data.data]); // add new task
+      setNewTodo("");
+      setNewTodoPriority("low");
+    } catch (err) {
+      console.log("err=>", err.message);
+    }
+  };
+
+  function getPDFsUploadedThisWeek(pdfs) {
+    const now = new Date();
+
+    // 🗓 Start of week (Sunday)
+    const startOfWeek = new Date(now);
+    startOfWeek.setHours(0, 0, 0, 0);
+    startOfWeek.setDate(now.getDate() - now.getDay()); // Sunday
+
+    // 🗓 End of week (next Sunday)
+    const endOfWeek = new Date(startOfWeek);
+    endOfWeek.setDate(startOfWeek.getDate() + 7);
+
+    // 📂 Filter PDFs with uploadedAt in range
+    const filtered = pdfs.filter((pdf) => {
+      if (!pdf.uploadedAt) return false; // skip if no date
+
+      const uploaded = new Date(pdf.uploadedAt);
+      return uploaded >= startOfWeek && uploaded < endOfWeek;
+    });
+
+    return filtered;
+  }
+
+  const totalPdfs = pdfs.length;
+  const uniqueCategories = new Set(pdfs.map((pdf) => pdf.category));
+  const totalCategories = uniqueCategories.size;
+
+  const pdfsThisWeek = getPDFsUploadedThisWeek(pdfs);
+  const totalpdfsthisweek = pdfsThisWeek.length;
+
+  const favouritePDFs = pdfs.filter((pdf) => pdf.isFavourite === true);
+  const recentPDFs = [...pdfs].sort(
+    (a, b) => new Date(b.uploadedAt) - new Date(a.uploadedAt)
+  ).slice(0,3);
+
+  const isQuizes = pdfs.filter((pdf) => pdf.isQuizGenerated === true);
+  const recentQuizes = [...isQuizes].sort(
+    (a, b) => new Date(b.uploadedAt) - new Date(a.uploadedAt)
+  ).slice(0,3);
+
+  const isflashcard = pdfs.filter((pdf) => pdf.isFlashcardGenerated === true);
+  const recentFlashcard = [...isflashcard].sort(
+    (a, b) => new Date(b.uploadedAt) - new Date(a.uploadedAt)
+  ).slice(0,3);
+
+  const isSummary = pdfs.filter((pdf) => pdf.isSummarized === true);
+  const recenSummaries = [...isSummary].sort(
+    (a, b) => new Date(b.uploadedAt) - new Date(a.uploadedAt)
+  ).slice(0,3);
+
+
+
   const stats = [
     {
       title: "PDFs Uploaded",
-      value: "127",
-      change: "+12 this week",
+      value: `${totalPdfs}`,
+      change: `${totalpdfsthisweek} this week`,
       icon: <Upload className="w-7 h-7" />,
       gradient: "from-blue-500 to-cyan-500",
       trend: "up",
     },
     {
       title: "Categories",
-      value: "24",
-      change: "+3 new",
+      value: `${totalCategories}`,
+      change: "",
       icon: <FolderOpen className="w-7 h-7" />,
       gradient: "from-emerald-500 to-teal-500",
       trend: "up",
@@ -228,15 +356,15 @@ const Dashboard = () => {
     },
   ];
 
-  const recentSummaries = [
-    { id: "1", title: "Neural Networks Summary", date: "30 minutes ago" },
-    {
-      id: "2",
-      title: "Microservices Architecture Summary",
-      date: "2 hours ago",
-    },
-    { id: "3", title: "DevOps Best Practices Summary", date: "6 hours ago" },
-  ];
+  // const recentSummaries = [
+  //   { id: "1", title: "Neural Networks Summary", date: "30 minutes ago" },
+  //   {
+  //     id: "2",
+  //     title: "Microservices Architecture Summary",
+  //     date: "2 hours ago",
+  //   },
+  //   { id: "3", title: "DevOps Best Practices Summary", date: "6 hours ago" },
+  // ];
 
   const favoritePdfs = [
     { id: "1", title: "Advanced React Patterns.pdf", date: "Last week" },
@@ -265,45 +393,56 @@ const Dashboard = () => {
     },
   ];
 
-  const addTodo = () => {
-    if (newTodo.trim()) {
-      const todo = {
-        id: Date.now().toString(),
-        text: newTodo,
-        completed: false,
-        priority: newTodoPriority,
-      };
-      setTodos([...todos, todo]);
-      setNewTodo("");
-      setNewTodoPriority("medium");
+  const toggleTodo = async (id) => {
+    try {
+      const token = localStorage.getItem("token");
+      const task = tasks.find((t) => t._id === id);
+
+      const res = await axios.put(
+        `${API_URL}/task/update-task/${id}`,
+        { status: task.status === "completed" ? "active" : "completed" },
+        { headers: { Authorization: `Bearer ${token}` } }
+      );
+
+      setTasks(tasks.map((t) => (t._id === id ? res.data.data : t)));
+    } catch (err) {
+      console.log("err =>", err.message);
     }
   };
 
-  const toggleTodo = (id) => {
-    setTodos(
-      todos.map((todo) =>
-        todo.id === id ? { ...todo, completed: !todo.completed } : todo
-      )
-    );
-  };
+  const deleteTodo = async (id) => {
+    try {
+      const token = localStorage.getItem("token");
+      await axios.delete(`${API_URL}/task/delete-task/${id}`, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
 
-  const deleteTodo = (id) => {
-    setTodos(todos.filter((todo) => todo.id !== id));
+      setTasks(tasks.filter((t) => t._id !== id));
+    } catch (err) {
+      console.log("err =>", err.message);
+    }
   };
 
   const startEdit = (todo) => {
-    setEditingTodo(todo.id);
-    setEditText(todo.text);
+    setEditingTodo(todo._id);
+    setEditText(todo.title);
   };
 
-  const saveEdit = () => {
-    setTodos(
-      todos.map((todo) =>
-        todo.id === editingTodo ? { ...todo, text: editText } : todo
-      )
-    );
-    setEditingTodo(null);
-    setEditText("");
+  const saveEdit = async () => {
+    try {
+      const token = localStorage.getItem("token");
+      const res = await axios.put(
+        `${API_URL}/task/update-task/${editingTodo}`,
+        { title: editText },
+        { headers: { Authorization: `Bearer ${token}` } }
+      );
+
+      setTasks(tasks.map((t) => (t._id === editingTodo ? res.data.data : t)));
+      setEditingTodo(null);
+      setEditText("");
+    } catch (err) {
+      console.log("err =>", err.message);
+    }
   };
 
   const cancelEdit = () => {
@@ -346,50 +485,66 @@ const Dashboard = () => {
     }
   };
 
-  const filteredTodos = todos.filter((todo) => {
-    if (todoFilter === "active") return !todo.completed;
-    if (todoFilter === "completed") return todo.completed;
+  const filteredTodos = tasks.filter((t) => {
+    if (todoFilter === "all") return true;
+    if (todoFilter === "active") return t.status === "active";
+    if (todoFilter === "completed") return t.status === "completed";
     return true;
   });
 
-  const completedCount = todos.filter((todo) => todo.completed).length;
-  const totalCount = todos.length;
+  const completedCount = tasks.filter((t) => t.status === "completed").length;
+  const totalCount = tasks.length;
 
   const tabData = {
     uploads: {
       title: "Recent Uploads",
       icon: <Upload className="w-5 h-5" />,
-      data: recentUploads,
+      data: recentPDFs,
       gradient: "from-blue-500 to-cyan-500",
     },
     quizzes: {
       title: "Recent Quizzes",
       icon: <Award className="w-5 h-5" />,
-      data: recentQuizzes,
+      data: recentQuizes,
       gradient: "from-purple-500 to-pink-500",
     },
     flashcards: {
       title: "Flashcards",
       icon: <Brain className="w-5 h-5" />,
-      data: recentFlashcards,
+      data: recentFlashcard,
       gradient: "from-teal-500 to-green-500",
     },
     summaries: {
       title: "AI Summaries",
       icon: <FileText className="w-5 h-5" />,
-      data: recentSummaries,
+      data: recenSummaries,
       gradient: "from-orange-500 to-red-500",
     },
   };
+ function timeAgo(dateString) {
+  const date = new Date(dateString);
+  const now = new Date();
+  const seconds = Math.floor((now - date) / 1000);
+
+  if (seconds < 60) return "just now";
+  const minutes = Math.floor(seconds / 60);
+  if (minutes < 60) return `${minutes} minute${minutes > 1 ? "s" : ""} ago`;
+  const hours = Math.floor(minutes / 60);
+  if (hours < 24) return `${hours} hour${hours > 1 ? "s" : ""} ago`;
+  const days = Math.floor(hours / 24);
+  return `${days} day${days > 1 ? "s" : ""} ago`;
+}
+
 
   const renderTabContent = () => {
     const currentTab = tabData[activeTab];
+    console.log("in the tab quiz-->", currentTab.data);
 
     return (
       <div className="space-y-3">
         {currentTab.data.map((item) => (
           <div
-            key={item.id}
+            key={item._id}
             className={`group p-4 bg-gradient-to-r ${
               activeTab === "uploads"
                 ? "from-blue-50 to-cyan-50 hover:from-blue-100 hover:to-cyan-100"
@@ -418,6 +573,7 @@ const Dashboard = () => {
                 )}
                 {item.type && (
                   <span className="text-xs bg-gray-200 text-gray-700 px-2 py-1 rounded-full">
+                    {/* {console.log(item.type)} */}
                     {item.type}
                   </span>
                 )}
@@ -425,8 +581,10 @@ const Dashboard = () => {
               </div>
             </div>
             <div className="flex items-center justify-between">
-              <span className="text-xs text-gray-500">{item.date}</span>
-              {item.progress && (
+              <span className="text-xs text-gray-500">
+                {timeAgo(item.uploadedAt)}
+              </span>
+              {/* {item.progress && (
                 <div className="flex items-center gap-2">
                   <div className="w-16 bg-gray-200 rounded-full h-2">
                     <div
@@ -438,7 +596,7 @@ const Dashboard = () => {
                     {item.progress}%
                   </span>
                 </div>
-              )}
+              )} */}
             </div>
           </div>
         ))}
@@ -451,7 +609,7 @@ const Dashboard = () => {
       <div className="max-w-7xl mx-auto space-y-8">
         {/* Header with Motivational Quote and Study Reminder */}
         <DashboardHeader />
-        
+
         {/* Enhanced Stats Cards */}
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
           {stats.map((stat, index) => (
@@ -549,7 +707,7 @@ const Dashboard = () => {
                 onChange={(e) => setNewTodo(e.target.value)}
                 placeholder="What do you want to accomplish today?"
                 className="flex-1 p-4 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white shadow-sm"
-                onKeyPress={(e) => e.key === "Enter" && addTodo()}
+                onKeyPress={(e) => e.key === "Enter" && addTask()}
               />
               <select
                 value={newTodoPriority}
@@ -561,7 +719,7 @@ const Dashboard = () => {
                 <option value="high">High</option>
               </select>
               <button
-                onClick={addTodo}
+                onClick={addTask}
                 className="bg-gradient-to-r from-blue-600 to-purple-600 text-white p-4 rounded-xl hover:from-blue-700 hover:to-purple-700 transition-all duration-300 shadow-lg hover:shadow-xl"
               >
                 <Plus className="w-6 h-6" />
@@ -590,35 +748,37 @@ const Dashboard = () => {
                 </p>
               </div>
             ) : (
-              filteredTodos.map((todo) => (
+              filteredTodos.map((task) => (
                 <div
-                  key={todo.id}
+                  key={task._id}
                   className={`group flex items-center gap-4 p-4 rounded-2xl border-2 transition-all duration-300 ${
-                    todo.completed
+                    task.status === "completed"
                       ? "bg-green-50 border-green-200 opacity-75"
                       : "bg-white border-gray-200 hover:border-blue-300 hover:shadow-md"
                   }`}
                 >
                   <button
-                    onClick={() => toggleTodo(todo.id)}
+                    onClick={() => toggleTodo(task._id)}
                     className={`w-6 h-6 rounded-full border-2 flex items-center justify-center transition-all duration-300 ${
-                      todo.completed
+                      task.status === "completed"
                         ? "bg-green-600 border-green-600 text-white"
                         : "border-gray-300 hover:border-green-600 hover:bg-green-50"
                     }`}
                   >
-                    {todo.completed && <Check className="w-4 h-4" />}
+                    {task.status === "completed" && (
+                      <Check className="w-4 h-4" />
+                    )}
                   </button>
 
                   <span
                     className={`inline-block px-3 py-1 rounded-full text-xs font-medium border ${getPriorityColor(
-                      todo.priority
+                      task.priority
                     )}`}
                   >
-                    {todo.priority}
+                    {task.priority}
                   </span>
 
-                  {editingTodo === todo.id ? (
+                  {editingTodo === task._id ? (
                     <div className="flex-1 flex gap-2">
                       <input
                         value={editText}
@@ -643,22 +803,22 @@ const Dashboard = () => {
                     <>
                       <span
                         className={`flex-1 font-medium ${
-                          todo.completed
+                          task.status === "completed"
                             ? "line-through text-gray-500"
                             : "text-gray-900"
                         }`}
                       >
-                        {todo.text}
+                        {task.title}
                       </span>
                       <div className="opacity-0 group-hover:opacity-100 transition-opacity flex gap-2">
                         <button
-                          onClick={() => startEdit(todo)}
+                          onClick={() => startEdit(task)}
                           className="text-blue-600 hover:text-blue-800 p-2 rounded-lg hover:bg-blue-50"
                         >
                           <Edit2 className="w-4 h-4" />
                         </button>
                         <button
-                          onClick={() => deleteTodo(todo.id)}
+                          onClick={() => deleteTodo(task._id)}
                           className="text-red-600 hover:text-red-800 p-2 rounded-lg hover:bg-red-50"
                         >
                           <Trash2 className="w-4 h-4" />
@@ -688,7 +848,7 @@ const Dashboard = () => {
               </div>
             </div>
             <div className="space-y-3">
-              {favoritePdfs.map((pdf) => (
+              {favouritePDFs.map((pdf) => (
                 <div
                   key={pdf.id}
                   className="group flex items-center gap-3 p-4 bg-gradient-to-r from-yellow-50 to-orange-50 rounded-xl hover:from-yellow-100 hover:to-orange-100 transition-all duration-300"
@@ -698,7 +858,13 @@ const Dashboard = () => {
                     <p className="font-medium text-gray-900 text-sm group-hover:text-orange-700 transition-colors">
                       {pdf.title}
                     </p>
-                    <p className="text-xs text-gray-500">{pdf.date}</p>
+                    <p className="text-xs text-gray-500">
+                      {new Date(pdf.uploadedAt).toLocaleDateString("en-GB", {
+                        day: "2-digit",
+                        month: "short",
+                        year: "numeric",
+                      })}
+                    </p>
                   </div>
                   <ChevronRight className="w-4 h-4 text-gray-400 group-hover:text-orange-600 transition-colors" />
                 </div>

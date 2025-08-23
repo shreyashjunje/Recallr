@@ -34,11 +34,14 @@ async function processWithGemini(fileUrl, customPrompt) {
     });
     console.log("Uploaded to Gemini:", uploadResult.file.uri);
 
-    // 3️⃣ Prepare prompt
+    //   // 3️⃣ Prepare prompt
     const defaultPrompt = `Analyze this PDF and return STRICT JSON with:
-      - title (max 5 words)
-      - category
-      - tags (5-7 keywords)`;
+        - title (max 5 words)
+        - category
+        - tags (5-7 keywords)
+        IMPORTANT: Return PURE JSON only, without any surrounding text or markdown formatting.
+
+    `;
 
     // 4️⃣ Send to Gemini
     const model = genAI.getGenerativeModel({ model: "gemini-2.5-pro" });
@@ -63,9 +66,11 @@ async function processWithGemini(fileUrl, customPrompt) {
     });
 
     console.log("Received response from Gemini");
+    console.log("result:::", result);
 
     // 5️⃣ Parse JSON
-    const responseText = result.response.text();
+    const responseText = await result.response.text();
+    console.log("responseText", responseText);
     const jsonStart = responseText.indexOf("{");
     const jsonEnd = responseText.lastIndexOf("}") + 1;
     return JSON.parse(responseText.slice(jsonStart, jsonEnd));
@@ -213,6 +218,11 @@ Follow this structure:
     "Summarize important sections clearly",
     "Keep sentences concise and meaningful"
   ],
+  "keyPoints": [
+    { "point": "Use bullet points for key insights", "important": true },
+    { "point": "Summarize important sections clearly", "important": false },
+    { "point": "Keep sentences concise and meaningful", "important": true }
+  ],
   "category": "Choose a single category that best fits (e.g., Programming, Cloud, AI, Web Development)"
 }
 
@@ -252,11 +262,32 @@ ${customPrompt}
     console.log("getting response from the gemini");
     console.log("Response text:", result);
 
-    // 5️⃣ Parse JSON
-    const responseText = result.response.text();
-    const jsonStart = responseText.indexOf("{");
-    const jsonEnd = responseText.lastIndexOf("}") + 1;
-    return JSON.parse(responseText.slice(jsonStart, jsonEnd));
+    // // 5️⃣ Parse JSON
+    // const responseText = result.response.text();
+    // const jsonStart = responseText.indexOf("{");
+    // const jsonEnd = responseText.lastIndexOf("}") + 1;
+    // return JSON.parse(responseText.slice(jsonStart, jsonEnd));
+    const responseText = await result.response.text();
+    console.log("Raw Gemini Response:", responseText);
+
+    // Defensive check
+    if (!responseText) {
+      throw new Error("Empty response from Gemini");
+    }
+
+    // Try to extract JSON safely
+    let parsedJSON;
+    try {
+      const jsonStart = responseText.indexOf("{");
+      const jsonEnd = responseText.lastIndexOf("}") + 1;
+      const jsonString = responseText.slice(jsonStart, jsonEnd);
+      parsedJSON = JSON.parse(jsonString);
+    } catch (parseErr) {
+      console.error("❌ Failed to parse JSON:", parseErr);
+      throw new Error("Gemini response was not valid JSON");
+    }
+
+    return parsedJSON;
   } catch (err) {
     console.error("❌ Error in processSummaryWithGemini:", err);
     throw err;
@@ -338,10 +369,9 @@ Rules:
   }
 }
 
-
 module.exports = {
   processWithGemini,
   processQuizWithGemini,
   processSummaryWithGemini,
-  processFlashcardsWithGemini
+  processFlashcardsWithGemini,
 };

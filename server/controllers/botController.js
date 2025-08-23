@@ -133,7 +133,9 @@ const uploadTelegramPDF = async (req, res) => {
     //   processAI,
     // ]);
 
+    console.log("---------------------------------");
     console.log("AI processing results:", aiResults);
+    console.log("---------------------------------");
 
     // Generate hash from file buffer
     const fileBuffer = req.file.buffer; // assuming Multer memoryStorage

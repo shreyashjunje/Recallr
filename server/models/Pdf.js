@@ -31,9 +31,24 @@ const pdfSchemas = new mongoose.Schema({
     },
   ],
 
-  summary: {
-    type: String,
-  },
+  summary: [
+    {
+      type: String,
+    },
+  ],
+  keyPoints: [
+    {
+      point: {
+        type: String,
+        required: true,
+      },
+      important: {
+        type: Boolean,
+        default: false,
+      },
+    },
+  ],
+
   quiz: [
     {
       question: String,
@@ -44,7 +59,7 @@ const pdfSchemas = new mongoose.Schema({
   ],
   uploadedAt: {
     type: Date,
-    derfault: Date.now(),
+    default: Date.now,
   },
   textExtracted: {
     type: String,
@@ -69,7 +84,7 @@ const pdfSchemas = new mongoose.Schema({
   },
   isQuizGenerated: {
     type: Boolean,
-    derfault: false,
+    default: false,
   },
   isSummarized: {
     type: Boolean,
@@ -93,6 +108,7 @@ const pdfSchemas = new mongoose.Schema({
   pages: {
     type: Number,
   },
+
   progress: {
     currentPage: {
       type: Number,
@@ -118,8 +134,6 @@ const pdfSchemas = new mongoose.Schema({
   quizGeneratedAt: { type: Date, default: null },
   flashcardsGeneratedAt: { type: Date, default: null },
   summaryGeneratedAt: { type: Date, default: null },
-
-  // NEW: async pipeline status
   status: {
     type: String,
     enum: ["UPLOADED", "PROCESSING", "READY", "FAILED"],
@@ -131,15 +145,16 @@ const pdfSchemas = new mongoose.Schema({
     finishedAt: { type: Date },
     error: { type: String },
   },
-
-  // NEW: metadata for tracing
   uploadedVia: { type: String, enum: ["web", "telegram"], default: "web" },
   originalName: { type: String },
   mimeType: { type: String },
 });
 
-pdfSchemas.index({ user: 1, fileHash: 1 }, { unique: true, sparse: true });
-pdfSchemas.index({ user: 1, createdAt: -1 });
-pdfSchemas.index({ user: 1, tags: 1 });
+// pdfSchemas.index(
+//   { user: 1, fileHash: 1 },
+//   { unique: true, partialFilterExpression: { fileHash: { $type: "string" } } }
+// );
+// pdfSchemas.index({ user: 1, createdAt: -1 });
+// pdfSchemas.index({ user: 1, tags: 1 });
 
 module.exports = mongoose.model("PDF", pdfSchemas);

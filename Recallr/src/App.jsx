@@ -26,6 +26,7 @@ import FlashcardGenerator from "./pages/aiflashcards/AiFlashcardsHome";
 import FlashcardHome from "./pages/aiflashcards/AiFlashcardsHome";
 import FlashcardsSettings from "./pages/aiflashcards/AiFlashcardsSettings";
 import Dashboard from "./pages/Dashboard";
+import AiSummaryDisplay from "./pages/aisummary/AiSummaryDisplay";
 
 function App() {
   return (
@@ -123,6 +124,7 @@ function App() {
           />
         </Route>
         <Route path="/quiz-master/quiz-info" element={<QuizInfoPage />} />
+        <Route path="/summary/:id" element={<AiSummaryDisplay/>}/>
       </Routes>
 
       {/* </BrowserRouter> */}

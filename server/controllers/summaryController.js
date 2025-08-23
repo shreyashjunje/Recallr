@@ -1,4 +1,5 @@
 const cloudinary = require("cloudinary").v2;
+const PDF =require("../models/Pdf")
 const { CloudinaryStorage } = require("multer-storage-cloudinary");
 // server / controllers / botController.js;
 cloudinary.config({
@@ -8,10 +9,16 @@ cloudinary.config({
 });
 // import stream from "stream";
 const stream = require("stream");
+const crypto = require("crypto");
 
 // import fs from "fs";
 const fs = require("fs");
+const { processSummaryWithGemini } = require("../services/geminiService");
 
+
+const generateFileHash = (buffer) => {
+  return crypto.createHash("sha256").update(buffer).digest("hex");
+};
 const generateSummary = async (req, res) => {
   console.log("in the backend controller");
   const { customPrompt, userId } = req.body;
@@ -64,22 +71,37 @@ const generateSummary = async (req, res) => {
 
     // const fileUrl = uploadResult.secure_url;
 
+    
+    // generate file hash
+    const fileHash = generateFileHash(file.buffer);
+
     // console.log("fileurl: ", fileurl);
-    const summary = await processSummaryWithGemini(file, customprompt);
+    const summary = await processSummaryWithGemini(file, customPrompt);
 
     console.log("got summary from the ai ");
     console.log("summary: ",summary)
 
-    // const newpdf = await PDF.create({
-    //   userId: req.body.userId,
-    //   title: summary.title,
-    //   tags: summary.tags,
-    //   category: summary.category,
-    //   cloudinaryUrl: NULL,
-    //   cloudinaryPublicId: NULL,
-    //   summary: summary.summary,
-    //   isSumarised: true,
-    // });
+    const newpdf = await PDF.create({
+      user:userId,
+      title: summary.title,
+      tags: summary.tags,
+      category: summary.category,
+      cloudinaryUrl: cloudResult.url || cloudResult.secure_url,
+      cloudinaryPublicId: cloudResult.public_id,
+      summary: summary.summary,
+      keyPoints:summary.keyPoints,
+      isSummarized: true,
+       fileHash,  
+      summaryGeneratedAt:Date.now(),
+      originalName:file.originalname,
+
+    });
+
+    res.status(200).json({
+      message:true,
+      message:"summary generated successfully",
+      data:newpdf
+    })
     
   } catch (err) {
     console.log("error:", err);

@@ -16,8 +16,12 @@ const DashboardHeader = () => {
     <div className="relative">
       {/* Background gradient with floating orbs */}
       <div
-        className="bg-gradient-to-r from-sky-500 via-indigo-500 to-teal-500
- text-white rounded-3xl p-8 shadow-2xl overflow-hidden relative"
+        className="bg-gradient-to-r from-sky-500/60 via-indigo-500/60 to-teal-500/60
+ text-white rounded-3xl p-8 shadow-2xl overflow-hidden relative backdrop-blur-md"
+
+//  className="bg-gradient-to-r from-sky-500/40 via-indigo-500/40 to-teal-500/40 
+// text-white rounded-3xl p-8 shadow-2xl overflow-hidden relative backdrop-blur-md"
+
       >
         {/* Floating shapes */}
         <motion.div
