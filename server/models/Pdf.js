@@ -69,6 +69,14 @@ const pdfSchemas = new mongoose.Schema({
       question: String,
       answer: String,
       difficulty: String,
+      // ✅ Tracking
+      isReviewed: { type: Boolean, default: true }, // has the user reviewed this?
+      lastReviewedAt: { type: Date }, // when last reviewed
+      reviewCount: { type: Number, default: 0 }, // how many times reviewed
+      confidenceLevel: {
+        type: String,
+        enum: ["again", "hard", "good", "easy"], // spaced repetition style feedback
+      },
     },
   ],
   fileHash: {

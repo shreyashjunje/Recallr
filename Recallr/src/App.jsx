@@ -27,6 +27,7 @@ import FlashcardHome from "./pages/aiflashcards/AiFlashcardsHome";
 import FlashcardsSettings from "./pages/aiflashcards/AiFlashcardsSettings";
 import Dashboard from "./pages/Dashboard";
 import AiSummaryDisplay from "./pages/aisummary/AiSummaryDisplay";
+import ShowFlashcards from "./pages/aiflashcards/ShowFlashcards";
 
 function App() {
   return (
@@ -72,6 +73,9 @@ function App() {
 
           <Route path="flashcards" element={<FlashcardHome />} />
           <Route path="flashcards/settings" element={<FlashcardsSettings />} />
+          <Route path="flashcards/get-flashcards/:id" element={<ShowFlashcards />} />
+          
+         
 
           <Route
             path="quizmaster"
@@ -124,7 +128,7 @@ function App() {
           />
         </Route>
         <Route path="/quiz-master/quiz-info" element={<QuizInfoPage />} />
-        <Route path="/summary/:id" element={<AiSummaryDisplay/>}/>
+        <Route path="/summary/:id" element={<AiSummaryDisplay />} />
       </Routes>
 
       {/* </BrowserRouter> */}

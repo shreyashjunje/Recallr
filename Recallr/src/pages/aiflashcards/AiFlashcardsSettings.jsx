@@ -4,6 +4,7 @@ import { Check, Library, Sparkles, Upload, X } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { jwtDecode } from "jwt-decode";
 import axios from "axios";
+import { toast } from "react-toastify";
 const API_URL = import.meta.env.VITE_API_URL;
 
 
@@ -66,7 +67,14 @@ const FlashcardsSettings = ({ onClose = false }) => {
         }
       );
 
-      console.log("res:", res.data);
+
+
+      console.log("res from flashcards:", res.data);
+
+      if(res.status===200){
+        // navigate("/")
+        toast.success("Flashcards Generated successfully")
+      }
 
       const data = await res.json();
       console.log("Backend response:", data);

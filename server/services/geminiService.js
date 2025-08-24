@@ -357,12 +357,35 @@ Rules:
     ]);
 
     console.log("📥 Got response from Gemini");
+    console.log("direct form gemini-->",result)
+    
 
-    // 5. Parse JSON safely
-    const responseText = result.response.text();
-    const jsonStart = responseText.indexOf("{");
-    const jsonEnd = responseText.lastIndexOf("}") + 1;
-    return JSON.parse(responseText.slice(jsonStart, jsonEnd));
+    // // 5. Parse JSON safely
+    // const responseText = result.response.text();
+    // const jsonStart = responseText.indexOf("{");
+    // const jsonEnd = responseText.lastIndexOf("}") + 1;
+    // return JSON.parse(responseText.slice(jsonStart, jsonEnd));
+      const responseText = await result.response.text();
+    console.log("Raw Gemini Response:", responseText);
+
+    // Defensive check
+    if (!responseText) {
+      throw new Error("Empty response from Gemini");
+    }
+
+    // Try to extract JSON safely
+    let parsedJSON;
+    try {
+      const jsonStart = responseText.indexOf("{");
+      const jsonEnd = responseText.lastIndexOf("}") + 1;
+      const jsonString = responseText.slice(jsonStart, jsonEnd);
+      parsedJSON = JSON.parse(jsonString);
+    } catch (parseErr) {
+      console.error("❌ Failed to parse JSON:", parseErr);
+      throw new Error("Gemini response was not valid JSON");
+    }
+
+    return parsedJSON;
   } catch (err) {
     console.error("❌ Error in processFlashcardsWithGemini:", err);
     throw err;
