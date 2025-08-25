@@ -1,14 +1,144 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
 
-// Recallr Animation Component
 const RecallrAnimation = () => {
+  const [isMobile, setIsMobile] = useState(false);
+
+  // Check if device is mobile
+  useEffect(() => {
+    const checkMobile = () => {
+      setIsMobile(window.innerWidth < 768);
+    };
+    
+    checkMobile();
+    window.addEventListener('resize', checkMobile);
+    
+    return () => window.removeEventListener('resize', checkMobile);
+  }, []);
+
   return (
-    <div className="w-full max-w-4xl mx-auto" style={{ height: "500px" }}>
+    <div className="w-full max-w-4xl mx-auto" style={{ height: isMobile ? "300px" : "500px" }}>
       <style
         dangerouslySetInnerHTML={{
           __html: `
-          /* (keep all your existing keyframes and styles here exactly as before) */
-           @keyframes rotate {
+          /* Responsive adjustments */
+          @media (max-width: 768px) {
+            .recallr-animation .processing-hub {
+              width: 80px;
+              height: 80px;
+            }
+            
+            .recallr-animation .hub-outer-ring {
+              width: 80px;
+              height: 80px;
+            }
+            
+            .recallr-animation .hub-inner-ring {
+              top: 10px;
+              left: 10px;
+              width: 60px;
+              height: 60px;
+            }
+            
+            .recallr-animation .recallr-core {
+              top: 15px;
+              left: 15px;
+              width: 50px;
+              height: 50px;
+              font-size: 16px;
+            }
+            
+            .recallr-animation .processing-indicator {
+              top: -3px;
+              left: -3px;
+              width: 60px;
+              height: 60px;
+            }
+            
+            .recallr-animation .pdf-document {
+              width: 24px;
+              height: 30px;
+            }
+            
+            .recallr-animation .source-platform {
+              width: 28px;
+              height: 28px;
+              font-size: 12px;
+            }
+            
+            .recallr-animation .output-card {
+              transform: scale(0.7);
+              transform-origin: top center;
+            }
+            
+            .recallr-animation .summary-output {
+              top: 20px !important;
+              right: 10px !important;
+            }
+            
+            .recallr-animation .quiz-output {
+              top: 20px !important;
+              left: 10px !important;
+            }
+            
+            .recallr-animation .dashboard-output {
+              top: 220px !important;
+              right: 10px !important;
+            }
+            
+            .recallr-animation .search-output {
+              top: 220px !important;
+              left: 10px !important;
+            }
+            
+            .recallr-animation .chat-output {
+              top: 120px !important;
+              bottom: auto !important;
+            }
+            
+            /* Adjust animation positions for mobile */
+            .recallr-animation .pdf-1 { 
+              --end-x: -30px; 
+              --end-y: -20px; 
+            }
+            
+            .recallr-animation .pdf-2 { 
+              --end-x: 30px; 
+              --end-y: -20px; 
+            }
+            
+            .recallr-animation .pdf-3 { 
+              --end-x: -30px; 
+              --end-y: 20px; 
+            }
+            
+            .recallr-animation .pdf-4 { 
+              --end-x: 30px; 
+              --end-y: 20px; 
+            }
+            
+            .recallr-animation .platform-gmail { 
+              top: 40px; 
+              left: 40px; 
+            }
+            
+            .recallr-animation .platform-drive { 
+              top: 40px; 
+              right: 40px; 
+            }
+            
+            .recallr-animation .platform-whatsapp { 
+              bottom: 40px; 
+              left: 40px; 
+            }
+            
+            .recallr-animation .platform-folder { 
+              bottom: 40px; 
+              right: 40px; 
+            }
+          }
+
+          /* Animation keyframes */
+          @keyframes rotate {
             from { transform: rotate(0deg); }
             to { transform: rotate(360deg); }
           }
@@ -69,14 +199,16 @@ const RecallrAnimation = () => {
             100% { opacity: 1; transform: scale(1); }
           }
 
-          @keyframes finalReveal {
-            0% { opacity: 0; transform: translate(-50%, -50%) scale(0.8); }
-            100% { opacity: 1; transform: translate(-50%, -50%) scale(1); }
-          }
-
-          @keyframes ctaGlow {
-            0% { opacity: 0; transform: scale(0.8); }
-            100% { opacity: 1; transform: scale(1); }
+          /* Base styles */
+          .recallr-animation {
+            position: relative;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(to bottom right, #ffffff, #f8fafc);
+            border-radius: 1rem;
+            overflow: hidden;
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+            border: 1px solid #e2e8f0;
           }
 
           .recallr-animation .bg-particle {
@@ -246,7 +378,6 @@ const RecallrAnimation = () => {
 
           .recallr-animation .output-card {
             position: absolute;
-            height: 150px;
             background: rgba(255, 255, 255, 0.95);
             backdrop-filter: blur(20px);
             border-radius: 12px;
@@ -359,10 +490,9 @@ const RecallrAnimation = () => {
           }
 
           .recallr-animation .dashboard-output {
-            top: 350px;
             width: 180px;
             height: 130px;
-            bottom: 120px;
+            top: 350px;
             right: 70px;
           }
 
@@ -401,8 +531,6 @@ const RecallrAnimation = () => {
           .recallr-animation .search-output {
             width: 200px;
             height: 130px;
-            bottom: 120px;
-            // left: 80px;
             top: 300px;
             right: 320px;
           }
@@ -494,53 +622,7 @@ const RecallrAnimation = () => {
             border-bottom-left-radius: 3px;
           }
 
-        //   .recallr-animation .final-scene {
-        //     position: absolute;
-        //     top: 50%;
-        //     left: 50%;
-        //     transform: translate(-50%, -50%);
-        //     text-align: center;
-        //     opacity: 0;
-        //     z-index: 200;
-        //   }
-
-          .recallr-animation .final-logo {
-            font-size: 36px;
-            font-weight: 800;
-            background: linear-gradient(135deg, #1e293b 0%, #667eea 100%);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
-            margin-bottom: 12px;
-          }
-
-          .recallr-animation .final-tagline {
-            font-size: 18px;
-            font-weight: 600;
-            color: #475569;
-            margin-bottom: 24px;
-          }
-
-          .recallr-animation .final-cta {
-            padding: 12px 24px;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
-            border: none;
-            border-radius: 8px;
-            font-weight: 600;
-            font-size: 14px;
-            cursor: pointer;
-            opacity: 0;
-            transform: scale(0.9);
-            box-shadow: 0 0 0 1px rgba(102, 126, 234, 0.2), 0 6px 24px rgba(102, 126, 234, 0.3);
-            transition: all 0.3s ease;
-          }
-
-          .recallr-animation .final-cta:hover {
-            transform: scale(0.95) translateY(-2px);
-            box-shadow: 0 0 0 1px rgba(102, 126, 234, 0.3), 0 8px 30px rgba(102, 126, 234, 0.4);
-          }
-
+          /* Animation sequences */
           .recallr-animation .pdf-1 { animation: pdfFlyIn 3s cubic-bezier(0.23, 1, 0.32, 1) 0.8s forwards; --start-x: -200px; --start-y: -100px; --end-x: -60px; --end-y: -30px; --rotation: -15deg; }
           .recallr-animation .pdf-2 { animation: pdfFlyIn 3s cubic-bezier(0.23, 1, 0.32, 1) 1.2s forwards; --start-x: 200px; --start-y: -100px; --end-x: 60px; --end-y: -30px; --rotation: 15deg; }
           .recallr-animation .pdf-3 { animation: pdfFlyIn 3s cubic-bezier(0.23, 1, 0.32, 1) 1.6s forwards; --start-x: -200px; --start-y: 100px; --end-x: -60px; --end-y: 30px; --rotation: 10deg; }
@@ -555,7 +637,6 @@ const RecallrAnimation = () => {
           .recallr-animation .output-2 { animation: outputReveal 1.2s cubic-bezier(0.23, 1, 0.32, 1) 7s forwards; }
           .recallr-animation .output-3 { animation: outputReveal 1.2s cubic-bezier(0.23, 1, 0.32, 1) 9s forwards; }
           .recallr-animation .output-4 { animation: outputReveal 1.2s cubic-bezier(0.23, 1, 0.32, 1) 11s forwards; }
-          .recallr-animation .output-5 { animation: outputReveal 1.2s cubic-bezier(0.23, 1, 0.32, 1) 13s forwards; }
 
           .recallr-animation .item-1 { animation: itemSlideIn 0.6s ease-out 5.5s forwards; }
           .recallr-animation .item-2 { animation: itemSlideIn 0.6s ease-out 5.8s forwards; }
@@ -574,14 +655,9 @@ const RecallrAnimation = () => {
 
           .recallr-animation .chat-msg-1 { animation: itemSlideIn 0.6s ease-out 13.5s forwards; }
           .recallr-animation .chat-msg-2 { animation: itemSlideIn 0.6s ease-out 14.2s forwards; }
-
-        //   .recallr-animation .final-appear { animation: finalReveal 1.5s cubic-bezier(0.23, 1, 0.32, 1) 16s forwards; }
-          .recallr-animation .cta-appear { animation: ctaGlow 1.2s cubic-bezier(0.34, 1.56, 0.64, 1) 17s forwards; }
         `,
         }}
       />
-
-      
 
       <div className="relative w-full h-full bg-gradient-to-br from-white to-gray-50 rounded-3xl overflow-hidden shadow-2xl border border-gray-100 recallr-animation">
         {/* Background Particles */}
@@ -757,13 +833,6 @@ const RecallrAnimation = () => {
             <div className="result-icon">📄</div>
             <span>Advanced tips.pdf</span>
           </div>
-        </div>
-
-        {/* Final Scene */}
-        <div className="final-scene final-appear">
-          {/* <div className="final-logo">Recallr</div> */}
-          {/* <div className="final-tagline">Learn smarter, faster.</div> */}
-          {/* <button className="final-cta cta-appear">Get Started</button> */}
         </div>
       </div>
     </div>

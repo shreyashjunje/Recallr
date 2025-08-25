@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
   Heart,
   Share2,
@@ -16,24 +16,57 @@ import {
   MoreHorizontal,
 } from "lucide-react";
 import { useLocation, useParams } from "react-router";
+import { toast } from "react-toastify";
+import axios from "axios";
+const API_URL=import.meta.env.VITE_API_URL
 
 const AiSummaryDisplay = () => {
   const { id } = useParams(); // <-- this will give you _id from URL
-  const location = useLocation(); 
+
+  const location = useLocation();
   const summary = location.state?.summary; // <-- this will give you the passed object
 
   console.log("id from URL:", id);
-  console.log("summary from state:", summary); 
+  // console.log("summary from state:", summary);
 
-  console.log("summary::::->",summary.data)
-  const summaryinfo=summary.data;
-  console.log("title:",summaryinfo.title)
-
-
+  // console.log("summary::::->", summary.data);
+  // const summaryinfo=summary.data;
+  // console.log("title:", summaryinfo.title);
 
   const [isFavorite, setIsFavorite] = useState(false);
   const [copied, setCopied] = useState(false);
   const [showShareMenu, setShowShareMenu] = useState(false);
+  const [summaryinfo, setSummaryinfo] = useState({});
+
+  const fetchSummary = async () => {
+    try {
+      const token = localStorage.getItem("token");
+      console.log("tokne-->", token);
+
+      console.log("iddddddd=", id);
+
+      const res = await axios.get(`${API_URL}/summary/get-summary/${id}`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+
+      if (res.status === 200) {
+        // setPdf(res.data.data);
+        setSummaryinfo(res.data.data);
+        console.log("summaryinfo:=====",summaryinfo)
+        toast.success("flashcards fetched successfully");
+      }
+
+      console.log("flashcards from show compo-->", res.data.data);
+    } catch (err) {
+      console.log("Error-->", err);
+      toast.error("flashcards fetched unsuccessful");
+    }
+  };
+  useEffect(() => {
+    fetchSummary();
+  }, []);
 
   // Sample data - replace with your actual data
   const summaryData = {
@@ -270,7 +303,7 @@ const AiSummaryDisplay = () => {
             <div className="flex items-center gap-2">
               <Tag className="text-slate-500" size={16} />
               <div className="flex flex-wrap gap-2">
-                {summaryinfo.tags.map((tag, index) => (
+                {summaryinfo?.tags?.map((tag, index) => (
                   <span
                     key={index}
                     className="px-2 py-1 bg-slate-100 text-slate-700 rounded-full text-xs font-medium hover:bg-slate-200 transition-colors cursor-pointer"
@@ -292,7 +325,7 @@ const AiSummaryDisplay = () => {
             <h2 className="text-xl font-semibold text-slate-900">Summary</h2>
           </div>
           <div className="space-y-4">
-            {summaryinfo.summary.map((paragraph, index) => (
+            {summaryinfo.summary?.map((paragraph, index) => (
               <p key={index} className="text-slate-700 leading-relaxed text-lg">
                 {paragraph}
               </p>
@@ -309,7 +342,7 @@ const AiSummaryDisplay = () => {
             <h2 className="text-xl font-semibold text-slate-900">Key Points</h2>
           </div>
           <div className="space-y-3">
-            {summaryinfo.keyPoints.map((keyPoint, index) => (
+            {summaryinfo?.keyPoints?.map((keyPoint, index) => (
               <div
                 key={index}
                 className={`flex items-start gap-4 p-4 rounded-xl transition-all duration-200 ${

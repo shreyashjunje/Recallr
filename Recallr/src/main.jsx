@@ -13,9 +13,9 @@ createRoot(document.getElementById("root")).render(
   <BrowserRouter>
     <AuthProvider>
       {/* <ThemeProvider> */}
-        <QuizProvider>
-          <App />
-        </QuizProvider>
+      <QuizProvider>
+        <App />
+      </QuizProvider>
       {/* </ThemeProvider> */}
     </AuthProvider>
     <ToastContainer

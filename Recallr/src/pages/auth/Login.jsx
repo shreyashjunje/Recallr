@@ -1,10 +1,10 @@
 import React, { useEffect, useState } from "react";
-import { Eye, EyeOff } from "lucide-react";
-// import loginIMG from "../../assets/auth/loginIMG.png";/
+import { Eye, EyeOff, ArrowLeft } from "lucide-react";
 import LoginAnimation from "../../components/auth/LoginAnimation";
 import axios from "axios";
 import { useNavigate } from "react-router";
 import { toast } from "react-toastify";
+import logo from "../../assets/logoR.png";
 
 export default function LoginPage() {
   const [showPassword, setShowPassword] = useState(false);
@@ -13,17 +13,26 @@ export default function LoginPage() {
   const [formErrors, setFormErrors] = useState({});
   const [rememberMe, setRememberMe] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [isMobile, setIsMobile] = useState(window.innerWidth < 1024);
   const navigate = useNavigate();
 
   const API_URL = import.meta.env.VITE_API_URL;
 
   useEffect(() => {
-    let token = localStorage.getItem("token");
+    // Handle responsive behavior
+    const handleResize = () => {
+      setIsMobile(window.innerWidth < 1024);
+    };
 
+    window.addEventListener("resize", handleResize);
+
+    let token = localStorage.getItem("token");
     if (token) {
       navigate("/dashboard");
       toast.success("User logged in successfully..!");
     }
+
+    return () => window.removeEventListener("resize", handleResize);
   }, []);
 
   const togglePasswordVisibility = () => {
@@ -34,22 +43,25 @@ export default function LoginPage() {
     navigate("/register");
   };
 
+  const handleBack = () => {
+    navigate(-1); // Go back to previous page
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    // // Frontend validation
-    // if (!loginId && !password) {
-    //   toast.error("Please enter both LoginId and password.");
-    //   return;
-
-    // }
     const errors = {};
     if (!loginId) errors.loginId = "Login ID is required";
     if (!password) errors.password = "Password is required";
 
-    setFormErrors(errors);
+    if (Object.keys(errors).length > 0) {
+      setFormErrors(errors);
+      return;
+    }
 
+    setFormErrors({});
     setLoading(true);
+
     try {
       const res = await axios.post(`${API_URL}/auth/login`, {
         loginId,
@@ -71,7 +83,7 @@ export default function LoginPage() {
       }
     } catch (err) {
       console.error("Login Error:", err.message);
-      // toast.error(err.message);
+      toast.error(err.response?.data?.message || "Login failed");
     } finally {
       setLoading(false);
     }
@@ -83,10 +95,9 @@ export default function LoginPage() {
     if (token) {
       console.log("inbackendcall....");
       toast.success("Successfully logged in!");
-      setSuccess(true);
       setTimeout(() => {
         navigate("/dashboard");
-      }, 1000); // 1 second
+      }, 1000);
     } else {
       window.location.href = `${import.meta.env.VITE_API_URL}/auth/google`;
     }
@@ -94,17 +105,54 @@ export default function LoginPage() {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 flex items-center justify-center p-4">
-      <div className="bg-white shadow-2xl w-full max-w-6xl rounded-2xl overflow-hidden flex flex-col lg:flex-row">
+      <div className="bg-white shadow-2xl w-full max-w-6xl rounded-2xl overflow-hidden flex flex-col lg:flex-row relative">
+        {/* Back Button for Mobile */}
+        {isMobile && (
+          <button
+            onClick={handleBack}
+            className="absolute top-2 left-4 z-10 p-2 rounded-full bg-white shadow-md lg:hidden "
+          >
+            <ArrowLeft size={20} className=""/>
+          </button>
+        )}
+
+        {/* Logo for Mobile */}
+        {/* {!isMobile && (
+          <div className="hidden w-[40%] lg:flex items-center justify-center mb-2 absolute top-2 left-8">
+            <div className=" h-10 flex items-center justify-center">
+              <img src={logo} alt="Recallr Logo" className="w-6 h-8" />
+            </div>
+            <span className="font-bold text-gray-800 text-xl mt-2">Recallr</span>
+          </div>
+        )} */}
+
+        {isMobile && (
+          <div className="absolute top-4 left-1/2 transform -translate-x-1/2 z-10 flex items-center">
+            <div className="flex items-center justify-center">
+              <img
+                src={logo}
+                alt="Recallr Logo"
+                className="w-7 h-8 sm:w-7 sm:h-7 md:w-8 md:h-8"
+              />
+            </div>
+            <span className="font-bold text-gray-800 text-lg sm:text-xl md:text-2xl mt-2">
+              Recallr
+            </span>
+          </div>
+        )}
+
         {/* Left Side - Login Form */}
         <div className="p-6 sm:p-8 md:p-10 lg:p-12 w-full lg:w-1/2 flex flex-col">
+          {/* Logo for Desktop */}
+
           {/* Login Form */}
           <form onSubmit={handleSubmit} autoComplete="on">
             <div className="flex-1">
-              <h1 className="text-2xl sm:text-3xl font-bold text-gray-900 mb-3">
+              <h1 className="text-2xl sm:text-3xl font-bold text-gray-900 mb-3 mt-6 lg:mt-0">
                 Login
               </h1>
               <p className="text-gray-600 mb-6 sm:mb-8">
-                Login to access your travelwise account
+                Login to access your TravelWise account
               </p>
 
               <div className="space-y-4 sm:space-y-6">
@@ -189,7 +237,7 @@ export default function LoginPage() {
                 <button
                   type="submit"
                   disabled={loading}
-                  className="w-full bg-blue-600 text-white py-2 sm:py-3 px-4 rounded-lg hover:bg-blue-700 transition-colors font-medium text-base sm:text-lg"
+                  className="w-full bg-blue-600 text-white py-2 sm:py-3 px-4 rounded-lg hover:bg-blue-700 transition-colors font-medium text-base sm:text-lg disabled:opacity-70"
                 >
                   {loading ? (
                     <div className="flex justify-center items-center">

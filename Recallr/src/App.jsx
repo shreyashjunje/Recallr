@@ -1,13 +1,8 @@
-import { Route } from "react-router-dom";
+import { Routes, Route } from "react-router-dom";
 import "./App.css";
-// import Navbar from "./components/Navabar";
 import Home from "./pages/Home";
 import LoginPage from "./pages/auth/Login";
-import { Router, Routes } from "react-router";
-import Navbar from "./components/Navabar";
-// import { Dashboard } from "./pages/Dashboard";
 import SignUpPage from "./pages/auth/Register";
-import { Upload } from "lucide-react";
 import UploadPDF from "./pages/UploadPDF";
 import Layout from "./components/layouts/Layout";
 import MyLibrary from "./pages/MyLibrary";
@@ -19,94 +14,41 @@ import {
 } from "./components/maincomponent/StatusComponent";
 import QuizMasterHome from "./components/QuizMaster/QuizMasterHome";
 import QuizSetup from "./components/QuizMaster/QuizSettings";
-import LogoLoader from "./components/ui/LogoLoader";
 import QuizInfoPage from "./components/QuizMaster/QuizInfoPage";
 import AiSummaryHome from "./pages/aisummary/AiSummaryHome";
-import FlashcardGenerator from "./pages/aiflashcards/AiFlashcardsHome";
 import FlashcardHome from "./pages/aiflashcards/AiFlashcardsHome";
 import FlashcardsSettings from "./pages/aiflashcards/AiFlashcardsSettings";
 import Dashboard from "./pages/Dashboard";
 import AiSummaryDisplay from "./pages/aisummary/AiSummaryDisplay";
 import ShowFlashcards from "./pages/aiflashcards/ShowFlashcards";
-import { useState } from "react";
-import { QuizInfo } from "./components/QuizMaster/QuizInfo";
-import { Quiz } from "./components/QuizMaster/Quiz";
-import { sampleQuestions, sampleQuizInfo } from "./data/sampleQuiz";
-import QuizPage from "./components/QuizMaster/QuizPage";
+// import { useState } from "react";
 import { ThemeProvider } from "./context/ThemeContext";
+import QuizPage from "./components/QuizMaster/QuizPage";
+import SummaryHome from "./pages/aisummary/SummaryHome";
 
 function App() {
-  const [quizStarted, setQuizStarted] = useState(false);
+  // const [quizStarted, setQuizStarted] = useState(false);
 
-  const handleStartQuiz = () => {
-    setQuizStarted(true);
-  };
-
-  const handleExitQuiz = () => {
-    setQuizStarted(false);
-  };
   return (
-    <>
-      {/* <BrowserRouter> */}
-      {/* <Navbar /> */}
-
+    // <BrowserRouter>
       <Routes>
         <Route path="/login" element={<LoginPage />} />
         <Route path="/register" element={<SignUpPage />} />
         <Route path="/view" element={<PDFViewer />} />
 
         <Route path="/" element={<Layout />}>
-          <Route path="/" element={<Home />} />
-
-          {/* <Route path="dashboard" element={<Dashboard />} /> */}
-          <Route
-            path="dashboard"
-            element={
-              // <LaunchingSoon
-              //   title="Dashboard"
-              //   message="All your PDFs, beautifully organized in one place."
-              //   estimatedDate="Next Week"
-              // />
-              <Dashboard />
-            }
-          />
+          <Route index element={<Home />} />
+          <Route path="dashboard" element={<Dashboard />} />
           <Route path="upload" element={<UploadPDF />} />
           <Route path="library" element={<MyLibrary />} />
-
-          <Route
-            path="ai-summaries"
-            element={
-              // <InDevelopment
-              //   title="AI Summaries"
-              //   message="Read less. Learn more."
-              //   estimatedDate="AUG 2025"
-              //   progress={75}
-              // />
-              <AiSummaryHome />
-            }
-          />
-
+          <Route path="ai-summaries" element={<SummaryHome />} />
+          <Route path="ai-summaries/:id" element={<AiSummaryDisplay />} />
+          <Route path="ai-summaries/generate-summary" element={<AiSummaryHome />} />
           <Route path="flashcards" element={<FlashcardHome />} />
           <Route path="flashcards/settings" element={<FlashcardsSettings />} />
-          <Route
-            path="flashcards/get-flashcards/:id"
-            element={<ShowFlashcards />}
-          />
-
-          <Route
-            path="quizmaster"
-            element={
-              // <InDevelopment
-              //   title="QUIZ Generator"
-              //   message="Test yourself instantly."
-              //   estimatedDate="AUG 2025"
-              //   progress={20}
-              // />
-              <QuizMasterHome />
-            }
-          />
+          <Route path="flashcards/get-flashcards/:id" element={<ShowFlashcards />} />
+          <Route path="quizmaster" element={<QuizMasterHome />} />
           <Route path="quizmaster/quizsettings" element={<QuizSetup />} />
-
           <Route
             path="study-groups"
             element={
@@ -118,7 +60,6 @@ function App() {
               />
             }
           />
-
           <Route
             path="voice-assistant"
             element={
@@ -130,7 +71,6 @@ function App() {
               />
             }
           />
-
           <Route
             path="chat-pdfs"
             element={
@@ -143,29 +83,7 @@ function App() {
             }
           />
         </Route>
-        {/* <Route path="/quizmaster/:id" element={<QuizPage />} /> */}
-        <Route path="/summary/:id" element={<AiSummaryDisplay />} />
 
-        {/* Quiz Page route */}
-        {/* <Route
-          path="/boltquiz"
-          element={
-            <div className="min-h-screen">
-              {!quizStarted ? (
-                <QuizInfo
-                  quizInfo={sampleQuizInfo}
-                  onStartQuiz={handleStartQuiz}
-                />
-              ) : (
-                <Quiz
-                  quizInfo={sampleQuizInfo}
-                  questions={sampleQuestions}
-                  onExit={handleExitQuiz}
-                />
-              )}
-            </div>
-          }
-        /> */}
         <Route
           path="/quizmaster/:id"
           element={
@@ -175,9 +93,7 @@ function App() {
           }
         />
       </Routes>
-
-      {/* </BrowserRouter> */}
-    </>
+    // </BrowserRouter>
   );
 }
 

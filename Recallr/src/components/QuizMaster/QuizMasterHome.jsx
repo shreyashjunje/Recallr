@@ -180,7 +180,7 @@ const QuizMasterHome = () => {
         setQuizzes(res.data.data);
         const all=res.data.data
         const quizzestotal=await all.length;
-        const uniqueCategories = new Set(all.map((flascards) => all.category));
+        const uniqueCategories = new Set(all.map((quiz) => quiz.category));
         const categoriestotal = uniqueCategories.size;
 
         setTotalQuizzes(quizzestotal)

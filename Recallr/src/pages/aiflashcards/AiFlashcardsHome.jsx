@@ -53,7 +53,7 @@ const FlashcardHome = () => {
         const all = res.data.data;
         setAllFlashcards(all);
         const totalFlashcards = await all.length;
-        const uniqueCategories = new Set(all.map((flascards) => all.category));
+        const uniqueCategories = new Set(all.map((flashcard) => flashcard.category));
         const totalCategories = uniqueCategories.size;
 
         setTotalCategories(totalCategories);
@@ -593,7 +593,7 @@ const FlashcardHome = () => {
             </div>
           )}
 
-          {totalFlashCards.length === 0 ? (
+          {totalFlashCards === 0 ? (
             <div className="text-center py-16">
               <div className="w-16 h-16 bg-slate-200 rounded-full flex items-center justify-center mx-auto mb-4">
                 <BookOpen className="w-8 h-8 text-slate-400" />
@@ -631,7 +631,7 @@ const FlashcardHome = () => {
                   {/* Card Header */}
                   <div className="flex items-start justify-between mb-4">
                     <div
-                      className={`w-3 h-3 ${(card.color =
+                      className={`w-3 h-3 ${(card.color ||
                         "bg-red-500")} rounded-full`}
                     >
                       
