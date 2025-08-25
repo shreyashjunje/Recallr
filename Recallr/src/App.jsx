@@ -28,8 +28,23 @@ import FlashcardsSettings from "./pages/aiflashcards/AiFlashcardsSettings";
 import Dashboard from "./pages/Dashboard";
 import AiSummaryDisplay from "./pages/aisummary/AiSummaryDisplay";
 import ShowFlashcards from "./pages/aiflashcards/ShowFlashcards";
+import { useState } from "react";
+import { QuizInfo } from "./components/QuizMaster/QuizInfo";
+import { Quiz } from "./components/QuizMaster/Quiz";
+import { sampleQuestions, sampleQuizInfo } from "./data/sampleQuiz";
+import QuizPage from "./components/QuizMaster/QuizPage";
+import { ThemeProvider } from "./context/ThemeContext";
 
 function App() {
+  const [quizStarted, setQuizStarted] = useState(false);
+
+  const handleStartQuiz = () => {
+    setQuizStarted(true);
+  };
+
+  const handleExitQuiz = () => {
+    setQuizStarted(false);
+  };
   return (
     <>
       {/* <BrowserRouter> */}
@@ -73,9 +88,10 @@ function App() {
 
           <Route path="flashcards" element={<FlashcardHome />} />
           <Route path="flashcards/settings" element={<FlashcardsSettings />} />
-          <Route path="flashcards/get-flashcards/:id" element={<ShowFlashcards />} />
-          
-         
+          <Route
+            path="flashcards/get-flashcards/:id"
+            element={<ShowFlashcards />}
+          />
 
           <Route
             path="quizmaster"
@@ -127,8 +143,37 @@ function App() {
             }
           />
         </Route>
-        <Route path="/quiz-master/quiz-info" element={<QuizInfoPage />} />
+        {/* <Route path="/quizmaster/:id" element={<QuizPage />} /> */}
         <Route path="/summary/:id" element={<AiSummaryDisplay />} />
+
+        {/* Quiz Page route */}
+        {/* <Route
+          path="/boltquiz"
+          element={
+            <div className="min-h-screen">
+              {!quizStarted ? (
+                <QuizInfo
+                  quizInfo={sampleQuizInfo}
+                  onStartQuiz={handleStartQuiz}
+                />
+              ) : (
+                <Quiz
+                  quizInfo={sampleQuizInfo}
+                  questions={sampleQuestions}
+                  onExit={handleExitQuiz}
+                />
+              )}
+            </div>
+          }
+        /> */}
+        <Route
+          path="/quizmaster/:id"
+          element={
+            <ThemeProvider>
+              <QuizPage />
+            </ThemeProvider>
+          }
+        />
       </Routes>
 
       {/* </BrowserRouter> */}

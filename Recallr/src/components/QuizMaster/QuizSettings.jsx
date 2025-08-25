@@ -96,7 +96,7 @@ const QuizSetup = () => {
       if (res.status === 200) {
         console.log("Quiz generated successfully:", res.data);
         toast.success("Quiz generated successfully!");
-        navigate("/quiz-master/quiz-info", {state: { quiz: res.data.quiz } });
+        navigate("/quizmaster");
       }
     } catch (err) {
       console.error("Error generating quiz:", err);
@@ -213,7 +213,7 @@ const QuizSetup = () => {
                     className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                   >
                     <option value="">Select a PDF...</option>
-                    {pdfs.map((pdf) => (
+                    {pdfs?.map((pdf) => (
                       <option key={pdf.id} value={pdf.id}>
                         {pdf.name}
                       </option>

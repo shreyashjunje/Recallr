@@ -7,13 +7,16 @@ import "react-toastify/dist/ReactToastify.css";
 import { ToastContainer } from "react-toastify";
 import { AuthProvider } from "./context/AuthContext";
 import { QuizProvider } from "./context/QuizContext";
+import { ThemeProvider } from "./context/ThemeContext";
 
 createRoot(document.getElementById("root")).render(
   <BrowserRouter>
     <AuthProvider>
-      <QuizProvider>
-        <App />
-      </QuizProvider>
+      {/* <ThemeProvider> */}
+        <QuizProvider>
+          <App />
+        </QuizProvider>
+      {/* </ThemeProvider> */}
     </AuthProvider>
     <ToastContainer
       position="top-right"

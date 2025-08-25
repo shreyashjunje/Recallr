@@ -9,6 +9,7 @@ import {
   Users,
   Award,
 } from "lucide-react";
+import { useLocation } from "react-router";
 
 const QuizInfoPage = () => {
   // Sample quiz data - replace with props or API data
