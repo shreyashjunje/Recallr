@@ -37,6 +37,7 @@ import QuoteCard from "../components/dashboard/helper/QuoteCard";
 import DashboardHeader from "@/components/dashboard/helper/DashboardHeader";
 import axios from "axios";
 import { jwtDecode } from "jwt-decode";
+import { useNavigate } from "react-router";
 const API_URL = import.meta.env.VITE_API_URL;
 
 // interface TodoItem {
@@ -82,6 +83,22 @@ const Dashboard = () => {
   const [showReminder, setShowReminder] = useState(false);
   const [studyTime, setStudyTime] = useState("");
   const [activeTab, setActiveTab] = useState("uploads");
+
+  const navigate = useNavigate();
+
+  // useEffect(() => {
+  //   const handlePopState = (event) => {
+  //     event.preventDefault();
+  //     navigate("/",{ replace: true }); // Always go home
+  //   };
+
+  //   window.addEventListener("popstate", handlePopState);
+
+  //   return () => {
+  //     window.removeEventListener("popstate", handlePopState);
+  //   };
+  // }, [navigate]);
+
   // const [todos, setTodos] = useState([
   //   {
   //     id: "1",
@@ -234,26 +251,24 @@ const Dashboard = () => {
   const totalpdfsthisweek = pdfsThisWeek.length;
 
   const favouritePDFs = pdfs.filter((pdf) => pdf.isFavourite === true);
-  const recentPDFs = [...pdfs].sort(
-    (a, b) => new Date(b.uploadedAt) - new Date(a.uploadedAt)
-  ).slice(0,3);
+  const recentPDFs = [...pdfs]
+    .sort((a, b) => new Date(b.uploadedAt) - new Date(a.uploadedAt))
+    .slice(0, 3);
 
   const isQuizes = pdfs.filter((pdf) => pdf.isQuizGenerated === true);
-  const recentQuizes = [...isQuizes].sort(
-    (a, b) => new Date(b.uploadedAt) - new Date(a.uploadedAt)
-  ).slice(0,3);
+  const recentQuizes = [...isQuizes]
+    .sort((a, b) => new Date(b.uploadedAt) - new Date(a.uploadedAt))
+    .slice(0, 3);
 
   const isflashcard = pdfs.filter((pdf) => pdf.isFlashcardGenerated === true);
-  const recentFlashcard = [...isflashcard].sort(
-    (a, b) => new Date(b.uploadedAt) - new Date(a.uploadedAt)
-  ).slice(0,3);
+  const recentFlashcard = [...isflashcard]
+    .sort((a, b) => new Date(b.uploadedAt) - new Date(a.uploadedAt))
+    .slice(0, 3);
 
   const isSummary = pdfs.filter((pdf) => pdf.isSummarized === true);
-  const recenSummaries = [...isSummary].sort(
-    (a, b) => new Date(b.uploadedAt) - new Date(a.uploadedAt)
-  ).slice(0,3);
-
-
+  const recenSummaries = [...isSummary]
+    .sort((a, b) => new Date(b.uploadedAt) - new Date(a.uploadedAt))
+    .slice(0, 3);
 
   const stats = [
     {
@@ -288,88 +303,6 @@ const Dashboard = () => {
       gradient: "from-orange-500 to-red-500",
       trend: "up",
     },
-  ];
-
-  const recentUploads = [
-    {
-      id: "1",
-      title: "Machine Learning Fundamentals.pdf",
-      date: "2 hours ago",
-      progress: 85,
-    },
-    {
-      id: "2",
-      title: "Data Structures and Algorithms.pdf",
-      date: "5 hours ago",
-      progress: 60,
-    },
-    {
-      id: "3",
-      title: "Web Development Guide.pdf",
-      date: "1 day ago",
-      progress: 100,
-    },
-  ];
-
-  const recentQuizzes = [
-    {
-      id: "1",
-      title: "JavaScript Basics Quiz",
-      date: "1 day ago",
-      type: "JavaScript",
-      score: 92,
-    },
-    {
-      id: "2",
-      title: "React Hooks Quiz",
-      date: "2 days ago",
-      type: "React",
-      score: 88,
-    },
-    {
-      id: "3",
-      title: "Database Design Quiz",
-      date: "3 days ago",
-      type: "Database",
-      score: 95,
-    },
-  ];
-
-  const recentFlashcards = [
-    {
-      id: "1",
-      title: "Python Functions Flashcards",
-      date: "1 hour ago",
-      progress: 75,
-    },
-    {
-      id: "2",
-      title: "SQL Commands Flashcards",
-      date: "4 hours ago",
-      progress: 90,
-    },
-    {
-      id: "3",
-      title: "Git Commands Flashcards",
-      date: "1 day ago",
-      progress: 100,
-    },
-  ];
-
-  // const recentSummaries = [
-  //   { id: "1", title: "Neural Networks Summary", date: "30 minutes ago" },
-  //   {
-  //     id: "2",
-  //     title: "Microservices Architecture Summary",
-  //     date: "2 hours ago",
-  //   },
-  //   { id: "3", title: "DevOps Best Practices Summary", date: "6 hours ago" },
-  // ];
-
-  const favoritePdfs = [
-    { id: "1", title: "Advanced React Patterns.pdf", date: "Last week" },
-    { id: "2", title: "System Design Interview.pdf", date: "2 weeks ago" },
-    { id: "3", title: "Clean Code Principles.pdf", date: "1 month ago" },
   ];
 
   const upcomingEvents = [
@@ -521,20 +454,19 @@ const Dashboard = () => {
       gradient: "from-orange-500 to-red-500",
     },
   };
- function timeAgo(dateString) {
-  const date = new Date(dateString);
-  const now = new Date();
-  const seconds = Math.floor((now - date) / 1000);
+  function timeAgo(dateString) {
+    const date = new Date(dateString);
+    const now = new Date();
+    const seconds = Math.floor((now - date) / 1000);
 
-  if (seconds < 60) return "just now";
-  const minutes = Math.floor(seconds / 60);
-  if (minutes < 60) return `${minutes} minute${minutes > 1 ? "s" : ""} ago`;
-  const hours = Math.floor(minutes / 60);
-  if (hours < 24) return `${hours} hour${hours > 1 ? "s" : ""} ago`;
-  const days = Math.floor(hours / 24);
-  return `${days} day${days > 1 ? "s" : ""} ago`;
-}
-
+    if (seconds < 60) return "just now";
+    const minutes = Math.floor(seconds / 60);
+    if (minutes < 60) return `${minutes} minute${minutes > 1 ? "s" : ""} ago`;
+    const hours = Math.floor(minutes / 60);
+    if (hours < 24) return `${hours} hour${hours > 1 ? "s" : ""} ago`;
+    const days = Math.floor(hours / 24);
+    return `${days} day${days > 1 ? "s" : ""} ago`;
+  }
 
   const renderTabContent = () => {
     const currentTab = tabData[activeTab];

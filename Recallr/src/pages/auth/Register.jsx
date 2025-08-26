@@ -1,12 +1,16 @@
 import React, { useState } from "react";
-import { Eye, EyeOff } from "lucide-react";
+import { Eye, EyeOff, ArrowLeft } from "lucide-react";
 import { motion } from "framer-motion";
 import RegisterAnimation from "../../components/auth/RegisterAnimation";
 import axios from "axios";
 import { useNavigate } from "react-router";
 import { toast } from "react-toastify";
+import logo from "../../assets/logoR.png"; // Make sure to import your logo
+import useAuth from "../../hooks/useAuth";
 
 export default function SignUpPage() {
+    // const { login } = useAuth(); // 👈 get login function from context
+
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [formErrors, setFormErrors] = useState({});
@@ -32,6 +36,7 @@ export default function SignUpPage() {
   };
 
   const handleSubmit = async (e) => {
+    console.log("in the handle submit function")
     e.preventDefault();
     const errors = {};
     if (!formData.userName) errors.userName = "Username ID is required";
@@ -67,7 +72,7 @@ export default function SignUpPage() {
       });
 
       if (res.status === 201) {
-        localStorage.setItem("token", res.data.token);
+        login(res.data.token); // 👈 updates context + localStorage
         toast.success("user logged in successfully..!");
         navigate("/dashboard");
       }
@@ -82,59 +87,74 @@ export default function SignUpPage() {
     }
   };
 
-    const googleLoginHandler = async () => {
-      const token = localStorage.getItem("token");
-  
-      if (token) {
-        console.log("inbackendcall....");
-        toast.success("Successfully logged in!");
-        setSuccess(true);
-        setTimeout(() => {
-          navigate("/dashboard");
-        }, 1000); // 1 second
-      } else {
-        window.location.href = `${import.meta.env.VITE_API_URL}/auth/google`;
-      }
-    };
-  
+  const goBack = () => {
+    navigate(-1); // Go back to previous page
+  };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 flex items-center justify-center">
-      <div className=" bg-white shadow-2xl rounded-2xl overflow-hidden w-full max-w-7xl flex flex-col lg:flex-row ">
+    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 flex items-center justify-center p-4">
+      <div className="bg-white shadow-2xl rounded-2xl overflow-hidden w-full max-w-7xl flex flex-col lg:flex-row">
+        {/* Mobile Header with Back Button and Logo */}
+        <div className="lg:hidden flex items-center justify-between p-4 border-b border-gray-200">
+          <button
+            onClick={goBack}
+            className="flex items-center text-gray-600 hover:text-gray-800 transition-colors"
+          >
+            <ArrowLeft className="w-5 h-5 mr-1" />
+            Back
+          </button>
+          <div className="flex items-center">
+            <img src={logo} alt="Recallr Logo" className="h-8 w-auto mr-2" />
+            <span className="text-xl font-bold text-gray-900">Recallr</span>
+          </div>
+          <div className="w-10"></div> {/* Spacer for balance */}
+        </div>
+
         {/* Left side - Animation (hidden on mobile) */}
         <div className="hidden lg:flex lg:w-1/2 p-8 xl:p-12 bg-gradient-to-br from-blue-100 to-indigo-200 items-center justify-center">
           <RegisterAnimation />
         </div>
 
         {/* Right side - Form */}
-        <div className="w-full  lg:w-1/2 p-6 sm:p-8 md:p-10 lg:p-8">
+        <div className="w-full lg:w-1/2 p-6 sm:p-8 md:p-10 lg:p-8">
+          {/* Back button for desktop */}
+          <button
+            onClick={goBack}
+            className="hidden lg:flex items-center text-gray-600 hover:text-gray-800 transition-colors mb-4"
+          >
+            <ArrowLeft className="w-5 h-5 mr-1" />
+            Back
+          </button>
+
           <form onSubmit={handleSubmit} className="max-w-md mx-auto">
             <motion.div
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.5 }}
             >
-              <h1 className="text-2xl sm:text-3xl font-bold text-gray-900 mb-2">
-                Sign up
-              </h1>
-              <p className="text-gray-600 mb-6 sm:mb-8">
-                Let's get you all set up so you can access your personal
-                account.
-              </p>
+              <div className="text-center lg:text-left">
+                <h1 className="text-2xl sm:text-3xl font-bold text-gray-900 mb-2">
+                  Sign up
+                </h1>
+                <p className="text-gray-600 mb-6 sm:mb-8">
+                  Let's get you all set up so you can access your personal
+                  account.
+                </p>
+              </div>
 
               <div className="space-y-4 sm:space-y-6">
                 {/* Name fields */}
-                <div className="grid grid-cols-1 sm:grid-cols-1 gap-4">
+                <div className="grid grid-cols-1 gap-4">
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-1">
-                      userName
+                      Username
                     </label>
                     <input
                       type="text"
                       name="userName"
                       value={formData.userName}
                       onChange={handleInputChange}
-                      className={`w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent
+                      className={`w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent
                                ${
                                  formErrors.userName
                                    ? "border-red-500 focus:ring-red-500"
@@ -161,7 +181,7 @@ export default function SignUpPage() {
                       name="email"
                       value={formData.email}
                       onChange={handleInputChange}
-                      className={`w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent
+                      className={`w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent
                          ${
                            formErrors.email
                              ? "border-red-500 focus:ring-red-500"
@@ -184,7 +204,7 @@ export default function SignUpPage() {
                       name="phoneNumber"
                       value={formData.phoneNumber}
                       onChange={handleInputChange}
-                      className={`w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent
+                      className={`w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent
                          ${
                            formErrors.phoneNumber
                              ? "border-red-500 focus:ring-red-500"
@@ -211,7 +231,7 @@ export default function SignUpPage() {
                         name="password"
                         value={formData.password}
                         onChange={handleInputChange}
-                        className={`w-full px-3 py-2 pr-10 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent
+                        className={`w-full px-3 py-2 pr-10 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent
                           ${
                             formErrors.password
                               ? "border-red-500 focus:ring-red-500"
@@ -249,7 +269,7 @@ export default function SignUpPage() {
                         name="confirmPassword"
                         value={formData.confirmPassword}
                         onChange={handleInputChange}
-                        className={`w-full px-3 py-2 pr-10 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent${
+                        className={`w-full px-3 py-2 pr-10 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent${
                           formErrors.confirmPassword
                             ? "border-red-500 focus:ring-red-500"
                             : "border-gray-300 focus:ring-blue-500"
@@ -303,7 +323,7 @@ export default function SignUpPage() {
                 {/* Submit button */}
                 <button
                   type="submit"
-                  className="w-full bg-blue-600 text-white py-2 sm:py-3 px-4 rounded-lg font-medium hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition duration-200 mt-4"
+                  className="w-full bg-blue-600 text-white py-2 sm:py-3 px-4 rounded-lg font-medium hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition duration-200 mt-4 disabled:opacity-50 disabled:cursor-not-allowed"
                   disabled={loading}
                 >
                   {loading ? (
@@ -342,7 +362,7 @@ export default function SignUpPage() {
                 <div className="grid grid-cols-3 gap-3">
                   <button
                     type="button"
-                    className="flex items-center justify-center px-4 py-2 border border-gray-300 rounded-lg bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    className="flex items-center justify-center px-4 py-2 border border-gray-300 rounded-lg bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-500 transition-colors"
                   >
                     <svg className="w-5 h-5 text-blue-600" viewBox="0 0 24 24">
                       <path
@@ -352,9 +372,9 @@ export default function SignUpPage() {
                     </svg>
                   </button>
                   <button
-                    onClick={googleLoginHandler}
+                    // onClick={googleLoginHandler}
                     type="button"
-                    className="flex items-center justify-center px-4 py-2 border border-gray-300 rounded-lg bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    className="flex items-center justify-center px-4 py-2 border border-gray-300 rounded-lg bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-500 transition-colors"
                   >
                     <svg className="w-5 h-5" viewBox="0 0 24 24">
                       <path
@@ -377,7 +397,7 @@ export default function SignUpPage() {
                   </button>
                   <button
                     type="button"
-                    className="flex items-center justify-center px-4 py-2 border border-gray-300 rounded-lg bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    className="flex items-center justify-center px-4 py-2 border border-gray-300 rounded-lg bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-500 transition-colors"
                   >
                     <svg className="w-5 h-5" viewBox="0 0 24 24">
                       <path

@@ -5,8 +5,10 @@ import axios from "axios";
 import { useNavigate } from "react-router";
 import { toast } from "react-toastify";
 import logo from "../../assets/logoR.png";
+import useAuth from "@/hooks/useAuth";
 
 export default function LoginPage() {
+  const { login, user, authChecked } = useAuth();
   const [showPassword, setShowPassword] = useState(false);
   const [loginId, setloginId] = useState("");
   const [password, setPassword] = useState("");
@@ -17,23 +19,6 @@ export default function LoginPage() {
   const navigate = useNavigate();
 
   const API_URL = import.meta.env.VITE_API_URL;
-
-  useEffect(() => {
-    // Handle responsive behavior
-    const handleResize = () => {
-      setIsMobile(window.innerWidth < 1024);
-    };
-
-    window.addEventListener("resize", handleResize);
-
-    let token = localStorage.getItem("token");
-    if (token) {
-      navigate("/dashboard");
-      toast.success("User logged in successfully..!");
-    }
-
-    return () => window.removeEventListener("resize", handleResize);
-  }, []);
 
   const togglePasswordVisibility = () => {
     setShowPassword(!showPassword);
@@ -71,7 +56,8 @@ export default function LoginPage() {
       console.log(res.data);
 
       if (res.status === 200) {
-        localStorage.setItem("token", res.data.token);
+        // console.log("toekn9999",res.data.token)
+        login(res.data.token); // 👈 use context login
         toast.success("User login successfully..!");
         navigate("/dashboard");
       }
@@ -89,20 +75,6 @@ export default function LoginPage() {
     }
   };
 
-  const googleLoginHandler = async () => {
-    const token = localStorage.getItem("token");
-
-    if (token) {
-      console.log("inbackendcall....");
-      toast.success("Successfully logged in!");
-      setTimeout(() => {
-        navigate("/dashboard");
-      }, 1000);
-    } else {
-      window.location.href = `${import.meta.env.VITE_API_URL}/auth/google`;
-    }
-  };
-
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 flex items-center justify-center p-4">
       <div className="bg-white shadow-2xl w-full max-w-6xl rounded-2xl overflow-hidden flex flex-col lg:flex-row relative">
@@ -112,7 +84,7 @@ export default function LoginPage() {
             onClick={handleBack}
             className="absolute top-2 left-4 z-10 p-2 rounded-full bg-white shadow-md lg:hidden "
           >
-            <ArrowLeft size={20} className=""/>
+            <ArrowLeft size={20} className="" />
           </button>
         )}
 
@@ -252,6 +224,7 @@ export default function LoginPage() {
                 <div className="text-center">
                   <span className="text-gray-600">Don't have an account? </span>
                   <button
+                    type="button"
                     onClick={handleSignUp}
                     className="text-red-500 hover:text-red-600 font-medium"
                   >
@@ -282,7 +255,7 @@ export default function LoginPage() {
                     </svg>
                   </button>
                   <button
-                    onClick={googleLoginHandler}
+                    // onClick={googleLoginHandler}
                     className="flex-1 border border-gray-300 rounded-lg py-2 sm:py-3 px-4 hover:bg-gray-50 transition-colors flex items-center justify-center"
                   >
                     <svg className="w-5 h-5" viewBox="0 0 24 24">

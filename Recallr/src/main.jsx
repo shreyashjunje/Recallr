@@ -12,21 +12,19 @@ import { ThemeProvider } from "./context/ThemeContext";
 createRoot(document.getElementById("root")).render(
   <BrowserRouter>
     <AuthProvider>
-      {/* <ThemeProvider> */}
       <QuizProvider>
         <App />
+        <ToastContainer
+          position="top-right"
+          toastClassName="custom-toast"
+          newestOnTop
+          autoClose={3000}
+          hideProgressBar={false}
+          closeOnClick
+          pauseOnHover
+          draggable
+        />{" "}
       </QuizProvider>
-      {/* </ThemeProvider> */}
     </AuthProvider>
-    <ToastContainer
-      position="top-right"
-      toastClassName="custom-toast"
-      newestOnTop
-      autoClose={3000}
-      hideProgressBar={false}
-      closeOnClick
-      pauseOnHover
-      draggable
-    />{" "}
   </BrowserRouter>
 );

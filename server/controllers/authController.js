@@ -104,13 +104,16 @@ const loginUser = async (req, res) => {
         phoneNumber: user.phoneNumber, // Include phone number in the token
       }, // Payload: minimal info
       process.env.JWT_SECRET, // Secret key (you'll store in .env)
-      { expiresIn: "7d" } // Token expiry
+      { expiresIn: "1d" } // Token expiry
     );
 
     return res
       .status(200)
-      .json({ sucess: true, message: "Login successful", token });
-  } catch (err) {}
+      .json({ success: true, message: "Login successful", token });
+  } catch (err) {
+    console.error("Login error:", err.message);
+    res.status(500).json({ message: "Server error" });
+  }
 };
 
 const logoutUser = async (req, res) => {
