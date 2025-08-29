@@ -32,6 +32,7 @@ import {
   Heart,
   Timer,
   Coffee,
+  RefreshCw,
 } from "lucide-react";
 import QuoteCard from "../components/dashboard/helper/QuoteCard";
 import DashboardHeader from "@/components/dashboard/helper/DashboardHeader";
@@ -86,50 +87,12 @@ const Dashboard = () => {
 
   const navigate = useNavigate();
 
-  // useEffect(() => {
-  //   const handlePopState = (event) => {
-  //     event.preventDefault();
-  //     navigate("/",{ replace: true }); // Always go home
-  //   };
-
-  //   window.addEventListener("popstate", handlePopState);
-
-  //   return () => {
-  //     window.removeEventListener("popstate", handlePopState);
-  //   };
-  // }, [navigate]);
-
-  // const [todos, setTodos] = useState([
-  //   {
-  //     id: "1",
-  //     text: "Review Machine Learning notes",
-  //     completed: false,
-  //     priority: "high",
-  //   },
-  //   {
-  //     id: "2",
-  //     text: "Complete Python assignment",
-  //     completed: true,
-  //     priority: "medium",
-  //   },
-  //   {
-  //     id: "3",
-  //     text: "Prepare for upcoming exam",
-  //     completed: false,
-  //     priority: "high",
-  //   },
-  //   {
-  //     id: "4",
-  //     text: "Read React documentation",
-  //     completed: false,
-  //     priority: "low",
-  //   },
-  // ]);
   const [newTodo, setNewTodo] = useState("");
   const [newTodoPriority, setNewTodoPriority] = useState("low");
   const [editingTodo, setEditingTodo] = useState(null);
   const [editText, setEditText] = useState("");
   const [todoFilter, setTodoFilter] = useState("all");
+  const [refreshing, setRefreshing] = useState(false);
 
   const [tasks, setTasks] = useState([]);
   const [pdfs, setPdfs] = useState([]);
@@ -159,9 +122,11 @@ const Dashboard = () => {
         },
       });
 
-      const tasks = res.data.data;
-      console.log("tasks:", tasks);
-      setTasks(tasks);
+      if (res.status == 200) {
+        const tasks = res.data.data;
+        console.log("tasks:", tasks);
+        setTasks(tasks);
+      }
     } catch (err) {
       console.log("err=>", err.message);
     }
@@ -182,9 +147,9 @@ const Dashboard = () => {
         params: { userId: userId },
       });
 
-      console.log("pdfs-->", res.data.pdfs);
-
-      setPdfs(res.data.pdfs);
+      if (res.status == 200) {
+        setPdfs(res.data.pdfs);
+      }
     } catch (err) {
       console.log("err", err);
     }
@@ -304,6 +269,8 @@ const Dashboard = () => {
       trend: "up",
     },
   ];
+
+  // Add this state variable
 
   const upcomingEvents = [
     {
@@ -428,6 +395,32 @@ const Dashboard = () => {
   const completedCount = tasks.filter((t) => t.status === "completed").length;
   const totalCount = tasks.length;
 
+  // const tabData = {
+  //   uploads: {
+  //     title: "Recent Uploads",
+  //     icon: <Upload className="w-5 h-5" />,
+  //     data: recentPDFs,
+  //     gradient: "from-blue-500 to-cyan-500",
+  //   },
+  //   quizzes: {
+  //     title: "Recent Quizzes",
+  //     icon: <Award className="w-5 h-5" />,
+  //     data: recentQuizes,
+  //     gradient: "from-purple-500 to-pink-500",
+  //   },
+  //   flashcards: {
+  //     title: "Flashcards",
+  //     icon: <Brain className="w-5 h-5" />,
+  //     data: recentFlashcard,
+  //     gradient: "from-teal-500 to-green-500",
+  //   },
+  //   summaries: {
+  //     title: "AI Summaries",
+  //     icon: <FileText className="w-5 h-5" />,
+  //     data: recenSummaries,
+  //     gradient: "from-orange-500 to-red-500",
+  //   },
+  // };
   const tabData = {
     uploads: {
       title: "Recent Uploads",
@@ -438,104 +431,222 @@ const Dashboard = () => {
     quizzes: {
       title: "Recent Quizzes",
       icon: <Award className="w-5 h-5" />,
-      data: recentQuizes,
+      data: recentQuizes.filter((q) => q !== undefined && q !== null), // Filter out undefined/null
       gradient: "from-purple-500 to-pink-500",
     },
     flashcards: {
       title: "Flashcards",
       icon: <Brain className="w-5 h-5" />,
-      data: recentFlashcard,
+      data: recentFlashcard.filter((f) => f !== undefined && f !== null), // Filter out undefined/null
       gradient: "from-teal-500 to-green-500",
     },
     summaries: {
       title: "AI Summaries",
       icon: <FileText className="w-5 h-5" />,
-      data: recenSummaries,
+      data: recenSummaries.filter((s) => s !== undefined && s !== null), // Filter out undefined/null
       gradient: "from-orange-500 to-red-500",
     },
   };
   function timeAgo(dateString) {
-    const date = new Date(dateString);
-    const now = new Date();
-    const seconds = Math.floor((now - date) / 1000);
+    if (!dateString) return "Unknown time";
 
-    if (seconds < 60) return "just now";
-    const minutes = Math.floor(seconds / 60);
-    if (minutes < 60) return `${minutes} minute${minutes > 1 ? "s" : ""} ago`;
-    const hours = Math.floor(minutes / 60);
-    if (hours < 24) return `${hours} hour${hours > 1 ? "s" : ""} ago`;
-    const days = Math.floor(hours / 24);
-    return `${days} day${days > 1 ? "s" : ""} ago`;
+    try {
+      const date = new Date(dateString);
+      if (isNaN(date.getTime())) return "Invalid date";
+
+      const now = new Date();
+      const seconds = Math.floor((now - date) / 1000);
+
+      if (seconds < 60) return "just now";
+      const minutes = Math.floor(seconds / 60);
+      if (minutes < 60) return `${minutes} minute${minutes > 1 ? "s" : ""} ago`;
+      const hours = Math.floor(minutes / 60);
+      if (hours < 24) return `${hours} hour${hours > 1 ? "s" : ""} ago`;
+      const days = Math.floor(hours / 24);
+      return `${days} day${days > 1 ? "s" : ""} ago`;
+    } catch (error) {
+      console.error("Error parsing date:", error);
+      return "Recent";
+    }
   }
 
+  // const renderTabContent = () => {
+  //   const currentTab = tabData[activeTab];
+  //   console.log("currentTAB:::",currentTab)
+  //   console.log("in the tab quiz-->", currentTab.data);
+
+  //   return (
+  //     <div className="space-y-3">
+  //       {currentTab?.data.map((item) => (
+  //         <div
+  //           key={item._id}
+  //           className={`group p-4 bg-gradient-to-r ${
+  //             activeTab === "uploads"
+  //               ? "from-blue-50 to-cyan-50 hover:from-blue-100 hover:to-cyan-100"
+  //               : activeTab === "quizzes"
+  //               ? "from-purple-50 to-pink-50 hover:from-purple-100 hover:to-pink-100"
+  //               : activeTab === "flashcards"
+  //               ? "from-teal-50 to-green-50 hover:from-teal-100 hover:to-green-100"
+  //               : "from-orange-50 to-red-50 hover:from-orange-100 hover:to-red-100"
+  //           } rounded-xl transition-all duration-300`}
+  //         >
+  //           <div className="flex items-center justify-between mb-2">
+  //             <p className="font-medium text-gray-900 text-sm group-hover:text-blue-700 transition-colors">
+  //               {item.title}
+  //             </p>
+  //             <div className="flex items-center gap-2">
+  //               {item.score && (
+  //                 <span
+  //                   className={`text-xs px-2 py-1 rounded-full font-medium ${
+  //                     activeTab === "quizzes"
+  //                       ? "bg-purple-200 text-purple-800"
+  //                       : "bg-blue-200 text-blue-800"
+  //                   }`}
+  //                 >
+  //                   {item.score}%
+  //                 </span>
+  //               )}
+  //               {item.type && (
+  //                 <span className="text-xs bg-gray-200 text-gray-700 px-2 py-1 rounded-full">
+  //                   {/* {console.log(item.type)} */}
+  //                   {item.type}
+  //                 </span>
+  //               )}
+  //               <Eye className="w-4 h-4 text-gray-400 group-hover:text-blue-600 transition-colors" />
+  //             </div>
+  //           </div>
+  //           <div className="flex items-center justify-between">
+  //             <span className="text-xs text-gray-500">
+  //               {timeAgo(item.uploadedAt)}
+  //             </span>
+  //             {/* {item.progress && (
+  //               <div className="flex items-center gap-2">
+  //                 <div className="w-16 bg-gray-200 rounded-full h-2">
+  //                   <div
+  //                     className={`bg-gradient-to-r ${currentTab.gradient} h-2 rounded-full transition-all duration-500`}
+  //                     style={{ width: `${item.progress}%` }}
+  //                   ></div>
+  //                 </div>
+  //                 <span className="text-xs text-gray-600">
+  //                   {item.progress}%
+  //                 </span>
+  //               </div>
+  //             )} */}
+  //           </div>
+  //         </div>
+  //       ))}
+  //     </div>
+  //   );
+  // };
   const renderTabContent = () => {
     const currentTab = tabData[activeTab];
-    console.log("in the tab quiz-->", currentTab.data);
 
     return (
       <div className="space-y-3">
-        {currentTab.data.map((item) => (
-          <div
-            key={item._id}
-            className={`group p-4 bg-gradient-to-r ${
-              activeTab === "uploads"
-                ? "from-blue-50 to-cyan-50 hover:from-blue-100 hover:to-cyan-100"
-                : activeTab === "quizzes"
-                ? "from-purple-50 to-pink-50 hover:from-purple-100 hover:to-pink-100"
-                : activeTab === "flashcards"
-                ? "from-teal-50 to-green-50 hover:from-teal-100 hover:to-green-100"
-                : "from-orange-50 to-red-50 hover:from-orange-100 hover:to-red-100"
-            } rounded-xl transition-all duration-300`}
-          >
-            <div className="flex items-center justify-between mb-2">
-              <p className="font-medium text-gray-900 text-sm group-hover:text-blue-700 transition-colors">
-                {item.title}
-              </p>
-              <div className="flex items-center gap-2">
-                {item.score && (
-                  <span
-                    className={`text-xs px-2 py-1 rounded-full font-medium ${
-                      activeTab === "quizzes"
-                        ? "bg-purple-200 text-purple-800"
-                        : "bg-blue-200 text-blue-800"
-                    }`}
-                  >
-                    {item.score}%
-                  </span>
+        {currentTab?.data.length > 0 ? (
+          currentTab.data.map((item) => (
+            <div
+              key={item._id}
+              className={`group p-4 bg-gradient-to-r ${
+                activeTab === "uploads"
+                  ? "from-blue-50 to-cyan-50 hover:from-blue-100 hover:to-cyan-100"
+                  : activeTab === "quizzes"
+                  ? "from-purple-50 to-pink-50 hover:from-purple-100 hover:to-pink-100"
+                  : activeTab === "flashcards"
+                  ? "from-teal-50 to-green-50 hover:from-teal-100 hover:to-green-100"
+                  : "from-orange-50 to-red-50 hover:from-orange-100 hover:to-red-100"
+              } rounded-xl transition-all duration-300 cursor-pointer`}
+              onClick={() => {
+                // Navigate to the appropriate page based on tab type
+                if (activeTab === "uploads") {
+                  navigate(`/pdf/${item._id}`);
+                } else if (activeTab === "quizzes") {
+                  navigate(`/quiz/${item._id}`);
+                } else if (activeTab === "flashcards") {
+                  navigate(`/flashcard/${item._id}`);
+                } else if (activeTab === "summaries") {
+                  navigate(`/summary/${item._id}`);
+                }
+              }}
+            >
+              <div className="flex items-center justify-between mb-2">
+                <p className="font-medium text-gray-900 text-sm group-hover:text-blue-700 transition-colors truncate">
+                  {item.title || "Untitled"}
+                </p>
+                <div className="flex items-center gap-2">
+                  {/* Show score for quizzes if available */}
+                  {activeTab === "quizzes" && item.score !== undefined && (
+                    <span className="text-xs px-2 py-1 rounded-full font-medium bg-purple-200 text-purple-800">
+                      {item.score}%
+                    </span>
+                  )}
+                  {/* Show category for all items if available */}
+                  {item.category && (
+                    <span className="text-xs bg-gray-200 text-gray-700 px-2 py-1 rounded-full truncate max-w-[80px]">
+                      {item.category}
+                    </span>
+                  )}
+                  <Eye className="w-4 h-4 text-gray-400 group-hover:text-blue-600 transition-colors" />
+                </div>
+              </div>
+              <div className="flex items-center justify-between">
+                <span className="text-xs text-gray-500">
+                  {item.uploadedAt ? timeAgo(item.uploadedAt) : "Recently"}
+                </span>
+                {/* Show progress if available */}
+                {item.progress !== undefined && (
+                  <div className="flex items-center gap-2">
+                    <div className="w-16 bg-gray-200 rounded-full h-2">
+                      <div
+                        className={`bg-gradient-to-r ${currentTab.gradient} h-2 rounded-full transition-all duration-500`}
+                        style={{ width: `${item.progress}%` }}
+                      ></div>
+                    </div>
+                    <span className="text-xs text-gray-600">
+                      {/* {item.progress}% */}
+                    </span>
+                  </div>
                 )}
-                {item.type && (
-                  <span className="text-xs bg-gray-200 text-gray-700 px-2 py-1 rounded-full">
-                    {/* {console.log(item.type)} */}
-                    {item.type}
-                  </span>
-                )}
-                <Eye className="w-4 h-4 text-gray-400 group-hover:text-blue-600 transition-colors" />
               </div>
             </div>
-            <div className="flex items-center justify-between">
-              <span className="text-xs text-gray-500">
-                {timeAgo(item.uploadedAt)}
-              </span>
-              {/* {item.progress && (
-                <div className="flex items-center gap-2">
-                  <div className="w-16 bg-gray-200 rounded-full h-2">
-                    <div
-                      className={`bg-gradient-to-r ${currentTab.gradient} h-2 rounded-full transition-all duration-500`}
-                      style={{ width: `${item.progress}%` }}
-                    ></div>
-                  </div>
-                  <span className="text-xs text-gray-600">
-                    {item.progress}%
-                  </span>
-                </div>
-              )} */}
+          ))
+        ) : (
+          <div className="text-center py-8">
+            <div className="p-3 bg-gray-100 rounded-full w-12 h-12 mx-auto mb-3 flex items-center justify-center">
+              {activeTab === "uploads" && (
+                <Upload className="w-6 h-6 text-gray-400" />
+              )}
+              {activeTab === "quizzes" && (
+                <Award className="w-6 h-6 text-gray-400" />
+              )}
+              {activeTab === "flashcards" && (
+                <Brain className="w-6 h-6 text-gray-400" />
+              )}
+              {activeTab === "summaries" && (
+                <FileText className="w-6 h-6 text-gray-400" />
+              )}
             </div>
+            <p className="text-gray-500 font-medium">No {activeTab} yet</p>
+            <p className="text-gray-400 text-sm mt-1">
+              {activeTab === "uploads" &&
+                "Upload your first PDF to get started"}
+              {activeTab === "quizzes" && "Generate a quiz from your PDFs"}
+              {activeTab === "flashcards" && "Create flashcards from your PDFs"}
+              {activeTab === "summaries" && "Generate summaries from your PDFs"}
+            </p>
           </div>
-        ))}
+        )}
       </div>
     );
   };
 
+  // Add this function to refresh data
+  const refreshData = async () => {
+    setRefreshing(true);
+    await fetchPdfs();
+    await fetchTasks();
+    setRefreshing(false);
+  };
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-100 p-4 sm:p-6 overflow-hidden">
       <div className="max-w-7xl mx-auto space-y-8">
@@ -780,9 +891,9 @@ const Dashboard = () => {
               </div>
             </div>
             <div className="space-y-3">
-              {favouritePDFs.map((pdf) => (
+              {favouritePDFs?.map((pdf) => (
                 <div
-                  key={pdf.id}
+                  key={pdf._id}
                   className="group flex items-center gap-3 p-4 bg-gradient-to-r from-yellow-50 to-orange-50 rounded-xl hover:from-yellow-100 hover:to-orange-100 transition-all duration-300"
                 >
                   <Heart className="w-5 h-5 text-red-500 fill-current" />
@@ -822,6 +933,18 @@ const Dashboard = () => {
                   </p>
                 </div>
               </div>
+              <button
+                onClick={refreshData}
+                disabled={refreshing}
+                className="p-2 bg-gray-100 rounded-lg hover:bg-gray-200 transition-colors disabled:opacity-50"
+                title="Refresh data"
+              >
+                <RefreshCw
+                  className={`w-5 h-5 text-gray-600 ${
+                    refreshing ? "animate-spin" : ""
+                  }`}
+                />
+              </button>
             </div>
 
             {/* Tab Navigation */}

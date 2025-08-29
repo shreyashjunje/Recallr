@@ -5,8 +5,8 @@ const User = require("../models/User");
 const cloudinary = require("cloudinary").v2;
 
 const uploadPdf = async (req, res) => {
-    // const userId = req.body; // 🔹 grab from body
-    // console.log("User ID--->:", userId);
+  // const userId = req.body; // 🔹 grab from body
+  // console.log("User ID--->:", userId);
 
   try {
     const file = req.file;
@@ -41,15 +41,14 @@ const uploadPdf = async (req, res) => {
     // const pages = data.numpages;
     // const userId = "6891d415c8cd6309b50acd01"; // Replace with your MongoDB user _id
 
-
-     // ✅ generate public delivery URL for PDF
+    // ✅ generate public delivery URL for PDF
     const pdfUrl = cloudinary.url(file.filename, {
       resource_type: "raw",
       format: "pdf",
     });
 
     console.log("PDF URL//////////:", pdfUrl);
-    console.log
+    console.log;
 
     const newPdf = new PDF({
       user: userId,
@@ -58,7 +57,7 @@ const uploadPdf = async (req, res) => {
       tags: normalizedTags,
       filename: file.originalname, // Store original filename
       cloudinaryUrl: pdfUrl, // uploaded file URL
-      cloudinaryPublicId:file.filename , // public_id in Cloudinary
+      cloudinaryPublicId: file.filename, // public_id in Cloudinary
       uploadedAt: Date.now(),
     });
 
@@ -169,22 +168,36 @@ const getPdfDetail = async (req, res) => {
   // const pdfId = req.params.id;
   // const userId = req.user._id;
 
-  const pdfId = "6895109468d925e56de481b3";
-  const userId = "6891d415c8cd6309b50acd01";
+  // const pdfId = "6895109468d925e56de481b3";
+  // const userId = "6891d415c8cd6309b50acd01";
 
   try {
-    const pdf = await PDF.findById(pdfId);
+    // const userId = req.user?.id;
+    const { id } = req.params;
+    console.log("pdfId:", id);
+
+    const pdf = await PDF.findById(id)
+      .populate("user", "userName email") // get user info
+      .populate({
+        path: "quizzes",
+        populate: { path: "userId", select: "userName email" }, // get quiz creator
+      })
+
+    // const pdf = await PDF.findById(id).populate("quizzes");
+    console.log(pdf);
 
     if (!pdf) {
       return res.status(400).json({ message: "pdf not found" });
     }
 
-    const user = await User.findById(userId);
-    if (!user.pdfs.includes(pdfId)) {
-      return res.status(400).json({ message: "Access Denied" });
-    }
+    // const user = await User.findById(userId);
+    // if (!user.pdfs.includes(pdfId)) {
+    //   return res.status(400).json({ message: "Access Denied" });
+    // }
 
-    res.status(200).json({ message: "fetched pdf: ", pdf });
+    res
+      .status(200)
+      .json({ success: true, message: "fetched pdf successfully ", data: pdf });
   } catch (err) {
     console.log("Error:", err);
     res.status(500).json({ message: "server error" });
@@ -196,7 +209,6 @@ const getAllPdfs = async (req, res) => {
   const userId = req.query.userId; // 🔹 grab from query
   // const userId = req.user.id; // 🔹 grab from query
   console.log("User ID:", userId);
-
 
   if (!userId) {
     return res.status(400).json({ message: "userId not found" });

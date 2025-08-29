@@ -42,6 +42,13 @@ const userSchema = new mongoose.Schema(
       token: { type: String },
       expiresAt: { type: Date },
     },
+
+    favouritePdfs:[
+      {
+        type:mongoose.Schema.Types.ObjectId,
+        ref:"PDF"
+      }
+    ]
     // // Telegram integration fields
     // telegramChatId: { type: String, default: null },
     // telegramLinkToken: { type: String, default: null },

@@ -10,7 +10,7 @@ const pdfSchemas = new mongoose.Schema({
   },
   user: {
     type: mongoose.Schema.Types.ObjectId,
-    refer: "User",
+    ref: "User",
     required: true,
   },
   cloudinaryUrl: {
@@ -49,14 +49,16 @@ const pdfSchemas = new mongoose.Schema({
     },
   ],
 
-  quiz: [
-    {
-      question: String,
-      options: [String],
-      answer: String,
-      difficulty: { type: String, enum: ["easy", "medium", "hard"] },
-    },
-  ],
+  // quiz: [
+  //   {
+  //     question: String,
+  //     options: [String],
+  //     answer: String,
+  //     difficulty: { type: String, enum: ["easy", "medium", "hard"] },
+  //   },
+  // ],
+  quizzes: [{ type: mongoose.Schema.Types.ObjectId, ref: "Quiz" }], // link quizzes here
+
   uploadedAt: {
     type: Date,
     default: Date.now,

@@ -277,9 +277,9 @@ const MyLibrary = () => {
   };
 
   const handleRead = async (pdf) => {
-  //  console.log("Reading PDF url:", pdf.cloudinaryUrl);
-  //  setShowViewer(pdf.cloudinaryUrl)
-  //  console.log("Show viewer set to:", showViewer);
+    //  console.log("Reading PDF url:", pdf.cloudinaryUrl);
+    //  setShowViewer(pdf.cloudinaryUrl)
+    //  console.log("Show viewer set to:", showViewer);
     navigate("/view", { state: { url: pdf.cloudinaryUrl } });
   };
   // Edit handler
@@ -339,6 +339,10 @@ const MyLibrary = () => {
     } catch (err) {
       console.error("Download failed:", err);
     }
+  };
+
+  const handlePdfDetails = (pdfId) => {
+    navigate(`/pdf/${pdfId}`);
   };
 
   return (
@@ -437,7 +441,6 @@ const MyLibrary = () => {
           </div>
         </div>
       </div>
-
       {/* PDF Grid/List */}
       <div className="max-w-7xl mx-auto px-6 py-8">
         {loading ? (
@@ -468,7 +471,13 @@ const MyLibrary = () => {
             {filteredPdfs.map((pdf) => (
               <div
                 key={pdf._id}
-                className="group relative bg-white border border-gray-200 rounded-2xl hover:border-gray-300 transition-all duration-300 hover:shadow-xl hover:shadow-gray-200/50 p-6 hover:transform hover:scale-[1.02]"
+                className="group relative bg-white border border-gray-200 rounded-2xl hover:border-gray-300 transition-all duration-300 hover:shadow-xl hover:shadow-gray-200/50 p-6 hover:transform hover:scale-[1.02] cursor-pointer"
+                onClick={(e) => {
+                  // Prevent card click when interacting with buttons or dropdown
+                  if (!e.target.closest('button, a, [role="button"]')) {
+                    handlePdfDetails(pdf._id);
+                  }
+                }}
               >
                 {/* Top section with icon and actions */}
                 <div className="flex items-start justify-between mb-4">
@@ -480,7 +489,10 @@ const MyLibrary = () => {
                   <div className="relative">
                     <button
                       className="p-2 hover:bg-gray-100 rounded-lg transition-colors text-gray-500 hover:text-gray-700"
-                      onClick={() => setSelectedPdf(pdf)}
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        setSelectedPdf(pdf);
+                      }}
                     >
                       <MoreVertical className="w-5 h-5" />
                     </button>
@@ -491,21 +503,19 @@ const MyLibrary = () => {
                         <div className="py-1">
                           <button
                             className="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 w-full text-left"
-                            onClick={() => handlePdfAction("edit", pdf)}
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              handlePdfAction("edit", pdf);
+                            }}
                           >
                             <Edit className="w-4 h-4 mr-2" />
                             Edit Details
                           </button>
                           <button
                             className="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 w-full text-left"
-                            // onClick={() => handlePdfAction("download", pdf)
-                            //    handledownload(pdf) // Uncomment if you want to use the download function
-                            // }
-                            // // onClick={handledownload(pdf)}
-
-                            onClick={() => {
+                            onClick={(e) => {
+                              e.stopPropagation();
                               handledownload(pdf.cloudinaryUrl);
-                              // setSelectedPdf(pdf);
                             }}
                           >
                             <Download className="w-4 h-4 mr-2" />
@@ -513,7 +523,8 @@ const MyLibrary = () => {
                           </button>
                           <button
                             className="flex items-center px-4 py-2 text-sm text-red-600 hover:bg-red-50 w-full text-left"
-                            onClick={() => {
+                            onClick={(e) => {
+                              e.stopPropagation();
                               setPdfToDelete(pdf);
                               setShowDeleteConfirm(true);
                               setSelectedPdf(null);
@@ -584,6 +595,7 @@ const MyLibrary = () => {
                     <button
                       key={feature}
                       className="flex flex-col items-center justify-center p-2 bg-gray-50 hover:bg-gray-100 text-gray-700 rounded-lg text-xs font-medium transition-all duration-200 hover:shadow-sm"
+                      onClick={(e) => e.stopPropagation()}
                     >
                       {getFeatureIcon(feature)}
                       <span className="mt-1">{feature}</span>
@@ -595,28 +607,18 @@ const MyLibrary = () => {
                 <div className="flex gap-2">
                   <button
                     className="flex-1 flex items-center justify-center space-x-2 px-4 py-3 bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white rounded-xl font-medium transition-all duration-200 hover:shadow-lg hover:shadow-blue-500/25"
-                    // onClick={() => handlePdfAction("view", pdf)}
-                    onClick={() => handleRead(pdf)}
-                    //   onClick={() =>
-                    //   <PdfViewer fileUrl={pdf.cloudinaryUrl} />}
-                    // onClick={() => setShowViewer(true)}
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      handleRead(pdf);
+                    }}
                   >
                     <Eye className="w-4 h-4" />
                     <span>Read</span>
                   </button>
-                  {/* <button
-                    className="p-3 bg-gray-100 hover:bg-gray-200 text-gray-600 rounded-xl transition-all duration-200 hover:scale-105"
-                    // onClick={() => handlePdfAction("download", pdf)}
-                    onClick={() => {
-                      handledownload(pdf);
-                      // setSelectedPdf(pdf);
-                    }}
-                  >
-                    <Download className="w-4 h-4" />
-                  </button> */}
                   <button
                     className="p-3 bg-gray-100 hover:bg-gray-200 text-gray-600 rounded-xl transition-all duration-200 hover:scale-105"
-                    onClick={() => {
+                    onClick={(e) => {
+                      e.stopPropagation();
                       handledownload(pdf.cloudinaryUrl);
                     }}
                   >
@@ -631,7 +633,13 @@ const MyLibrary = () => {
             {filteredPdfs.map((pdf) => (
               <div
                 key={pdf._id}
-                className="group relative bg-white border border-gray-200 rounded-2xl hover:border-gray-300 transition-all duration-300 p-4 flex items-center space-x-4 hover:bg-gray-50"
+                className="group relative bg-white border border-gray-200 rounded-2xl hover:border-gray-300 transition-all duration-300 p-4 flex items-center space-x-4 hover:bg-gray-50 cursor-pointer"
+                onClick={(e) => {
+                  // Prevent card click when interacting with buttons or dropdown
+                  if (!e.target.closest('button, a, [role="button"]')) {
+                    handlePdfDetails(pdf._id);
+                  }
+                }}
               >
                 <div
                   className={`w-12 h-12 rounded-lg bg-gradient-to-r ${pdf.color} flex items-center justify-center flex-shrink-0`}
@@ -689,6 +697,7 @@ const MyLibrary = () => {
                             key={feature}
                             className="p-1.5 bg-gray-100 hover:bg-gray-200 text-gray-600 rounded-md text-xs transition-colors"
                             title={feature}
+                            onClick={(e) => e.stopPropagation()}
                           >
                             {getFeatureIcon(feature)}
                           </button>
@@ -697,12 +706,10 @@ const MyLibrary = () => {
 
                       <button
                         className="flex items-center space-x-1 px-3 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg text-sm font-medium transition-colors"
-                        onClick={() => handleRead(pdf)}
-                        // onClick={() => setShowViewer(true)}
-
-                        // onClick={() => (
-                        //   <PDFViewer fileUrl={pdf.cloudinaryUrl} />
-                        // )}
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          handleRead(pdf);
+                        }}
                       >
                         <Eye className="w-4 h-4" />
                         <span>Read</span>
@@ -710,7 +717,10 @@ const MyLibrary = () => {
 
                       <button
                         className="p-2 bg-gray-100 hover:bg-gray-200 text-gray-600 rounded-lg transition-colors"
-                        onClick={() => handlePdfAction("download", pdf)}
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          handlePdfAction("download", pdf);
+                        }}
                       >
                         <Download className="w-4 h-4" />
                       </button>
@@ -718,7 +728,10 @@ const MyLibrary = () => {
                       <div className="relative">
                         <button
                           className="p-2 text-gray-500 hover:text-gray-700 hover:bg-gray-100 rounded-lg"
-                          onClick={() => setSelectedPdf(pdf)}
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            setSelectedPdf(pdf);
+                          }}
                         >
                           <MoreVertical className="w-4 h-4" />
                         </button>
@@ -728,21 +741,28 @@ const MyLibrary = () => {
                             <div className="py-1">
                               <button
                                 className="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 w-full text-left"
-                                onClick={() => handlePdfAction("edit", pdf)}
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  handlePdfAction("edit", pdf);
+                                }}
                               >
                                 <Edit className="w-4 h-4 mr-2" />
                                 Edit Details
                               </button>
                               <button
                                 className="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 w-full text-left"
-                                onClick={() => handlePdfAction("download", pdf)}
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  handlePdfAction("download", pdf);
+                                }}
                               >
                                 <Download className="w-4 h-4 mr-2" />
                                 Download
                               </button>
                               <button
                                 className="flex items-center px-4 py-2 text-sm text-red-600 hover:bg-red-50 w-full text-left"
-                                onClick={() => {
+                                onClick={(e) => {
+                                  e.stopPropagation();
                                   setPdfToDelete(pdf);
                                   setShowDeleteConfirm(true);
                                   setSelectedPdf(null);
@@ -929,8 +949,6 @@ const MyLibrary = () => {
           onClose={() => setSelectedPdf(null)}
         />
       )} */}
-
-    
 
       {/* {showViewer && <PdfViewer url={`${showViewer}.pdf`} />} */}
       {showViewer && <PdfViewer url={showViewer} />}
