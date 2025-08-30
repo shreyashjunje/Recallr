@@ -292,140 +292,142 @@ export default function Sidebar() {
   );
 
   // Desktop sidebar component
-  const DesktopSidebar = () => (
-    <div className="hidden md:flex w-72 bg-gradient-to-br from-slate-50 to-blue-50/30 border-r border-gray-200/60 h-screen flex-col relative overflow-hidden z-10">
-      {/* Header */}
-      <div className="p-6 relative z-10">
-        <div className="flex items-center space-x-1">
-          <div className="relative">
-            <div className="w-14 h-12 pb-4 rounded-2xl flex items-center justify-center shadow-lg">
-              <img src={logo} alt="Recallr Logo" />
-            </div>
-          </div>
-          <div className="">
-            <h1 className="font-bold text-xl text-gray-900 bg-gradient-to-r from-gray-900 to-gray-700 bg-clip-text">
-              Recallr
-            </h1>
-            <div className="flex items-center space-x-2">
-              <p className="text-sm text-gray-600">Don't store. Recall</p>
-              <div className="flex space-x-0.5">
-                <div className="w-1 h-1 bg-gradient-to-r from-yellow-400 to-orange-500 rounded-full animate-pulse"></div>
-                <div className="w-1 h-1 bg-gradient-to-r from-pink-400 to-rose-500 rounded-full animate-pulse delay-100"></div>
-                <div className="w-1 h-1 bg-gradient-to-r from-blue-400 to-cyan-500 rounded-full animate-pulse delay-200"></div>
-              </div>
-            </div>
+ // Desktop sidebar component
+const DesktopSidebar = () => (
+  <div className="hidden md:flex w-72 bg-gradient-to-br from-slate-50 to-blue-50/30 border-r border-gray-200/60 h-screen flex-col relative overflow-hidden z-10">
+    {/* Header */}
+    <div className="p-6 relative z-10 flex-shrink-0">
+      <div className="flex items-center space-x-1">
+        <div className="relative">
+          <div className="w-14 h-12 pb-4 rounded-2xl flex items-center justify-center shadow-lg">
+            <img src={logo} alt="Recallr Logo" />
           </div>
         </div>
-
-        {/* Achievement Stats */}
-        <div className="mt-4 flex items-center justify-between bg-white/50 backdrop-blur-sm rounded-xl p-3 border border-white/20">
-          {achievements.map((achievement, index) => (
-            <div key={index} className="flex items-center space-x-2">
-              <achievement.icon className={`w-4 h-4 ${achievement.color}`} />
-              <span className="text-xs font-semibold text-gray-700">
-                {achievement.label}
-              </span>
+        <div className="">
+          <h1 className="font-bold text-xl text-gray-900 bg-gradient-to-r from-gray-900 to-gray-700 bg-clip-text">
+            Recallr
+          </h1>
+          <div className="flex items-center space-x-2">
+            <p className="text-sm text-gray-600">Don't store. Recall</p>
+            <div className="flex space-x-0.5">
+              <div className="w-1 h-1 bg-gradient-to-r from-yellow-400 to-orange-500 rounded-full animate-pulse"></div>
+              <div className="w-1 h-1 bg-gradient-to-r from-pink-400 to-rose-500 rounded-full animate-pulse delay-100"></div>
+              <div className="w-1 h-1 bg-gradient-to-r from-blue-400 to-cyan-500 rounded-full animate-pulse delay-200"></div>
             </div>
-          ))}
+          </div>
         </div>
       </div>
 
-      {/* Menu Items */}
-      <div className="flex-1 px-3 overflow-y-auto scrollbar-hide">
-        {menuItems.map((section, sectionIndex) => (
-          <div key={sectionIndex} className="mb-8">
-            <div className="flex items-center space-x-2 px-4 mb-4">
-              <h3 className="text-xs font-bold text-gray-500 uppercase tracking-wider">
-                {section.section}
-              </h3>
-              <div className="flex-1 h-px bg-gradient-to-r from-gray-200 to-transparent"></div>
-            </div>
-
-            <nav className="space-y-2">
-              {section.items.map((item, itemIndex) => {
-                const Icon = item.icon;
-                const isActive = activeItem === item.name;
-                const isHovered = hoveredItem === item.name;
-
-                return (
-                  <button
-                    key={itemIndex}
-                    onClick={() => handleItemClick(item.name)}
-                    onMouseEnter={() => setHoveredItem(item.name)}
-                    onMouseLeave={() => setHoveredItem(null)}
-                    className={`relative w-full group transition-all duration-300 ease-out transform ${
-                      isActive ? "scale-102" : isHovered ? "scale-101" : ""
-                    }`}
-                  >
-                    <div
-                      className={`flex items-center space-x-4 px-4 py-3.5 rounded-2xl transition-all duration-300 ${
-                        isActive
-                          ? `${item.bgAccent} shadow-lg shadow-black/5 border border-white/40`
-                          : isHovered
-                          ? "bg-white/60 backdrop-blur-sm shadow-md shadow-black/5"
-                          : "hover:bg-white/40"
-                      }`}
-                    >
-                      <div
-                        className={`relative p-2.5 rounded-xl transition-all duration-300 ${
-                          isActive || isHovered
-                            ? `bg-gradient-to-r ${item.color} shadow-lg`
-                            : "bg-gray-100"
-                        }`}
-                      >
-                        <Icon
-                          className={`w-5 h-5 transition-all duration-300 ${
-                            isActive || isHovered
-                              ? "text-white"
-                              : "text-gray-600"
-                          }`}
-                        />
-                        {item.special && (isActive || isHovered) && (
-                          <div className="absolute inset-0 bg-gradient-to-r from-pink-500 to-rose-500 rounded-xl blur opacity-30"></div>
-                        )}
-                      </div>
-                      <div className="flex-1 flex items-center justify-between">
-                        <span
-                          className={`font-semibold transition-all duration-300 ${
-                            isActive ? "text-gray-900" : "text-gray-700"
-                          }`}
-                        >
-                          {item.name}
-                        </span>
-                        <div className="flex items-center space-x-2">
-                          {item.badge && (
-                            <span
-                              className={`px-2 py-1 text-xs font-bold rounded-full transition-all duration-300 ${
-                                item.badge === "NEW"
-                                  ? "bg-gradient-to-r from-green-500 to-emerald-500 text-white animate-pulse"
-                                  : item.badge === "BETA"
-                                  ? "bg-gradient-to-r from-orange-500 to-red-500 text-white"
-                                  : "bg-gray-200 text-gray-700"
-                              }`}
-                            >
-                              {item.badge}
-                            </span>
-                          )}
-                          {(isActive || isHovered) && (
-                            <ChevronRight className="w-4 h-4 text-gray-400 transition-transform duration-300 transform translate-x-0 group-hover:translate-x-1" />
-                          )}
-                        </div>
-                      </div>
-                    </div>
-                    {isActive && (
-                      <div
-                        className={`absolute left-0 top-1/2 transform -translate-y-1/2 w-1 h-8 bg-gradient-to-b ${item.color} rounded-r-full shadow-lg`}
-                      ></div>
-                    )}
-                  </button>
-                );
-              })}
-            </nav>
+      {/* Achievement Stats */}
+      <div className="mt-4 flex items-center justify-between bg-white/50 backdrop-blur-sm rounded-xl p-3 border border-white/20">
+        {achievements.map((achievement, index) => (
+          <div key={index} className="flex items-center space-x-2">
+            <achievement.icon className={`w-4 h-4 ${achievement.color}`} />
+            <span className="text-xs font-semibold text-gray-700">
+              {achievement.label}
+            </span>
           </div>
         ))}
       </div>
+    </div>
 
-      {/* User Profile */}
+    {/* Menu Items - This section should be scrollable */}
+    <div className="flex-1 overflow-y-auto px-3 py-2">
+      {menuItems.map((section, sectionIndex) => (
+        <div key={sectionIndex} className="mb-8">
+          <div className="flex items-center space-x-2 px-4 mb-4">
+            <h3 className="text-xs font-bold text-gray-500 uppercase tracking-wider">
+              {section.section}
+            </h3>
+            <div className="flex-1 h-px bg-gradient-to-r from-gray-200 to-transparent"></div>
+          </div>
+
+          <nav className="space-y-2">
+            {section.items.map((item, itemIndex) => {
+              const Icon = item.icon;
+              const isActive = activeItem === item.name;
+              const isHovered = hoveredItem === item.name;
+
+              return (
+                <button
+                  key={itemIndex}
+                  onClick={() => handleItemClick(item.name)}
+                  onMouseEnter={() => setHoveredItem(item.name)}
+                  onMouseLeave={() => setHoveredItem(null)}
+                  className={`relative w-full group transition-all duration-300 ease-out transform ${
+                    isActive ? "scale-102" : isHovered ? "scale-101" : ""
+                  }`}
+                >
+                  <div
+                    className={`flex items-center space-x-4 px-4 py-3.5 rounded-2xl transition-all duration-300 ${
+                      isActive
+                        ? `${item.bgAccent} shadow-lg shadow-black/5 border border-white/40`
+                        : isHovered
+                        ? "bg-white/60 backdrop-blur-sm shadow-md shadow-black/5"
+                        : "hover:bg-white/40"
+                    }`}
+                  >
+                    <div
+                      className={`relative p-2.5 rounded-xl transition-all duration-300 ${
+                        isActive || isHovered
+                          ? `bg-gradient-to-r ${item.color} shadow-lg`
+                          : "bg-gray-100"
+                      }`}
+                    >
+                      <Icon
+                        className={`w-5 h-5 transition-all duration-300 ${
+                          isActive || isHovered
+                            ? "text-white"
+                            : "text-gray-600"
+                        }`}
+                      />
+                      {item.special && (isActive || isHovered) && (
+                        <div className="absolute inset-0 bg-gradient-to-r from-pink-500 to-rose-500 rounded-xl blur opacity-30"></div>
+                      )}
+                    </div>
+                    <div className="flex-1 flex items-center justify-between">
+                      <span
+                        className={`font-semibold transition-all duration-300 ${
+                          isActive ? "text-gray-900" : "text-gray-700"
+                        }`}
+                      >
+                        {item.name}
+                      </span>
+                      <div className="flex items-center space-x-2">
+                        {item.badge && (
+                          <span
+                            className={`px-2 py-1 text-xs font-bold rounded-full transition-all duration-300 ${
+                              item.badge === "NEW"
+                                ? "bg-gradient-to-r from-green-500 to-emerald-500 text-white animate-pulse"
+                                : item.badge === "BETA"
+                                ? "bg-gradient-to-r from-orange-500 to-red-500 text-white"
+                                : "bg-gray-200 text-gray-700"
+                            }`}
+                          >
+                            {item.badge}
+                          </span>
+                        )}
+                        {(isActive || isHovered) && (
+                          <ChevronRight className="w-4 h-4 text-gray-400 transition-transform duration-300 transform translate-x-0 group-hover:translate-x-1" />
+                        )}
+                      </div>
+                    </div>
+                  </div>
+                  {isActive && (
+                    <div
+                      className={`absolute left-0 top-1/2 transform -translate-y-1/2 w-1 h-8 bg-gradient-to-b ${item.color} rounded-r-full shadow-lg`}
+                    ></div>
+                  )}
+                </button>
+              );
+            })}
+          </nav>
+        </div>
+      ))}
+    </div>
+
+    {/* User Profile - Fixed at bottom */}
+    <div className="flex-shrink-0">
       <SidebarUserNav
         user={user}
         trigger={
@@ -453,7 +455,8 @@ export default function Sidebar() {
         }
       />
     </div>
-  );
+  </div>
+);
 
   return (
     <>

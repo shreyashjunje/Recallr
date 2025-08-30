@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { Upload, FileText, Settings, Brain, Clock, Target } from "lucide-react";
 import { useQuiz } from "../../context/QuizContext";
@@ -26,12 +26,52 @@ const QuizSetup = () => {
     shuffleOptions: true,
   });
   const [generating, setGenerating] = useState(false);
+  const [userPdfs, setUserPdfs] = useState([]);
+  const [loadingPdfs, setLoadingPdfs] = useState(false);
+
+  // Fetch user's PDF library when component mounts
+  useEffect(() => {
+    if (formData.source === "library") {
+      fetchUserPdfs();
+    }
+  }, [formData.source]);
+
+  const fetchUserPdfs = async () => {
+    try {
+      setLoadingPdfs(true);
+      const token = localStorage.getItem("token");
+      if (!token) return;
+
+      const decodedToken = jwtDecode(token);
+      const userId = decodedToken.id;
+
+      const response = await axios.get(`${API_URL}/pdf/pdfs/`, {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+      
+      setUserPdfs(response.data.pdfs);
+    } catch (error) {
+      console.error("Error fetching user PDFs:", error);
+      toast.error("Failed to load your PDF library");
+    } finally {
+      setLoadingPdfs(false);
+    }
+  };
 
   const handleInputChange = (field, value) => {
     setFormData((prev) => ({
       ...prev,
       [field]: value,
     }));
+
+    // Clear the other source when switching
+    if (field === "source") {
+      if (value === "library") {
+        setFormData(prev => ({ ...prev, uploadedFile: null }));
+      } else {
+        setFormData(prev => ({ ...prev, selectedPDF: "" }));
+      }
+    }
   };
 
   const handleQuestionTypeChange = (type, checked) => {
@@ -45,64 +85,85 @@ const QuizSetup = () => {
 
   const handleFileUpload = (e) => {
     const file = e.target.files?.[0];
-    // if (file && file.type === "application/pdf") {
-    //   setFormData((prev) => ({
-    //     ...prev,
-    //     uploadedFile: file,
-    //   }));
-    // }
     if (file && file.type === "application/pdf") {
       setFormData((prev) => ({
         ...prev,
         uploadedFile: file,
-        selectedPDF: "", // Clear library selection if switching to upload
+        selectedPDF: "", // Clear library selection
       }));
     } else {
-      // Optional: Show error for non-PDF files
-      alert("Please select a PDF file");
-      e.target.value = ""; // Reset input
+      toast.error("Please select a PDF file");
+      e.target.value = "";
     }
   };
 
   const handleGenerate = async () => {
+    if (!canProceed()) {
+      toast.error("Please complete all required fields");
+      return;
+    }
+
     setGenerating(true);
 
-    const token = localStorage.getItem("token");
-    if (!token) return;
-
-    const decodedToken = jwtDecode(token);
-    const userID = decodedToken.id;
-    const fd = new FormData();
-    fd.append("userId", userID);
-    fd.append("uploadedFile", formData.uploadedFile); // must match backend's upload.single("uploadedFile")
-    fd.append("source", formData.source);
-    fd.append("selectedPDF", formData.selectedPDF);
-    fd.append("numQuestions", formData.numQuestions);
-    fd.append("difficulty", formData.difficulty);
-    fd.append("timeLimit", formData.timeLimit);
-    fd.append("timeLimitType", formData.timeLimitType);
-    fd.append("mode", formData.mode);
-    fd.append("markingScheme", formData.markingScheme);
-    fd.append("shuffleQuestions", formData.shuffleQuestions);
-    fd.append("shuffleOptions", formData.shuffleOptions);
-    // If questionTypes is an array, send it properly:
-    formData.questionTypes.forEach((q) => fd.append("questionTypes[]", q));
-
     try {
+      const token = localStorage.getItem("token");
+      if (!token) {
+        toast.error("Please log in to generate quiz");
+        return;
+      }
+
+      const decodedToken = jwtDecode(token);
+      const userId = decodedToken.id;
+      
+      const fd = new FormData();
+      fd.append("userId", userId);
+      fd.append("source", formData.source);
+      fd.append("numQuestions", formData.numQuestions);
+      fd.append("difficulty", formData.difficulty);
+      fd.append("timeLimit", formData.timeLimit);
+      fd.append("timeLimitType", formData.timeLimitType);
+      fd.append("mode", formData.mode);
+      fd.append("markingScheme", formData.markingScheme);
+      fd.append("shuffleQuestions", formData.shuffleQuestions);
+      fd.append("shuffleOptions", formData.shuffleOptions);
+      
+      // Add source-specific data
+      if (formData.source === "upload") {
+        if (formData.uploadedFile) {
+          fd.append("uploadedFile", formData.uploadedFile);
+        }
+      } else if (formData.source === "library") {
+        fd.append("pdfId", formData.selectedPDF);
+      }
+      
+      // Add question types as array
+      formData.questionTypes.forEach((q) => fd.append("questionTypes", q));
+
       const res = await axios.post(`${API_URL}/quiz/generate-quiz`, fd, {
-        headers: { "Content-Type": "multipart/form-data" },
+        headers: { 
+          "Content-Type": "multipart/form-data",
+          Authorization: `Bearer ${token}`
+        },
       });
 
       if (res.status === 200) {
         console.log("Quiz generated successfully:", res.data);
         toast.success("Quiz generated successfully!");
+        
+        // If using context, update it
+        if (generateQuiz) {
+          generateQuiz(res.data);
+        }
+        
         navigate("/quizmaster");
       }
     } catch (err) {
       console.error("Error generating quiz:", err);
+      const errorMessage = err.response?.data?.message || "Failed to generate quiz";
+      toast.error(errorMessage);
+    } finally {
+      setGenerating(false);
     }
-
-    setGenerating(false);
   };
 
   const canProceed = () => {
@@ -205,20 +266,39 @@ const QuizSetup = () => {
                 </p>
 
                 {formData.source === "library" && (
-                  <select
-                    value={formData.selectedPDF}
-                    onChange={(e) =>
-                      handleInputChange("selectedPDF", e.target.value)
-                    }
-                    className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                  >
-                    <option value="">Select a PDF...</option>
-                    {pdfs?.map((pdf) => (
-                      <option key={pdf.id} value={pdf.id}>
-                        {pdf.name}
-                      </option>
-                    ))}
-                  </select>
+                  <div>
+                    {loadingPdfs ? (
+                      <div className="text-center py-4">
+                        <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-blue-600 mx-auto"></div>
+                        <p className="text-gray-500 mt-2">Loading PDFs...</p>
+                      </div>
+                    ) : userPdfs.length > 0 ? (
+                      <select
+                        value={formData.selectedPDF}
+                        onChange={(e) =>
+                          handleInputChange("selectedPDF", e.target.value)
+                        }
+                        className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                      >
+                        <option value="">Select a PDF...</option>
+                        {userPdfs.map((pdf) => (
+                          <option key={pdf._id} value={pdf._id}>
+                            {pdf.title || pdf.originalName}
+                          </option>
+                        ))}
+                      </select>
+                    ) : (
+                      <div className="text-center py-4 text-gray-500">
+                        <p>No PDFs found in your library</p>
+                        <button 
+                          onClick={fetchUserPdfs}
+                          className="text-blue-600 hover:text-blue-800 mt-2"
+                        >
+                          Refresh
+                        </button>
+                      </div>
+                    )}
+                  </div>
                 )}
               </div>
 
@@ -280,6 +360,15 @@ const QuizSetup = () => {
                 )}
               </div>
             </div>
+
+            {/* Selected PDF Info */}
+            {formData.source === "library" && formData.selectedPDF && (
+              <div className="mt-6 p-4 bg-blue-50 rounded-lg border border-blue-200">
+                <p className="text-blue-700">
+                  Selected: {userPdfs.find(p => p._id === formData.selectedPDF)?.title}
+                </p>
+              </div>
+            )}
           </div>
         )}
 

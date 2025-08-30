@@ -2,6 +2,10 @@ const PDF = require("../models/Pdf");
 const pdfParse = require("pdf-parse");
 const axios = require("axios");
 const User = require("../models/User");
+const {
+  processSummaryWithGeminiFromUrl,
+} = require("../services/geminiService");
+const Pdf = require("../models/Pdf");
 const cloudinary = require("cloudinary").v2;
 
 const uploadPdf = async (req, res) => {
@@ -181,10 +185,10 @@ const getPdfDetail = async (req, res) => {
       .populate({
         path: "quizzes",
         populate: { path: "userId", select: "userName email" }, // get quiz creator
-      })
+      });
 
     // const pdf = await PDF.findById(id).populate("quizzes");
-    console.log(pdf);
+    // console.log(pdf);
 
     if (!pdf) {
       return res.status(400).json({ message: "pdf not found" });
@@ -206,9 +210,11 @@ const getPdfDetail = async (req, res) => {
 
 const getAllPdfs = async (req, res) => {
   console.log("inthe getAllPdfs function");
-  const userId = req.query.userId; // 🔹 grab from query
+  // const userId = req.query.userId; // 🔹 grab from query
   // const userId = req.user.id; // 🔹 grab from query
-  console.log("User ID:", userId);
+  // console.log("User ID:", userId);
+
+  const userId=req.user?.id;
 
   if (!userId) {
     return res.status(400).json({ message: "userId not found" });
@@ -268,6 +274,56 @@ const downloadPdf = async (req, res) => {
   }
 };
 
+const generateSummaryOnly = async (req, res) => {
+  const { fileUrl, fileName, customPrompt } = req.body;
+
+  try {
+    if (!fileUrl) {
+      return res.status(400).json({ message: "No file URL provided" });
+    }
+
+    console.log("Fetching file from Cloudinary:", fileUrl);
+
+    // 1. Pass Cloudinary file URL directly to Gemini
+    const airesponse = await processSummaryWithGeminiFromUrl(
+      fileUrl,
+      fileName,
+      customPrompt
+    );
+
+    const { summary, keyPoints } = airesponse;
+    // 2. Find PDF doc by Cloudinary URL (or fileName) and update
+    const updatedPdf = await Pdf.findOneAndUpdate(
+      { cloudinaryUrl: fileUrl }, // match document
+      {
+        $set: {
+          summary, // array of summary lines
+          keyPoints, // key points array
+          isSummarized: true, // flag
+          summaryGeneratedAt: new Date(), // timestamp
+        },
+      },
+      { new: true } // return updated document
+    );
+
+    if (!updatedPdf) {
+      return res.status(404).json({ message: "PDF not found in database" });
+    }
+
+    res.status(200).json({
+      message: "Summary generated & saved successfully",
+      pdf: updatedPdf,
+    });
+  } catch (err) {
+    console.error("❌ Error generating summary:", err);
+    res.status(500).json({ message: "Failed to generate summary" });
+  }
+};
+
+const generateFlashCardsOnly=async (req,res) =>{
+
+}
+
 module.exports = {
   uploadPdf,
   deletePdf,
@@ -275,4 +331,6 @@ module.exports = {
   getPdfDetail,
   getAllPdfs,
   downloadPdf,
+  generateSummaryOnly,
+  generateFlashCardsOnly
 };

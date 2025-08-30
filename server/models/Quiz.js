@@ -16,16 +16,19 @@ const quizSchema = new mongoose.Schema(
       required: true,
       trim: true,
     },
-    description:{
-        type: String,
-        trim: true,     
+    description: {
+      type: String,
+      trim: true,
     },
-     // Metadata
+    // Metadata
     category: { type: String },
     tags: [{ type: String }],
-    status: { type: String, enum: ["Draft", "Active", "Archived"], default: "Active" },
+    status: {
+      type: String,
+      enum: ["Draft", "Active", "Archived"],
+      default: "Active",
+    },
     version: { type: Number, default: 1 },
-
 
     settings: {
       numQuestions: { type: Number, default: 10, min: 5, max: 30 },
@@ -45,8 +48,9 @@ const quizSchema = new mongoose.Schema(
       perQuestionTime: { type: Number, default: 0 },
       mode: { type: String, enum: ["Practice", "Exam"], default: "Practice" },
       markingScheme: {
-        correct: { type: Number, default: 1 },
-        wrong: { type: Number, default: 0 }, // can be -0.25 for negative marking
+        type: String,
+        enum: ["normal", "negative"],
+        default: "normal",
       },
     },
 

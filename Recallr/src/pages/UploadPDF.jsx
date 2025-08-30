@@ -13,6 +13,7 @@ import {
 } from "lucide-react";
 import axios from "axios";
 import { jwtDecode } from "jwt-decode";
+import PageHeader from "@/components/helper/PageHeader";
 // Simple toast notification system
 
 const showToast = (message, type = "info") => {
@@ -233,7 +234,7 @@ const PDFUploadForm = () => {
   return (
     <div className="min-h-screen bg-gray-50 py-8">
       <div className="max-w-6xl mx-auto px-4">
-        <div className="text-center mb-8">
+        {/* <div className="text-center mb-8">
           <h1 className="text-3xl font-bold text-gray-900 mb-2">
             Upload Your PDFs
           </h1>
@@ -241,7 +242,9 @@ const PDFUploadForm = () => {
             Choose between web upload or connect with our Telegram bot for easy
             mobile uploads
           </p>
-        </div>
+        </div> */}
+        <PageHeader/>
+
 
         <div className="grid md:grid-cols-2 gap-8">
           {/* Web Upload Form */}

@@ -36,9 +36,10 @@ function App() {
       <Route path="/login" element={<LoginPage />} />
       <Route path="/register" element={<SignUpPage />} />
       <Route path="/view" element={<PDFViewer />} />
+      <Route path="/" element={<Home />} />
 
       <Route path="/" element={<Layout />}>
-        <Route index element={<Home />} />
+        <Route index element={<Dashboard />} />
         <Route path="dashboard" element={<Dashboard />} />
         <Route path="upload" element={<UploadPDF />} />
         <Route path="library" element={<MyLibrary />} />
