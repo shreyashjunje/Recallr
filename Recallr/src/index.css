@@ -12,6 +12,19 @@
   align-items: center;
 }
 
+@keyframes progress {
+  0% {
+    width: 30%;
+  }
+  100% {
+    width: 80%;
+  }
+}
+
+.animate-progress {
+  animation: progress 2s ease-in-out infinite alternate;
+}
+
 .content-section {
   flex: 1;
   padding: 2rem;
@@ -264,8 +277,6 @@
 
 /* Other animations should be similarly adjusted */
 
-
-
 @layer base {
   :root {
     --background: 0 0% 100%;
@@ -321,8 +332,6 @@
     --chart-5: 340 75% 55%;
   }
 }
-
-
 
 @layer base {
   * {

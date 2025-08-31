@@ -7,6 +7,7 @@ import { toast } from "react-toastify";
 import logo from "../../assets/logoR.png";
 import useAuth from "@/hooks/useAuth";
 
+
 export default function LoginPage() {
   const { login, user, authChecked } = useAuth();
   const [showPassword, setShowPassword] = useState(false);
@@ -19,6 +20,13 @@ export default function LoginPage() {
   const navigate = useNavigate();
 
   const API_URL = import.meta.env.VITE_API_URL;
+
+  useEffect(() => {
+    const handleResize = () => setIsMobile(window.innerWidth < 1024);
+    window.addEventListener("resize", handleResize);
+
+    return () => window.removeEventListener("resize", handleResize);
+  }, []);
 
   const togglePasswordVisibility = () => {
     setShowPassword(!showPassword);
@@ -59,6 +67,14 @@ export default function LoginPage() {
         // console.log("toekn9999",res.data.token)
         login(res.data.token); // 👈 use context login
         toast.success("User login successfully..!");
+
+        const token = res.data.token;
+        if (rememberMe) {
+          localStorage.setItem("token", token); // persists until manually cleared
+        } else {
+          sessionStorage.setItem("token", token); // clears when browser is closed
+        }
+
         navigate("/dashboard");
       }
 
@@ -69,24 +85,45 @@ export default function LoginPage() {
       }
     } catch (err) {
       console.error("Login Error:", err.message);
-      toast.error(err.response?.data?.message || "Login failed");
+      toast.error(err.data?.message || "Login failed due to server error");
     } finally {
       setLoading(false);
     }
   };
 
+  const handleforgotPassword = () => {
+    navigate("/forgot-password");
+  };
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 flex items-center justify-center p-4">
+      {isMobile && (
+        <button
+          onClick={handleBack}
+          className="absolute top-5 left-4 z-10 p-2 rounded-full bg-white shadow-md lg:hidden "
+        >
+          <ArrowLeft size={20} className="" />
+        </button>
+      )}
+
+      {isMobile && (
+        <div className="absolute top-4 left-1/2 transform -translate-x-1/2 z-10 flex items-center">
+          <div className="flex items-center justify-center">
+            <img
+              src={logo}
+              alt="Recallr Logo"
+              className="w-9 h-12 sm:w-7 sm:h-7 md:w-8 md:h-8"
+            />
+          </div>
+          <span className="font-bold text-gray-800 text-2xl sm:text-xl md:text-2xl mt-2">
+            Recallr
+          </span>
+        </div>
+      )}
+      
+
       <div className="bg-white shadow-2xl w-full max-w-6xl rounded-2xl overflow-hidden flex flex-col lg:flex-row relative">
         {/* Back Button for Mobile */}
-        {isMobile && (
-          <button
-            onClick={handleBack}
-            className="absolute top-2 left-4 z-10 p-2 rounded-full bg-white shadow-md lg:hidden "
-          >
-            <ArrowLeft size={20} className="" />
-          </button>
-        )}
 
         {/* Logo for Mobile */}
         {/* {!isMobile && (
@@ -98,21 +135,6 @@ export default function LoginPage() {
           </div>
         )} */}
 
-        {isMobile && (
-          <div className="absolute top-4 left-1/2 transform -translate-x-1/2 z-10 flex items-center">
-            <div className="flex items-center justify-center">
-              <img
-                src={logo}
-                alt="Recallr Logo"
-                className="w-7 h-8 sm:w-7 sm:h-7 md:w-8 md:h-8"
-              />
-            </div>
-            <span className="font-bold text-gray-800 text-lg sm:text-xl md:text-2xl mt-2">
-              Recallr
-            </span>
-          </div>
-        )}
-
         {/* Left Side - Login Form */}
         <div className="p-6 sm:p-8 md:p-10 lg:p-12 w-full lg:w-1/2 flex flex-col">
           {/* Logo for Desktop */}
@@ -120,11 +142,12 @@ export default function LoginPage() {
           {/* Login Form */}
           <form onSubmit={handleSubmit} autoComplete="on">
             <div className="flex-1">
+            
               <h1 className="text-2xl sm:text-3xl font-bold text-gray-900 mb-3 mt-6 lg:mt-0">
                 Login
               </h1>
               <p className="text-gray-600 mb-6 sm:mb-8">
-                Login to access your TravelWise account
+                Login to access your Recallr account
               </p>
 
               <div className="space-y-4 sm:space-y-6">
@@ -200,7 +223,11 @@ export default function LoginPage() {
                       Remember me
                     </span>
                   </label>
-                  <button className="text-sm text-red-500 hover:text-red-600">
+                  <button
+                    type="button"
+                    onClick={handleforgotPassword}
+                    className="text-sm text-red-500 hover:text-red-600"
+                  >
                     Forgot Password
                   </button>
                 </div>
@@ -233,7 +260,7 @@ export default function LoginPage() {
                 </div>
 
                 {/* Divider */}
-                <div className="relative my-4">
+                {/* <div className="relative my-4">
                   <div className="absolute inset-0 flex items-center">
                     <div className="w-full border-t border-gray-300"></div>
                   </div>
@@ -242,10 +269,10 @@ export default function LoginPage() {
                       Or login with
                     </span>
                   </div>
-                </div>
+                </div> */}
 
                 {/* Social Login Buttons */}
-                <div className="flex gap-3 sm:gap-4">
+                {/* <div className="flex gap-3 sm:gap-4">
                   <button className="flex-1 border border-gray-300 rounded-lg py-2 sm:py-3 px-4 hover:bg-gray-50 transition-colors flex items-center justify-center">
                     <svg className="w-5 h-5 text-blue-600" viewBox="0 0 24 24">
                       <path
@@ -286,7 +313,7 @@ export default function LoginPage() {
                       <path d="M18.71 19.5c-.83 1.24-1.71 2.45-3.05 2.47-1.34.03-1.77-.79-3.29-.79-1.53 0-2 .77-3.27.82-1.31.05-2.3-1.32-3.14-2.53C4.25 17 2.94 12.45 4.7 9.39c.87-1.52 2.43-2.48 4.12-2.51 1.28-.02 2.5.87 3.29.87.78 0 2.26-1.07 3.81-.91.65.03 2.47.26 3.64 1.98-.09.06-2.17 1.28-2.15 3.81.03 3.02 2.65 4.03 2.68 4.04-.03.07-.42 1.44-1.38 2.83M13 3.5c.73-.83 1.94-1.46 2.94-1.5.13 1.17-.34 2.35-1.04 3.19-.69.85-1.83 1.51-2.95 1.42-.15-1.15.41-2.35 1.05-3.11z" />
                     </svg>
                   </button>
-                </div>
+                </div> */}
               </div>
             </div>
           </form>

@@ -7,11 +7,17 @@ const {
   registerUser,
   loginUser,
   logoutUser,
+  forgotpassword,
+  validateResetToken,
+  resetpassword,
 } = require("../controllers/authController");
 
 router.post("/register", registerUser);
 router.post("/login", loginUser);
 router.post("/logout", logoutUser);
+router.post("/forgot-password",forgotpassword)
+router.post("/reset-password",resetpassword)
+router.post("/validate-reset-token",validateResetToken)
 
 // 1️⃣ Redirect to Google for login
 router.get("/google", (req, res, next) => {

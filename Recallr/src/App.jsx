@@ -26,6 +26,10 @@ import { ThemeProvider } from "./context/ThemeContext";
 import QuizPage from "./components/QuizMaster/QuizPage";
 import SummaryHome from "./pages/aisummary/SummaryHome";
 import PDFDetailsPage from "./pages/PdfDetails";
+import ForgotPassword from "./pages/auth/ForgotPassword";
+import ResetPassword from "./pages/auth/ResetPassword";
+import TermsOfService from "./components/auth/Terms";
+import PrivacyPolicy from "./components/auth/PrivacyPolicies";
 
 function App() {
   // const [quizStarted, setQuizStarted] = useState(false);
@@ -35,11 +39,17 @@ function App() {
     <Routes>
       <Route path="/login" element={<LoginPage />} />
       <Route path="/register" element={<SignUpPage />} />
+      <Route path="/forgot-password" element={<ForgotPassword />} />
+      <Route path="/reset-password" element={<ResetPassword />} />
       <Route path="/view" element={<PDFViewer />} />
+      <Route path="/terms" element={<TermsOfService />} />
+      <Route path="/privacy" element={<PrivacyPolicy />} />
+
+
       <Route path="/" element={<Home />} />
 
       <Route path="/" element={<Layout />}>
-        <Route index element={<Dashboard />} />
+        {/* <Route index element={<Dashboard />} /> */}
         <Route path="dashboard" element={<Dashboard />} />
         <Route path="upload" element={<UploadPDF />} />
         <Route path="library" element={<MyLibrary />} />

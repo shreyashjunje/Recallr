@@ -22,6 +22,12 @@ const userSchema = new mongoose.Schema(
       type: String,
       required: true,
     },
+    resetPasswordToken:{
+      type:String,
+    },
+    resetPasswordExpires:{
+      type:Date,
+    },
     googleId: { type: String }, // only for Google login
     createdAt: {
       type: Date,
