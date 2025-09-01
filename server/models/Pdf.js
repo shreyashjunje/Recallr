@@ -119,26 +119,17 @@ const pdfSchemas = new mongoose.Schema({
     type: Number,
   },
 
+  totalPages: {
+    type: Number,
+    // required: true,
+  },
+  currentPage: {
+    type: Number,
+    default: 0, // track where user left off
+  },
   progress: {
-    currentPage: {
-      type: Number,
-      default: 0,
-    },
-    totalPages: {
-      type: Number,
-      default: 0,
-    },
-    percentage: {
-      type: Number,
-      default: 0,
-    },
-    timeSpent: {
-      type: Number,
-      default: 0, // in minutes
-    },
-    lastOpenedAt: {
-      type: Date,
-    },
+    type: Number,
+    default: 0, // in percentage
   },
 
   quizGeneratedAt: { type: Date, default: null },

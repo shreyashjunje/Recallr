@@ -81,7 +81,13 @@ async function processWithGemini(fileUrl, customPrompt) {
     const jsonEnd = responseText.lastIndexOf("}") + 1;
     return JSON.parse(responseText.slice(jsonStart, jsonEnd));
   } catch (error) {
+    if (error.status === 503 && retries > 0) {
+      console.warn(`Gemini overloaded. Retrying in ${delay / 1000}s...`);
+      await new Promise((r) => setTimeout(r, delay));
+      return processWithGemini(prompt, retries - 1, delay * 2); // exponential backoff
+    }
     console.error("Error processing PDF:", error);
+
     throw new Error(`AI processing failed: ${error.message}`);
   }
 }
@@ -613,7 +619,7 @@ Rules:
 async function processQuizWithGeminiFromUrl(fileUrl, fileName, settings) {
   try {
     // 1️⃣ Download PDF from Cloudinary
-    console.log("in the gemini function settings:::",settings)
+    console.log("in the gemini function settings:::", settings);
     const cloudinaryResponse = await axios.get(fileUrl, {
       responseType: "arraybuffer",
       auth: {
@@ -637,14 +643,13 @@ async function processQuizWithGeminiFromUrl(fileUrl, fileName, settings) {
     });
     console.log("✅ Uploaded to Gemini:", uploadResult);
 
-    
     // 3️⃣ Safely handle questionTypes to avoid the TypeError
-    const questionTypes = Array.isArray(settings.questionTypes) 
-      ? settings.questionTypes 
-      : typeof settings.questionTypes === 'string'
+    const questionTypes = Array.isArray(settings.questionTypes)
+      ? settings.questionTypes
+      : typeof settings.questionTypes === "string"
       ? [settings.questionTypes]
       : [];
-    
+
     const questionTypesString = questionTypes.join(", ");
 
     // 🔹 Enhanced prompt with explicit formatting instructions
@@ -726,5 +731,5 @@ module.exports = {
   processFlashcardsWithGemini,
   processSummaryWithGeminiFromUrl,
   processFlashcardsWithGeminiFromUrl,
-  processQuizWithGeminiFromUrl
+  processQuizWithGeminiFromUrl,
 };

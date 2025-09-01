@@ -77,13 +77,13 @@ const editUser = async (req, res) => {
       return res.status(404).json({ message: "user not found" });
     }
 
-    const {userName,email,phoneNumber} =req.body;
+    const { userName, email, phoneNumber } = req.body;
 
     // if(!userName || !email || !phoneNumber){
     //     return res.status(400).json({message:"All fields are required"})
     // }
 
-     // Check if email is being changed
+    // Check if email is being changed
     if (email && email !== user.email) {
       const emailExists = await User.findOne({ email });
       if (emailExists) {
@@ -92,7 +92,7 @@ const editUser = async (req, res) => {
       user.email = email;
     }
 
-     // Check if email is being changed
+    // Check if email is being changed
     if (userName && userName !== user.userName) {
       const userNameExists = await User.findOne({ userName });
       if (userNameExists) {
@@ -101,7 +101,7 @@ const editUser = async (req, res) => {
       user.userName = userName;
     }
 
-     // Check if email is being changed
+    // Check if email is being changed
     if (phoneNumber && phoneNumber !== user.phoneNumber) {
       const phoneNumberExists = await User.findOne({ phoneNumber });
       if (phoneNumberExists) {
@@ -116,25 +116,46 @@ const editUser = async (req, res) => {
     //     phoneNumber:phoneNumber
     // })
 
-    const updatedUser =await user.save();
+    const updatedUser = await user.save();
 
     return res.status(200).json({
-        success:true,
-        message:"Profile updated successfully",
-        data:{
-            userId:updatedUser ._id,
-            userName:updatedUser .userName,
-            email:updatedUser .email,
-            phoneNumber:updatedUser .phoneNumber,
-        }
-    })
-
-
-
+      success: true,
+      message: "Profile updated successfully",
+      data: {
+        userId: updatedUser._id,
+        userName: updatedUser.userName,
+        email: updatedUser.email,
+        phoneNumber: updatedUser.phoneNumber,
+      },
+    });
   } catch (err) {
     console.log("Error: ", err);
     res.status(500).json({ message: "server error" });
   }
 };
 
-module.exports = { getFullProfile, deleteUser ,editUser};
+const getAverageProgress = async (req, res) => {
+  try {
+    const { id } = req.user?.id;
+    const docs = await PDF.find({ user: id });
+
+    if (!docs.length) {
+      return res.json({ averageProgress: 0 });
+    }
+
+    // calculate progress for each doc
+    const progresses = docs.map(
+      (doc) => (doc.currentPage / doc.totalPages) * 100
+    );
+
+    // average progress
+    const averageProgress =
+      progresses.reduce((a, b) => a + b, 0) / progresses.length;
+
+    res.status(200).json({ averageProgress });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+};
+
+module.exports = { getFullProfile, deleteUser, editUser, getAverageProgress };

@@ -7,6 +7,13 @@ const {
 } = require("../services/geminiService");
 const Pdf = require("../models/Pdf");
 const cloudinary = require("cloudinary").v2;
+// import stream from "stream";
+const stream = require("stream");
+const crypto = require("crypto");
+
+const generateFileHash = (buffer) => {
+  return crypto.createHash("sha256").update(buffer).digest("hex");
+};
 
 const uploadPdf = async (req, res) => {
   // const userId = req.body; // 🔹 grab from body
@@ -15,13 +22,17 @@ const uploadPdf = async (req, res) => {
   try {
     const file = req.file;
     console.log("File received:", file);
+    const id = req.user.id; // 🔹 grab from body
+    console.log("useriiiiiddd::", req.user?.id);
+
+    console.log("user id in pdf uploader controller: ", id);
+
     if (!file) {
       return res.status(400).json({ message: "No file uploaded" });
     }
 
     const { title, category, tags } = req.body;
-    const userId = req.body.userID; // 🔹 grab from body
-    console.log("userId======:", userId);
+    console.log("userId======:", id);
     if (!title || !category || !tags) {
       return res
         .status(400)
@@ -33,44 +44,57 @@ const uploadPdf = async (req, res) => {
       .map((tag) => tag.trim())
       .filter((tag) => tag.length > 0);
 
-    // // ✅ Download the file from Cloudinary
-    // const cloudinaryUrl = file.path;
-    // const axiosResponse = await axios.get(cloudinaryUrl, {
-    //   responseType: "arraybuffer",
-    // });
-    // const buffer = Buffer.from(axiosResponse.data, "binary");
-
-    // // ✅ Parse the PDF to count pages
-    // const data = await pdfParse(buffer);
-    // const pages = data.numpages;
-    // const userId = "6891d415c8cd6309b50acd01"; // Replace with your MongoDB user _id
+    console.log("upto cloudinary upload");
+    const buffer = file.buffer;
 
     // ✅ generate public delivery URL for PDF
-    const pdfUrl = cloudinary.url(file.filename, {
-      resource_type: "raw",
-      format: "pdf",
+    const uploadCloudinary = new Promise((resolve, reject) => {
+      const uploadStream = cloudinary.uploader.upload_stream(
+        {
+          resource_type: "raw",
+          folder: "recallr",
+          access_mode: "public",
+        },
+        (err, result) => (err ? reject(err) : resolve(result))
+      );
+      const stream = require("stream");
+      const bufferStream = new stream.PassThrough();
+      bufferStream.end(buffer);
+      bufferStream.pipe(uploadStream);
     });
+    // console.log("file buffer:::", file.buffer);
+    const cloudResult = await uploadCloudinary;
 
-    console.log("PDF URL//////////:", pdfUrl);
-    console.log;
+    // console.log("PDF URL//////////:", pdfUrl);
+    console.log("after cloudinary upload");
+
+    const fileBuffer = req.file.buffer; // assuming Multer memoryStorage
+
+    const fileHash = generateFileHash(file.buffer);
 
     const newPdf = new PDF({
-      user: userId,
+      user: id,
       title,
       category,
       tags: normalizedTags,
       filename: file.originalname, // Store original filename
-      cloudinaryUrl: pdfUrl, // uploaded file URL
-      cloudinaryPublicId: file.filename, // public_id in Cloudinary
+      cloudinaryUrl: cloudResult.url || cloudResult.secure_url,
+      cloudinaryPublicId: cloudResult.public_id,
       uploadedAt: Date.now(),
+      fileHash,
+      originalName: file.originalname,
     });
 
     await newPdf.save();
 
-    // After saving newPdf
-    await User.findByIdAndUpdate(userId, {
-      $push: { pdfs: newPdf._id },
-    });
+    const user = await User.findById(id);
+    user.pdfs.push(newPdf._id);
+    await user.save();
+
+    // // After saving newPdf
+    // await User.findByIdAndUpdate(id, {
+    //   $push: { pdfs: newPdf._id },
+    // });
 
     res.status(201).json({ message: "PDF uploaded successfully", pdf: newPdf });
   } catch (err) {
@@ -79,12 +103,52 @@ const uploadPdf = async (req, res) => {
   }
 };
 
-const deletePdf = async (req, res) => {
-  const userId = req.body.userId; // 🔹 grab from body
-  const pdfId = req.body.pdfId; // 🔹 grab from body
+// const deletePdf = async (req, res) => {
+//   const userId = req.body.userId; // 🔹 grab from body
+//   const pdfId = req.body.pdfId; // 🔹 grab from body
 
-  console.log("User ID::::::", userId);
-  console.log("PDF ID:", pdfId);
+//   console.log("userID from delete::::", userId);
+//   console.log("pdfId from delete:::", pdfId);
+
+//   if (!userId || !pdfId) {
+//     return res.status(400).json({ message: "userId and pdfId are required" });
+//   }
+
+//   try {
+//     const user = await User.findById(userId);
+//     const pdf = await PDF.findById(pdfId);
+//     console.log("User:", user);
+//     console.log("PDF:", pdf);
+
+//     if (!user.pdfs.some((id) => id.toString() === pdfId)) {
+//       return res
+//         .status(400)
+//         .json({ message: "You do not have permission to delete this PDF" });
+//     }
+
+//     //delete pdf
+//     const deletedPDF = await PDF.findByIdAndDelete(pdfId);
+//     if (!deletedPDF) {
+//       return res.status(404).json({ message: "PDF not found" });
+//     }
+
+//     if (pdf && pdf.cloudinaryPublicId) {
+//       await cloudinary.uploader.destroy(pdf.cloudinaryPublicId, {
+//         resource_type: "raw",
+//       });
+//     }
+
+//     user.pdfs.pull(pdfId);
+//     await user.save();
+
+//     res.status(200).json({ message: "pdf deleted successfully" });
+//   } catch (err) {
+//     console.log("Error: ", err);
+//     res.status(500).json({ message: "server error" });
+//   }
+// };
+const deletePdf = async (req, res) => {
+  const { userId, pdfId } = req.body;
 
   if (!userId || !pdfId) {
     return res.status(400).json({ message: "userId and pdfId are required" });
@@ -92,35 +156,48 @@ const deletePdf = async (req, res) => {
 
   try {
     const user = await User.findById(userId);
-    const pdf = await PDF.findById(pdfId);
-    console.log("User:", user);
-    console.log("PDF:", pdf);
+    if (!user) return res.status(404).json({ message: "User not found" });
 
-    if (!user.pdfs.includes(pdfId)) {
+    const pdf = await PDF.findById(pdfId);
+    if (!pdf) return res.status(404).json({ message: "PDF not found" });
+
+    console.log(
+      "User PDFs:",
+      user.pdfs.map((id) => id.toString())
+    );
+    console.log("Requested PDF ID:", pdfId);
+    console.log(
+      "User PDFs:",
+      user.pdfs.map((id) => id.toString())
+    );
+    console.log("Requested PDF ID:", pdfId);
+
+
+    // check ownership
+    if (!user.pdfs.some((id) => id.equals(pdfId))) {
       return res
-        .status(400)
+        .status(403)
         .json({ message: "You do not have permission to delete this PDF" });
     }
 
-    //delete pdf
-    const deletedPDF = await PDF.findByIdAndDelete(pdfId);
-    if (!deletedPDF) {
-      return res.status(404).json({ message: "PDF not found" });
-    }
-
-    if (pdf && pdf.cloudinaryPublicId) {
+    // delete from cloudinary first
+    if (pdf.cloudinaryPublicId) {
       await cloudinary.uploader.destroy(pdf.cloudinaryPublicId, {
-        resource_type: "raw",
+        resource_type: "raw", // ✅ auto instead of raw
       });
     }
 
+    // delete from DB
+    await PDF.findByIdAndDelete(pdfId);
+
+    // remove from user's list
     user.pdfs.pull(pdfId);
     await user.save();
 
-    res.status(200).json({ message: "pdf deleted successfully" });
+    res.status(200).json({ message: "PDF deleted successfully" });
   } catch (err) {
-    console.log("Error: ", err);
-    res.status(500).json({ message: "server error" });
+    console.error("Error deleting PDF:", err);
+    res.status(500).json({ message: "Server error" });
   }
 };
 
@@ -214,7 +291,7 @@ const getAllPdfs = async (req, res) => {
   // const userId = req.user.id; // 🔹 grab from query
   // console.log("User ID:", userId);
 
-  const userId=req.user?.id;
+  const userId = req.user?.id;
 
   if (!userId) {
     return res.status(400).json({ message: "userId not found" });
@@ -320,9 +397,29 @@ const generateSummaryOnly = async (req, res) => {
   }
 };
 
-const generateFlashCardsOnly=async (req,res) =>{
+const generateFlashCardsOnly = async (req, res) => {};
 
-}
+const updatePdfProgress = async (req, res) => {
+  try {
+    const { currentPage, totalPages } = req.body;
+
+    if (!currentPage || !totalPages) {
+      return res.status(400).json({ message: "Missing fields" });
+    }
+
+    const progress = Math.round((currentPage / totalPages) * 100);
+
+    const updatedDoc = await PDF.findByIdAndUpdate(
+      req.params.id,
+      { currentPage, totalPages: totalPages, progress },
+      { new: true }
+    );
+
+    res.json(updatedDoc);
+  } catch (error) {
+    res.status(500).json({ message: "Error updating progress", error });
+  }
+};
 
 module.exports = {
   uploadPdf,
@@ -332,5 +429,6 @@ module.exports = {
   getAllPdfs,
   downloadPdf,
   generateSummaryOnly,
-  generateFlashCardsOnly
+  generateFlashCardsOnly,
+  updatePdfProgress,
 };

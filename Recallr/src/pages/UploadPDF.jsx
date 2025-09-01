@@ -129,15 +129,15 @@ const PDFUploadForm = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     console.log("Submitting PDF upload...");
+
     // alert("Submitting PDF upload...");
 
     const token = localStorage.getItem("token");
     if (!token) return;
+    console.log("token::::", token);
 
     const decodedToken = jwtDecode(token);
     const userID = decodedToken.id;
-
-
 
     if (!selectedFile) {
       toast.error("Please select a file to upload");
@@ -156,11 +156,12 @@ const PDFUploadForm = () => {
     formData.append("tags", tags.join(","));
     formData.append("userID", userID); // add userID in body
 
-
     try {
       // Using fetch instead of axios
       const response = await axios.post(`${API_URL}/pdf/upload-pdf`, formData, {
-        headers: { "Content-Type": "multipart/form-data" },
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
       });
 
       const result = response.data;
@@ -243,8 +244,7 @@ const PDFUploadForm = () => {
             mobile uploads
           </p>
         </div> */}
-        <PageHeader/>
-
+        <PageHeader />
 
         <div className="grid md:grid-cols-2 gap-8">
           {/* Web Upload Form */}
