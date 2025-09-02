@@ -136,17 +136,18 @@ const editUser = async (req, res) => {
 
 const getAverageProgress = async (req, res) => {
   try {
-    const { id } = req.user?.id;
-    const docs = await PDF.find({ user: id });
+    const id = req.user?.id;
+    const docs = await Pdf.find({ user: id });
 
     if (!docs.length) {
       return res.json({ averageProgress: 0 });
     }
 
     // calculate progress for each doc
-    const progresses = docs.map(
-      (doc) => (doc.currentPage / doc.totalPages) * 100
-    );
+    // const progresses = docs.map((doc) =>
+    //   doc.totalPages > 0 ? (doc.currentPage / doc.totalPages) * 100 : 0
+    // );
+    const progresses = docs.map((doc) => doc.progress || 0);
 
     // average progress
     const averageProgress =

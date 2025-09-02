@@ -58,6 +58,8 @@ const addToFavourite = async (req, res) => {
       { new: true }
     ).populate("favouritePdfs");
 
+    await Pdf.findByIdAndUpdate(pdfId, { isFavourite: true });
+
     if (!user) {
       return res.status(400).json({ message: "user not found" });
     }
@@ -117,6 +119,8 @@ const removeFromFavourites = async (req, res) => {
       { $pull: { favouritePdfs: pdfId } }, // $addToSet avoids duplicates
       { new: true }
     ).populate("favouritePdfs");
+
+    await Pdf.findByIdAndUpdate(pdfId, { isFavourite: false });
 
     if (!user) {
       return res.status(400).json({ message: "user not found" });

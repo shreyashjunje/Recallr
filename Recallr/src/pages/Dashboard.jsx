@@ -93,6 +93,7 @@ const Dashboard = () => {
   const [editText, setEditText] = useState("");
   const [todoFilter, setTodoFilter] = useState("all");
   const [refreshing, setRefreshing] = useState(false);
+  const [favpdfs,setFavpdfs]=useState([])
 
   const [tasks, setTasks] = useState([]);
   const [pdfs, setPdfs] = useState([]);
@@ -148,7 +149,12 @@ const Dashboard = () => {
       });
 
       if (res.status == 200) {
+        console.log("res.data.pdfs::",res.data.pdfs)
         setPdfs(res.data.pdfs);
+        console.log("pdfs::::",pdfs)
+        const favouritePDFs = res.data.pdfs.filter((pdf) => pdf.isFavourite === true);
+        console.log("fav pdfs::",favouritePDFs)
+        setFavpdfs(favouritePDFs)
       }
     } catch (err) {
       console.log("err", err);
@@ -215,7 +221,7 @@ const Dashboard = () => {
   const pdfsThisWeek = getPDFsUploadedThisWeek(pdfs);
   const totalpdfsthisweek = pdfsThisWeek.length;
 
-  const favouritePDFs = pdfs.filter((pdf) => pdf.isFavourite === true);
+  // const favouritePDFs = pdfs.filter((pdf) => pdf.isFavourite === true);
   const recentPDFs = [...pdfs]
     .sort((a, b) => new Date(b.uploadedAt) - new Date(a.uploadedAt))
     .slice(0, 3);
@@ -891,7 +897,7 @@ const Dashboard = () => {
               </div>
             </div>
             <div className="space-y-3">
-              {favouritePDFs?.map((pdf) => (
+              {favpdfs?.map((pdf) => (
                 <div
                   key={pdf._id}
                   className="group flex items-center gap-3 p-4 bg-gradient-to-r from-yellow-50 to-orange-50 rounded-xl hover:from-yellow-100 hover:to-orange-100 transition-all duration-300"

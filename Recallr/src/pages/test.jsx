@@ -29,7 +29,6 @@ import {
   FileCheck,
   FileX,
   FileUp,
-  X,
 } from "lucide-react";
 import { AuthContext } from "@/context/AuthContext";
 import { jwtDecode } from "jwt-decode";
@@ -59,39 +58,6 @@ const MyLibrary = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [showViewer, setShowViewer] = useState(null);
   const [averageProgress, setAverageProgress] = useState(0);
-  const [favorites, setFavorites] = useState([]);
-  // const handleToggleFavorite = async (pdf) => {
-  //   try {
-  //     const token = localStorage.getItem("token");
-  //     if (!token) return;
-
-  //     const endpoint = pdf.isFavorite
-  //       ? `${API_URL}/helper/remove-from-favourite`
-  //       : `${API_URL}/helper/add-to-favourite`;
-
-  //     const response = await axios.post(
-  //       endpoint,
-  //       { pdfId: pdf._id },
-  //       { headers: { Authorization: `Bearer ${token}` } }
-  //     );
-
-  //     if (response.status === 200) {
-  //       setPDFS((prevPDFs) =>
-  //         prevPDFs.map((p) =>
-  //           p._id === pdf._id ? { ...p, isFavorite: !p.isFavorite } : p
-  //         )
-  //       );
-
-  //       toast.success(
-  //         pdf.isFavorite ? "Removed from favorites" : "Added to favorites"
-  //       );
-  //     }
-  //   } catch (error) {
-  //     console.error("Error toggling favorite:", error);
-  //     toast.error("Failed to update favorites");
-  //   }
-  // };
-
   const dropdownRef = useRef(null);
 
   // const [title, setTitle] = useState("");
@@ -102,6 +68,19 @@ const MyLibrary = () => {
     category: "",
     tags: "",
   });
+
+  // When opening modal, preload values from selectedPdf
+  // useEffect(() => {
+  //   if (selectedPdf) {
+  //     setTitle(selectedPdf.title || "");
+  //     setCategory(selectedPdf.category || "");
+  //     setTags(selectedPdf.tags?.join(", ") || "");
+  //   } else {
+  //     setTitle("");
+  //     setCategory("");
+  //     setTags("");
+  //   }
+  // }, [selectedPdf]);
 
   useEffect(() => {
     if (selectedPdf) {
@@ -118,6 +97,34 @@ const MyLibrary = () => {
       });
     }
   }, [selectedPdf, showModal]); // Add showModal to dependencies
+
+  // // Close dropdown when clicking outside
+  // useEffect(() => {
+  //   const handleClickOutside = (event) => {
+  //     if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
+  //       setSelectedPdf(null);
+  //     }
+  //   };
+
+  //   document.addEventListener("mousedown", handleClickOutside);
+  //   return () => {
+  //     document.removeEventListener("mousedown", handleClickOutside);
+  //   };
+  // }, []);
+
+  // Close dropdown when clicking outside
+//   useEffect(() => {
+//     const handleClickOutside = (event) => {
+//       if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
+//         setSelectedPdf(null);
+//       }
+//     };
+
+//     document.addEventListener("mousedown", handleClickOutside);
+//     return () => {
+//       document.removeEventListener("mousedown", handleClickOutside);
+//     };
+//   }, []);
 
   const handleInputChange = (field, value) => {
     setFormData((prev) => ({
@@ -146,14 +153,15 @@ const MyLibrary = () => {
   }, []);
 
   useEffect(() => {
-    if (!showModal) {
+    if (showModal && selectedPdf) {
       setFormData({
-        title: "",
-        category: "",
-        tags: "",
+        title: selectedPdf.title || "",
+        category: selectedPdf.category || "",
+        description: selectedPdf.description || "",
+        file: selectedPdf.file || null,
       });
     }
-  }, [showModal]);
+  }, [showModal, selectedPdf]);
 
   // Color generator based on title hash
   const getColorFromTitle = (title) => {
@@ -179,142 +187,46 @@ const MyLibrary = () => {
     return new Date(dateString).toLocaleDateString(undefined, options);
   };
 
-  // Format file size
-  const formatFileSize = (bytes) => {
-    if (bytes === 0) return "0 Bytes";
-    const k = 1024;
-    const sizes = ["Bytes", "KB", "MB", "GB"];
-    const i = Math.floor(Math.log(bytes) / Math.log(k));
-    return parseFloat((bytes / Math.pow(k, i)).toFixed(1)) + " " + sizes[i];
-  };
-
-  const fetchPdfs = async () => {
+  // Fetch PDFs from backend
+  useEffect(() => {
     const token = localStorage.getItem("token");
     if (!token) return;
 
     const decodedToken = jwtDecode(token);
     const userID = decodedToken.id;
-    try {
-      setLoading(true);
-      const res = await axios.get(`${API_URL}/pdf/pdfs`, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-        params: { userId: userID },
-      });
 
-      // Transform the data to include calculated fields
-      const transformedData = res.data.pdfs.map((pdf) => ({
-        ...pdf,
-        color: getColorFromTitle(pdf.title),
-        formattedSize: formatFileSize(pdf.size || 0),
-        formattedDate: formatDate(pdf.createdAt || new Date()),
-        // progress: Math.floor(Math.random() * 100), // Random progress for demo
-        features: ["Summary", "Quiz", "Flashcards"], // Default features
-        tags: pdf.tags || ["Document", "Study"], // Default tags if none
-      }));
-
-      setPDFS(transformedData);
-      console.log("Fetched PDFs:", transformedData);
-    } catch (error) {
-      console.error("Error fetching PDFs:", error);
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  // Fetch user's favorite PDFs
-  const fetchFavorites = async () => {
-    try {
-      const token = localStorage.getItem("token");
-      if (!token) return;
-
-      const response = await axios.get(`${API_URL}/helper/get-favourite-pdfs`, {
-        headers: { Authorization: `Bearer ${token}` },
-      });
-
-      if (response.data.success) {
-        setFavorites(response.data.data);
-
-        // Update the PDFs with favorite status
-        setPDFS((prevPDFs) =>
-          prevPDFs.map((pdf) => ({
-            ...pdf,
-            isFavorite: response.data.data.some((fav) => fav._id === pdf._id),
-          }))
-        );
-      }
-    } catch (error) {
-      console.error("Error fetching favorites:", error);
-    }
-  };
-
-  // Fetch PDFs from backend
-  useEffect(() => {
-    fetchPdfs();
-    fetchFavorites();
-  }, [user]);
-
-  // Toggle favorite status
-  const handleToggleFavorite = async (pdf) => {
-    try {
-      const token = localStorage.getItem("token");
-      if (!token) return;
-
-      // Determine which endpoint to call based on current favorite status
-      const endpoint = pdf.isFavorite
-        ? `${API_URL}/helper/remove-from-favourite`
-        : `${API_URL}/helper/add-to-favourite`;
-
-      // Use appropriate HTTP method
-      const config = {
-        headers: { Authorization: `Bearer ${token}` },
-      };
-
-      let response;
-      if (pdf.isFavorite) {
-        // Use DELETE method for removal
-        response = await axios.delete(endpoint, {
-          ...config,
-          data: { pdfId: pdf._id },
+    const fetchPdfs = async () => {
+      try {
+        setLoading(true);
+        const res = await axios.get(`${API_URL}/pdf/pdfs`, {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+          params: { userId: userID },
         });
-      } else {
-        // Use POST method for addition
-        response = await axios.post(endpoint, { pdfId: pdf._id }, config);
+
+        // Transform the data to include calculated fields
+        const transformedData = res.data.pdfs.map((pdf) => ({
+          ...pdf,
+          color: getColorFromTitle(pdf.title),
+          formattedSize: formatFileSize(pdf.size || 0),
+          formattedDate: formatDate(pdf.createdAt || new Date()),
+          // progress: Math.floor(Math.random() * 100), // Random progress for demo
+          features: ["Summary", "Quiz", "Flashcards"], // Default features
+          tags: pdf.tags || ["Document", "Study"], // Default tags if none
+        }));
+
+        setPDFS(transformedData);
+        console.log("Fetched PDFs:", transformedData);
+      } catch (error) {
+        console.error("Error fetching PDFs:", error);
+      } finally {
+        setLoading(false);
       }
+    };
 
-      if (response.status === 200) {
-        // Update local state
-        setPDFS((prevPDFs) =>
-          prevPDFs.map((p) =>
-            p._id === pdf._id ? { ...p, isFavorite: !p.isFavorite } : p
-          )
-        );
-
-        setFavorites((prevPdfs) =>
-          prevPdfs.map((p) =>
-            p._id === pdf._id ? { ...p, isFavorite: !p.isFavorite } : p
-          )
-        );
-
-        // Update favorites list
-        if (pdf.isFavorite) {
-          setFavorites((prev) => prev.filter((fav) => fav._id !== pdf._id));
-        } else {
-          // We might not have the full PDF data, so we add what we have
-          setFavorites((prev) => [...prev, { ...pdf, isFavorite: true }]);
-        }
-
-        // Show toast notification
-        toast.success(
-          pdf.isFavorite ? "Removed from favorites" : "Added to favorites"
-        );
-      }
-    } catch (error) {
-      console.error("Error toggling favorite:", error);
-      toast.error("Failed to update favorites");
-    }
-  };
+    fetchPdfs();
+  }, [user]);
 
   // Filter and sort PDFs
   const filteredPdfs = PDFS.filter((pdf) => {
@@ -422,47 +334,6 @@ const MyLibrary = () => {
     }
   };
 
-  // Confirm delete
-  const confirmDelete = async () => {
-    if (!pdfToDelete) return;
-
-    const token = localStorage.getItem("token");
-    if (!token) {
-      toast.error("You are not logged in");
-      return;
-    }
-
-    const decodedToken = jwtDecode(token);
-    const userID = decodedToken.id;
-
-    // Optimistic update
-    const oldPDFs = [...PDFS];
-    setPDFS((prev) => prev.filter((p) => p._id !== pdfToDelete._id));
-    setShowDeleteConfirm(false);
-    setPdfToDelete(null);
-
-    try {
-      await axios.delete(`${API_URL}/pdf/delete-pdf`, {
-        headers: { Authorization: `Bearer ${token}` },
-        data: { userId: userID, pdfId: pdfToDelete._id },
-      });
-
-      toast.success("PDF deleted successfully");
-    } catch (error) {
-      console.error("Error deleting PDF:", error);
-      setPDFS(oldPDFs); // rollback if deletion failed
-      toast.error("Failed to delete PDF");
-    }
-  };
-
-  const handleRead = async (pdf) => {
-    //  console.log("Reading PDF url:", pdf.cloudinaryUrl);
-    //  setShowViewer(pdf.cloudinaryUrl)
-    //  console.log("Show viewer set to:", showViewer);
-    console.log("pdfId:::", pdf._id);
-    navigate("/view", { state: { url: pdf.cloudinaryUrl, pdfId: pdf._id } });
-    // navigate("/view", { state: { pdfUrl: pdf.cloudinaryUrl ,fileName:pdf.title });
-  };
   // Edit handler
   // const editHandler = async (pdfData) => {
   //   if (!selectedPdf) return;
@@ -544,150 +415,10 @@ const MyLibrary = () => {
     }
   };
 
-  // const handledownload = async (pdf) => {
-
-  //   const pdfUrl=pdf.cloudinaryUrl
-  //   const pdfname=pdf?.originalName
-  //   console.log("downloded pdf:::",pdf)
-  //   try {
-  //     const response = await fetch(pdfUrl);
-  //     const blob = await response.blob();
-  //     const url = window.URL.createObjectURL(blob);
-  //     const a = document.createElement("a");
-  //     a.href = url;
-  //     a.download =  "myfile.pdf"// You can also dynamically name the file here
-  //     document.body.appendChild(a);
-  //     a.click();
-  //     a.remove();
-  //     window.URL.revokeObjectURL(url);
-  //   } catch (err) {
-  //     console.error("Download failed:", err);
-  //   }
-  // };
-  const handledownload = async (pdf) => {
-    const pdfName =
-      pdf.originalName && pdf.originalName.trim() !== ""
-        ? pdf.originalName
-        : "myfile.pdf";
-
-    try {
-      const response = await fetch(pdf.cloudinaryUrl, { mode: "cors" });
-      const blob = await response.blob();
-      const url = window.URL.createObjectURL(blob);
-
-      const a = document.createElement("a");
-      a.href = url;
-      a.download = pdfName; // force your filename
-      document.body.appendChild(a);
-      a.click();
-      a.remove();
-
-      window.URL.revokeObjectURL(url);
-    } catch (err) {
-      console.error("Download failed:", err);
-    }
-  };
-
-  const handlePdfDetails = (pdfId) => {
-    navigate(`/pdf/${pdfId}`);
-  };
-
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100">
       {/* Header */}
-      <div className="sticky top-0 z-10 bg-white/95 backdrop-blur-sm border-b border-gray-200 shadow-sm">
-        <div className="max-w-7xl mx-auto px-6 py-6">
-          <div className="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-4 mb-6">
-            <div>
-              <h1 className="text-4xl font-bold bg-gradient-to-r from-gray-800 to-gray-600 bg-clip-text text-transparent">
-                My Library
-              </h1>
-              <p className="text-gray-600 mt-1">
-                {filteredPdfs.length}{" "}
-                {filteredPdfs.length === 1 ? "document" : "documents"} in your
-                collection
-              </p>
-            </div>
-            <button
-              className="flex items-center space-x-2 px-6 py-3 bg-gradient-to-r from-blue-600 to-blue-700 text-white rounded-xl font-medium hover:from-blue-700 hover:to-blue-800 transition-all duration-200 shadow-lg hover:shadow-blue-500/25 hover:scale-[1.02] active:scale-95"
-              onClick={() => setIsModalOpen(true)}
-            >
-              <Upload className="w-5 h-5" />
-              <span>Upload New PDF</span>
-            </button>
-          </div>
 
-          {/* Search and Filters */}
-          <div className="flex flex-col lg:flex-row gap-4 items-stretch lg:items-center">
-            <div className="flex-1 relative">
-              <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
-              <input
-                type="text"
-                placeholder="Search PDFs, tags, or content..."
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                className="w-full pl-12 pr-4 py-3 bg-white border border-gray-300 rounded-xl text-gray-900 placeholder-gray-500 focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 transition-all duration-200 shadow-sm"
-              />
-            </div>
-
-            <div className="flex gap-3 flex-wrap lg:flex-nowrap">
-              <div className="relative flex-1 lg:flex-none min-w-[180px]">
-                <select
-                  value={selectedCategory}
-                  onChange={(e) => setSelectedCategory(e.target.value)}
-                  className="appearance-none bg-white border border-gray-300 rounded-xl px-4 py-3 pr-10 text-gray-700 focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 transition-all duration-200 shadow-sm w-full"
-                >
-                  {categories.map((category) => (
-                    <option key={category} value={category}>
-                      {category}
-                    </option>
-                  ))}
-                </select>
-                <ChevronDown className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5 pointer-events-none" />
-              </div>
-
-              <div className="relative flex-1 lg:flex-none min-w-[160px]">
-                <select
-                  value={sortBy}
-                  onChange={(e) => setSortBy(e.target.value)}
-                  className="appearance-none bg-white border border-gray-300 rounded-xl px-4 py-3 pr-10 text-gray-700 focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 transition-all duration-200 shadow-sm w-full"
-                >
-                  {sortOptions.map((option) => (
-                    <option key={option} value={option}>
-                      {option}
-                    </option>
-                  ))}
-                </select>
-                <ChevronDown className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5 pointer-events-none" />
-              </div>
-
-              {/* View Mode Toggle */}
-              <div className="flex border border-gray-300 rounded-xl p-1 bg-white shadow-sm">
-                <button
-                  onClick={() => setViewMode("grid")}
-                  className={`p-2 rounded-lg transition-all duration-200 ${
-                    viewMode === "grid"
-                      ? "bg-blue-600 text-white shadow-sm"
-                      : "text-gray-500 hover:text-gray-700 hover:bg-gray-50"
-                  }`}
-                >
-                  <Grid className="w-4 h-4" />
-                </button>
-                <button
-                  onClick={() => setViewMode("list")}
-                  className={`p-2 rounded-lg transition-all duration-200 ${
-                    viewMode === "list"
-                      ? "bg-blue-600 text-white shadow-sm"
-                      : "text-gray-500 hover:text-gray-700 hover:bg-gray-50"
-                  }`}
-                >
-                  <List className="w-4 h-4" />
-                </button>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
       {/* PDF Grid/List */}
       <div className="max-w-7xl mx-auto px-6 py-8 ">
         {loading ? (
@@ -738,94 +469,59 @@ const MyLibrary = () => {
                     >
                       <FileText className="w-7 h-7 text-white" />
                     </div>
-
-                    {/* Favorite and More Actions */}
-                    <div className="flex items-center gap-1">
-                      {/* Favorite Icon */}
+                    <div className="relative">
                       <button
-                        className="p-2 hover:bg-yellow-50 rounded-lg transition-colors text-gray-400 hover:text-yellow-500"
+                        className="p-2 hover:bg-gray-100 rounded-lg transition-colors text-gray-500 hover:text-gray-700"
                         onClick={(e) => {
                           e.stopPropagation();
-                          handleToggleFavorite(pdf);
+                          setSelectedPdf(pdf);
                         }}
-                        title={
-                          pdf.isFavorite
-                            ? "Remove from favorites"
-                            : "Add to favorites"
-                        }
                       >
-                        {pdf.isFavorite ? (
-                          <Star className="w-5 h-5 fill-yellow-400 text-yellow-400" />
-                        ) : (
-                          <Star className="w-5 h-5" />
-                        )}
+                        <MoreVertical className="w-5 h-5" />
                       </button>
 
-                      <div className="relative">
-                        <button
-                          className="p-2 hover:bg-gray-100 rounded-lg transition-colors text-gray-500 hover:text-gray-700"
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            setSelectedPdf(pdf);
-                          }}
+                      {/* Dropdown menu */}
+                      {selectedPdf?._id === pdf._id && (
+                        <div
+                          ref={dropdownRef}
+                          className="absolute right-0 mt-2 w-48 bg-white rounded-xl shadow-lg z-10 border border-gray-200 overflow-hidden"
                         >
-                          <MoreVertical className="w-5 h-5" />
-                        </button>
-
-                        {/* Dropdown menu */}
-                        {selectedPdf?._id === pdf._id && (
-                          <div
-                            ref={dropdownRef}
-                            className="absolute right-0 mt-2 w-48 bg-white rounded-xl shadow-lg z-10 border border-gray-200 overflow-hidden"
-                          >
-                            {/* Close Icon */}
+                          <div className="py-2">
                             <button
-                              className="absolute top-2 right-2 text-gray-600 hover:text-gray-900"
+                              className="flex items-center px-4 py-3 text-sm text-gray-700 hover:bg-blue-50 w-full text-left transition-colors"
                               onClick={(e) => {
                                 e.stopPropagation();
+                                handlePdfAction("edit", pdf);
+                              }}
+                            >
+                              <Edit className="w-4 h-4 mr-3 text-blue-500" />
+                              Edit Details
+                            </button>
+                            <button
+                              className="flex items-center px-4 py-3 text-sm text-gray-700 hover:bg-blue-50 w-full text-left transition-colors"
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                handledownload(pdf);
+                              }}
+                            >
+                              <Download className="w-4 h-4 mr-3 text-blue-500" />
+                              Download
+                            </button>
+                            <button
+                              className="flex items-center px-4 py-3 text-sm text-red-600 hover:bg-red-50 w-full text-left transition-colors"
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                setPdfToDelete(pdf);
+                                setShowDeleteConfirm(true);
                                 setSelectedPdf(null);
                               }}
                             >
-                              <X className="w-5 h-5" />
+                              <Trash2 className="w-4 h-4 mr-3" />
+                              Delete
                             </button>
-
-                            <div className="py-2">
-                              <button
-                                className="flex items-center px-4 py-3 text-sm text-gray-700 hover:bg-blue-50 w-full text-left transition-colors"
-                                onClick={(e) => {
-                                  e.stopPropagation();
-                                  handlePdfAction("edit", pdf);
-                                }}
-                              >
-                                <Edit className="w-4 h-4 mr-3 text-blue-500" />
-                                Edit Details
-                              </button>
-                              <button
-                                className="flex items-center px-4 py-3 text-sm text-gray-700 hover:bg-blue-50 w-full text-left transition-colors"
-                                onClick={(e) => {
-                                  e.stopPropagation();
-                                  handlePdfAction("download", pdf);
-                                }}
-                              >
-                                <Download className="w-4 h-4 mr-3 text-blue-500" />
-                                Download
-                              </button>
-                              <button
-                                className="flex items-center px-4 py-3 text-sm text-red-600 hover:bg-red-50 w-full text-left transition-colors"
-                                onClick={(e) => {
-                                  e.stopPropagation();
-                                  setPdfToDelete(pdf);
-                                  setShowDeleteConfirm(true);
-                                  setSelectedPdf(null);
-                                }}
-                              >
-                                <Trash2 className="w-4 h-4 mr-3" />
-                                Delete
-                              </button>
-                            </div>
                           </div>
-                        )}
-                      </div>
+                        </div>
+                      )}
                     </div>
                   </div>
 
@@ -838,13 +534,9 @@ const MyLibrary = () => {
                       <span className="px-3 py-1 bg-blue-50 text-blue-700 rounded-full text-xs font-medium">
                         {pdf.category || "Uncategorized"}
                       </span>
-                      {/* Favorite badge for mobile view */}
-                      {pdf.isFavorite && (
-                        <div className="md:hidden flex items-center text-yellow-500">
-                          <Star className="w-4 h-4 fill-yellow-400 mr-1" />
-                          <span className="text-xs">Favorite</span>
-                        </div>
-                      )}
+                      {/* <span className="text-sm text-gray-500">
+                        {pdf.formattedSize}
+                      </span> */}
                     </div>
                     <div className="flex items-center gap-2 text-sm text-gray-400">
                       <Clock className="w-4 h-4" />
@@ -890,6 +582,18 @@ const MyLibrary = () => {
                     </div>
                   </div>
 
+                  {/* Feature Chips */}
+                  {/* <div className="flex flex-wrap gap-2 mb-6">
+              {pdf.features.map((feature) => (
+                <div
+                  key={feature}
+                  className="inline-flex items-center px-3 py-1.5 bg-gray-50 text-gray-700 rounded-lg text-xs font-medium border border-gray-100"
+                >
+                  {getFeatureIcon(feature)}
+                  <span className="ml-1.5">{feature}</span>
+                </div>
+              ))}
+            </div> */}
                   {/* Feature Chips */}
                   <div className="flex flex-wrap gap-2 mb-6 min-h-[40px]">
                     {pdf?.isQuizGenerated && (
@@ -959,14 +663,9 @@ const MyLibrary = () => {
                 <div className="flex-1 min-w-0">
                   <div className="flex items-start justify-between">
                     <div className="flex-1 min-w-0">
-                      <div className="flex items-center gap-2 mb-1">
-                        <h3 className="text-xl font-bold text-gray-900 group-hover:text-blue-600 transition-colors">
-                          {pdf.title}
-                        </h3>
-                        {pdf.isFavorite && (
-                          <Star className="w-4 h-4 fill-yellow-400 text-yellow-500" />
-                        )}
-                      </div>
+                      <h3 className="text-xl font-bold text-gray-900 group-hover:text-blue-600 transition-colors">
+                        {pdf.title}
+                      </h3>
                       <div className="flex items-center gap-4 mt-2">
                         <span className="px-3 py-1 bg-blue-50 text-blue-700 rounded-full text-xs font-medium">
                           {pdf.category || "Uncategorized"}
@@ -1023,26 +722,6 @@ const MyLibrary = () => {
                         ))}
                       </div>
 
-                      {/* Favorite Button for List View */}
-                      <button
-                        className="p-2.5 text-gray-400 hover:text-yellow-500 hover:bg-yellow-50 rounded-xl transition-colors"
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          handleToggleFavorite(pdf);
-                        }}
-                        title={
-                          pdf.isFavorite
-                            ? "Remove from favorites"
-                            : "Add to favorites"
-                        }
-                      >
-                        {pdf.isFavorite ? (
-                          <Star className="w-5 h-5 fill-yellow-400 text-yellow-400" />
-                        ) : (
-                          <Star className="w-5 h-5" />
-                        )}
-                      </button>
-
                       <button
                         className="flex items-center space-x-2 px-4 py-2.5 bg-blue-600 hover:bg-blue-700 text-white rounded-xl text-sm font-medium transition-colors shadow-md shadow-blue-500/30"
                         onClick={(e) => {
@@ -1080,17 +759,6 @@ const MyLibrary = () => {
                             ref={dropdownRef}
                             className="absolute right-0 mt-2 w-48 bg-white rounded-xl shadow-lg z-10 border border-gray-200 overflow-hidden"
                           >
-                            {/* Close Icon */}
-                            <button
-                              className="absolute top-2 right-2 text-gray-600 hover:text-gray-900"
-                              onClick={(e) => {
-                                e.stopPropagation();
-                                setSelectedPdf(null);
-                              }}
-                            >
-                              <X className="w-5 h-5" />
-                            </button>
-
                             <div className="py-2">
                               <button
                                 className="flex items-center px-4 py-3 text-sm text-gray-700 hover:bg-blue-50 w-full text-left transition-colors"
@@ -1137,140 +805,6 @@ const MyLibrary = () => {
         )}
       </div>
 
-      {/* Stats Footer */}
-      <div className="border-t border-gray-200 bg-white">
-        <div className="max-w-7xl mx-auto px-6 py-8">
-          <div className="grid grid-cols-1 sm:grid-cols-4 gap-6">
-            <div className="text-center p-6 bg-gradient-to-br from-blue-50 to-blue-100 rounded-xl">
-              <div className="text-3xl font-bold text-blue-900 mb-1">
-                {PDFS.length}
-              </div>
-              <div className="text-sm text-blue-700 font-medium">
-                Total Documents
-              </div>
-            </div>
-            <div className="text-center p-6 bg-gradient-to-br from-green-50 to-green-100 rounded-xl">
-              <div className="text-3xl font-bold text-green-900 mb-1">
-                {/* {PDFS.length > 0
-                  ? Math.round(
-                      PDFS.reduce((acc, pdf) => acc + pdf.progress, 0) /
-                        PDFS.length
-                    )
-                  : 0} */}
-                {averageProgress}%
-              </div>
-              <div className="text-sm text-green-700 font-medium">
-                Average Progress
-              </div>
-            </div>
-            <div className="text-center p-6 bg-gradient-to-br from-purple-50 to-purple-100 rounded-xl">
-              <div className="text-3xl font-bold text-purple-900 mb-1">
-                {categories.length - 1}
-              </div>
-              <div className="text-sm text-purple-700 font-medium">
-                Categories
-              </div>
-            </div>
-            <div className="text-center p-6 bg-gradient-to-br from-orange-50 to-orange-100 rounded-xl">
-              <div className="text-3xl font-bold text-orange-900 mb-1">
-                {PDFS.filter((pdf) => pdf.progress === 100).length}
-              </div>
-              <div className="text-sm text-orange-700 font-medium">
-                Completed
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      {/* Edit PDF Modal */}
-      {/* {showModal && (
-        <div
-          className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4"
-          onClick={() => {
-            setShowModal(false);
-            setSelectedPdf(null);
-          }}
-        >
-          <div
-            className="bg-white rounded-2xl shadow-xl w-full max-w-md"
-            onClick={(e) => e.stopPropagation()}
-          >
-            <div className="p-6">
-              <h3 className="text-xl font-semibold text-gray-900 mb-4">
-                {selectedPdf ? "Edit PDF Details" : "Upload New PDF"}
-              </h3>
-
-              <div className="space-y-4">
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
-                    Title
-                  </label>
-                  <input
-                    type="text"
-                    value={formData.title}
-                    onChange={(e) => handleInputChange("title", e.target.value)}
-                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                  />
-                </div>
-
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
-                    Category
-                  </label>
-                  <select
-                    value={formData.category}
-                    onChange={(e) =>
-                      handleInputChange("category", e.target.value)
-                    }
-                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                  >
-                    <option value="">Select category</option>
-                    {categories
-                      .filter((c) => c !== "All Categories")
-                      .map((category) => (
-                        <option key={category} value={category}>
-                          {category}
-                        </option>
-                      ))}
-                  </select>
-                </div>
-
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
-                    Tags (comma separated)
-                  </label>
-                  <input
-                    type="text"
-                    value={formData.tags}
-                    onChange={(e) => handleInputChange("tags", e.target.value)}
-                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                    use
-                  />
-                </div>
-              </div>
-
-              <div className="flex justify-end space-x-3 mt-6">
-                <button
-                  onClick={() => {
-                    setShowModal(false);
-                    setSelectedPdf(null);
-                  }}
-                  className="px-4 py-2 text-gray-700 hover:bg-gray-100 rounded-lg"
-                >
-                  Cancel
-                </button>
-                <button
-                  onClick={editHandler}
-                  className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
-                >
-                  {selectedPdf ? "Save Changes" : "Upload"}
-                </button>
-              </div>
-            </div>
-          </div>
-        </div>
-      )} */}
       {showModal && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
           <div className="bg-white rounded-2xl shadow-xl w-full max-w-md">
@@ -1293,6 +827,7 @@ const MyLibrary = () => {
                         title: e.target.value,
                       }))
                     }
+                    // onChange={handleInputChange}
                     className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                   />
                 </div>
@@ -1358,52 +893,6 @@ const MyLibrary = () => {
           </div>
         </div>
       )}
-
-      {/* Delete Confirmation Modal */}
-      {showDeleteConfirm && (
-        <div
-          className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4"
-          onClick={() => setShowDeleteConfirm(false)}
-        >
-          <div
-            className="bg-white rounded-2xl shadow-xl w-full max-w-md"
-            onClick={(e) => e.stopPropagation()} // Prevent click from bubbling to parent
-          >
-            <div className="p-6">
-              <div className="flex items-center justify-center w-16 h-16 bg-red-100 rounded-full mx-auto mb-4">
-                <Trash2 className="w-8 h-8 text-red-600" />
-              </div>
-              <h3 className="text-xl font-semibold text-gray-900 text-center mb-2">
-                Delete PDF?
-              </h3>
-              <p className="text-gray-500 text-center mb-6">
-                Are you sure you want to delete "{pdfToDelete?.title}"? This
-                action cannot be undone.
-              </p>
-
-              <div className="flex justify-center space-x-4">
-                <button
-                  onClick={() => setShowDeleteConfirm(false)}
-                  className="px-6 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50"
-                >
-                  Cancel
-                </button>
-                <button
-                  onClick={confirmDelete}
-                  className="px-6 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700"
-                >
-                  Delete
-                </button>
-              </div>
-            </div>
-          </div>
-        </div>
-      )}
-
-      {/* {showViewer && <PdfViewer url={`${showViewer}.pdf`} />} */}
-      {/* {showViewer && <PdfViewer url={showViewer} />} */}
-
-      {/* {selectedPdf && <PdfReader pdfUrl={selectedPdf} />} */}
 
       <PDFUploadModal
         isOpen={isModalOpen}
