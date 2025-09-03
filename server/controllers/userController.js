@@ -1,3 +1,4 @@
+const { uploadToCloudinary } = require("../config/cloudinary");
 const Pdf = require("../models/Pdf");
 const User = require("../models/User");
 const cloudinary = require("cloudinary").v2;
@@ -5,24 +6,27 @@ const cloudinary = require("cloudinary").v2;
 const getFullProfile = async (req, res) => {
   //   const userId = req.params.id;
 
-  const userId = "6891d415c8cd6309b50acd01";
+  const id = req.user?.id;
+  console.log("userid::: in the profioe-->", id);
   try {
-    const user = await User.findById(userId).select("-password");
+    // const user = await User.findById(id).select("-password");
+    const user = await User.findById(id)
+      .select("-password") // exclude password
+      .populate("pdfs")
+      .populate("quizzes")
+      // .populate("attempts")
+      .populate("favouritePdfs");
 
     if (!user) {
       return res.status(400).json({ message: "user not found" });
     }
 
-    const { userName, email, phoneNumber } = user;
+    // const { userName, email, phoneNumber } = user;
 
     res.status(200).json({
       success: true,
       message: "user fetched successfully",
-      user: {
-        userName,
-        email,
-        phoneNumber,
-      },
+      data: user,
     });
   } catch (err) {
     console.log("Error: ", err);
@@ -159,4 +163,31 @@ const getAverageProgress = async (req, res) => {
   }
 };
 
-module.exports = { getFullProfile, deleteUser, editUser, getAverageProgress };
+const updateProfilePicture = async (req, res) => {
+  try {
+    const id = req.user?.id; // from auth middleware
+    const file = req.file;
+
+    // upload to cloudinary
+    const result = await uploadToCloudinary(file);
+
+    // update user
+    const updatedUser = await User.findByIdAndUpdate(
+      id,
+      { profilePicture: result.secure_url },
+      { new: true }
+    );
+
+    res.json({ success: true, user: updatedUser });
+  } catch (err) {
+    res.status(500).json({ success: false, message: err.message });
+  }
+};
+
+module.exports = {
+  getFullProfile,
+  deleteUser,
+  editUser,
+  getAverageProgress,
+  updateProfilePicture,
+};

@@ -22,11 +22,11 @@ const userSchema = new mongoose.Schema(
       type: String,
       required: true,
     },
-    resetPasswordToken:{
-      type:String,
+    resetPasswordToken: {
+      type: String,
     },
-    resetPasswordExpires:{
-      type:Date,
+    resetPasswordExpires: {
+      type: Date,
     },
     googleId: { type: String }, // only for Google login
     createdAt: {
@@ -49,12 +49,19 @@ const userSchema = new mongoose.Schema(
       expiresAt: { type: Date },
     },
 
-    favouritePdfs:[
+    favouritePdfs: [
       {
-        type:mongoose.Schema.Types.ObjectId,
-        ref:"PDF"
-      }
-    ]
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "PDF",
+      },
+    ],
+
+    profilePicture: {
+      type: String, // store image URL (e.g., from Cloudinary or local server)
+      default:
+        "https://res.cloudinary.com/demo/image/upload/v1692282928/default-avatar.png", // fallback
+    },
+
     // // Telegram integration fields
     // telegramChatId: { type: String, default: null },
     // telegramLinkToken: { type: String, default: null },

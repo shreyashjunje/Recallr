@@ -165,8 +165,18 @@ const Navbar = () => {
                       <div className="bg-white/60 backdrop-blur-sm rounded-2xl  border border-white/20 shadow-lg">
                         <div className="flex items-center space-x-3">
                           <div className="relative">
-                            <div className="w-12 h-12 bg-gray-500 rounded-2xl flex items-center justify-center shadow-lg">
-                              <User className="w-6 h-6 text-white" />
+                            <div className="w-12 h-12 rounded-2xl flex items-center justify-center shadow-lg overflow-hidden">
+                              {user?.profilePicture ? (
+                                <img
+                                  src={user.profilePicture}
+                                  alt="Profile"
+                                  className="w-full h-full object-cover"
+                                />
+                              ) : (
+                                <div className="w-12 h-12 bg-gradient-to-r from-indigo-500 to-purple-600 rounded-2xl flex items-center justify-center">
+                                  <User className="w-6 h-6 text-white" />
+                                </div>
+                              )}
                             </div>
                           </div>
                           {/* <div className="flex-1 min-w-0">

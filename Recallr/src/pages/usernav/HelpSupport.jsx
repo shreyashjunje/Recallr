@@ -4,7 +4,7 @@ import { Search, ChevronDown, MessageCircle, User, CreditCard, Settings, HelpCir
 
 const HelpSupportPage = () => {
   const [searchQuery, setSearchQuery] = useState('');
-  const [openFAQ, setOpenFAQ] = useState<number | null>(null);
+  const [openFAQ, setOpenFAQ] = useState(null);
   const [showChat, setShowChat] = useState(false);
 
   const faqItems = [

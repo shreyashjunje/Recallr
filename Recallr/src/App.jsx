@@ -30,6 +30,9 @@ import ForgotPassword from "./pages/auth/ForgotPassword";
 import ResetPassword from "./pages/auth/ResetPassword";
 import TermsOfService from "./components/auth/Terms";
 import PrivacyPolicy from "./components/auth/PrivacyPolicies";
+import HelpSupportPage from "./pages/usernav/HelpSupport";
+import ProfilePage from "./pages/usernav/Profile";
+import SettingsPage from "./pages/usernav/Settings";
 
 function App() {
   // const [quizStarted, setQuizStarted] = useState(false);
@@ -44,7 +47,6 @@ function App() {
       <Route path="/view" element={<PDFViewer />} />
       <Route path="/terms" element={<TermsOfService />} />
       <Route path="/privacy" element={<PrivacyPolicy />} />
-
 
       <Route path="/" element={<Home />} />
 
@@ -69,6 +71,11 @@ function App() {
         />
         <Route path="quizmaster" element={<QuizMasterHome />} />
         <Route path="quizmaster/quizsettings" element={<QuizSetup />} />
+
+        <Route path="help&support" element={<HelpSupportPage />} />
+        <Route path="profile" element={<ProfilePage />} />
+        <Route path="settings" element={<SettingsPage />} />
+
         <Route
           path="study-groups"
           element={

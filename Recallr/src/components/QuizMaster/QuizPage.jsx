@@ -23,7 +23,7 @@ const API_URL=import.meta.env.VITE_API_URL
 //     'Your progress is automatically saved',
 //     'Submit the quiz before time runs out to save your score'
 //   ]
-// };
+// };0
 
 
 export default function QuizPage() {

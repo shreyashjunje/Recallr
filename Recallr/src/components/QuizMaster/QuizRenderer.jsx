@@ -32,14 +32,11 @@ export function QuestionRenderer({
 
   const renderMCQ = () => (
     <div className="space-y-3">
-    
       {question.options?.map((option, index) => {
         const isSelected = question.multipleSelect
           ? Array.isArray(userAnswer?.answer) &&
             userAnswer.answer.includes(option)
           : userAnswer?.answer === option;
-
-        console.log("question options:::", question?.options);
 
         return (
           <button
@@ -135,6 +132,22 @@ export function QuestionRenderer({
     );
   };
 
+  // Determine which component to render based on question type
+  const renderQuestionContent = () => {
+    switch(question.type) {
+      case "MCQ":
+        return renderMCQ();
+      case "TrueFalse":
+        return renderTrueFalse();
+      case "FillBlank":
+        return renderFillBlank();
+      case "ShortAnswer":
+        return renderShortAnswer();
+      default:
+        return null;
+    }
+  };
+
   return (
     <div className="space-y-6">
       <div className="text-center">
@@ -147,15 +160,7 @@ export function QuestionRenderer({
       </div>
 
       <div className="mt-8 space-y-6">
-        {Array.isArray(questionTypes) &&
-          questionTypes.map((type, index) => (
-            <div key={index}>
-              {type === "MCQ" && renderMCQ()}
-              {type === "TrueFalse" && renderTrueFalse()}
-              {type === "FillBlank" && renderFillBlank()}
-              {type === "ShortAnswer" && renderShortAnswer()}
-            </div>
-          ))}
+        {renderQuestionContent()}
       </div>
     </div>
   );

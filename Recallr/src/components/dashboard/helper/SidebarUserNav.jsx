@@ -12,8 +12,12 @@ import {
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { User, Settings, HelpCircle, LogOut } from "lucide-react";
 import useAuth from "@/hooks/useAuth";
+import { useNavigate } from "react-router";
 
 export default function SidebarUserNav({ trigger, user }) {
+
+  const navigate=useNavigate()
+  console.log("user in the user navvvvvvv:::",user)
 
   const { logout } = useAuth();
   // Ensure trigger is a single valid React element
@@ -46,17 +50,17 @@ export default function SidebarUserNav({ trigger, user }) {
 
         <DropdownMenuSeparator />
 
-        <DropdownMenuItem>
+        <DropdownMenuItem onClick={()=>navigate("/profile")}>
           <User className="mr-2 h-4 w-4" />
           <span>Profile</span>
         </DropdownMenuItem>
 
-        <DropdownMenuItem>
+        <DropdownMenuItem onClick={()=>navigate("/settings")}>
           <Settings className="mr-2 h-4 w-4" />
           <span>Settings</span>
         </DropdownMenuItem>
 
-        <DropdownMenuItem>
+        <DropdownMenuItem onClick={()=>navigate("/help&support")}>
           <HelpCircle className="mr-2 h-4 w-4" />
           <span>Help & Support</span>
         </DropdownMenuItem>
