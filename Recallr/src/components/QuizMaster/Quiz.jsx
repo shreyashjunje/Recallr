@@ -8,6 +8,7 @@ import { QuizNavigation } from "./QuizNavigation";
 import { QuizStats } from "./QuizStats";
 import { QuizResults } from "./QuizResults";
 import { ArrowLeft, Sun, Moon } from "lucide-react";
+const getQId = (q) => q?.id ?? q?._id;
 
 const pointsPerQuestion = 100;
 
@@ -34,9 +35,39 @@ export function Quiz({ quizInfo, questions, onExit }) {
   //     },
   //   });
   // }, [quizInfo._id]);
+  // useEffect(() => {
+  //   let correctCount = 0;
+  //   savedAnswers.forEach((ans) => {
+  //     const question = questions.find((q) => q.id === ans.questionId);
+  //     if (question && ans.answer === question.correctAnswer) {
+  //       correctCount++;
+  //     }
+  //   });
+
+  //   // Don't reset if we're already in the middle of a quiz
+  //   if (state.quizId !== quizInfo._id) {
+  //     dispatch({
+  //       type: "INIT_QUIZ",
+  //       payload: {
+  //         quizId: quizInfo._id,
+  //         currentQuestionIndex: 0,
+  //         answers: savedAnswers,
+  //         timeRemaining: quizInfo.settings?.timeLimit * 60,
+  //         isCompleted: savedAnswers.length >= questions.length, // Check if already completed
+  //         score: correctCount * pointsPerQuestion, // ✅ fixed
+  //         startTime: Date.now(),
+  //       },
+  //     });
+  //   }
+  // }, [quizInfo._id]);
   useEffect(() => {
-    // Don't reset if we're already in the middle of a quiz
     if (state.quizId !== quizInfo._id) {
+      // compute correctness for saved answers (resume case)
+      const correctCount = savedAnswers.reduce((acc, ans) => {
+        const q = questions.find((qq) => getQId(qq) === ans.questionId);
+        return acc + (q && ans.answer === q?.correctAnswer ? 1 : 0);
+      }, 0);
+
       dispatch({
         type: "INIT_QUIZ",
         payload: {
@@ -44,19 +75,37 @@ export function Quiz({ quizInfo, questions, onExit }) {
           currentQuestionIndex: 0,
           answers: savedAnswers,
           timeRemaining: quizInfo.settings?.timeLimit * 60,
-          isCompleted: savedAnswers.length >= questions.length, // Check if already completed
-          score: savedAnswers.length * pointsPerQuestion,
+          // IMPORTANT: let Submit button complete the quiz; don't auto-complete by count
+          isCompleted: false,
+          score: correctCount * pointsPerQuestion,
           startTime: Date.now(),
         },
       });
     }
   }, [quizInfo._id]);
+
   const handleTimeUp = useCallback(() => {
-    // Calculate final score before completing quiz
-    const finalScore = state.answers.length * pointsPerQuestion;
+    // compute final score based on correctness (dedupe latest answers)
+    const latest = new Map();
+    state.answers.forEach((a) => latest.set(a.questionId, a));
+
+    let correctCount = 0;
+    for (const [qid, ans] of latest.entries()) {
+      const q = questions.find((qq) => getQId(qq) === qid);
+      if (q && ans.answer === q.correctAnswer) correctCount++;
+    }
+
+    const finalScore = correctCount * pointsPerQuestion;
+    const completedAt = Date.now();
+    const durationSeconds = Math.floor((completedAt - state.startTime) / 1000);
+
     dispatch({ type: "UPDATE_SCORE", payload: finalScore });
-    dispatch({ type: "COMPLETE_QUIZ" });
-  }, [dispatch, state.answers.length]);
+    // include completion metadata so reducer/state will hold it
+    dispatch({
+      type: "COMPLETE_QUIZ",
+      payload: { completedAt, durationSeconds },
+    });
+  }, [dispatch, state.answers, questions, state.startTime]);
 
   const { timeRemaining, startTimer, formatTime } = useTimer(
     quizInfo.settings?.timeLimit * 60,
@@ -73,16 +122,15 @@ export function Quiz({ quizInfo, questions, onExit }) {
     dispatch({ type: "SET_TIME_REMAINING", payload: timeRemaining });
   }, [timeRemaining, dispatch]);
 
-  // Save answers to localStorage whenever they change
+  // Save answers to localStorage whenehandleAnswerChangever they change
   useEffect(() => {
     setSavedAnswers(state.answers);
   }, [state.answers, setSavedAnswers]);
 
   const currentQuestion = questions[state.currentQuestionIndex];
   const currentAnswer = state.answers.find(
-    (answer) => answer.questionId === currentQuestion.id
+    (a) => a.questionId === getQId(currentQuestion)
   );
-
   useEffect(() => {
     if (state.isCompleted) {
       console.log("state in quiz complete --->,", state);
@@ -143,20 +191,13 @@ export function Quiz({ quizInfo, questions, onExit }) {
 
   const handleAnswerChange = (answer) => {
     const userAnswer = {
-      questionId: currentQuestion.id,
+      questionId: getQId(currentQuestion),
       answer,
       timeSpent: 0,
-      isCorrect: false,
+      isCorrect: false, // (server-side or post-submit compute if needed)
     };
 
     dispatch({ type: "SET_ANSWER", payload: userAnswer });
-
-    // REMOVE THIS PART - let the Submit button handle completion
-    // if (state.currentQuestionIndex === questions.length - 1) {
-    //   const finalScore = state.answers.length * pointsPerQuestion;
-    //   dispatch({ type: "UPDATE_SCORE", payload: finalScore });
-    //   dispatch({ type: "COMPLETE_QUIZ" });
-    // }
   };
 
   const handlePrevious = () => {
@@ -178,13 +219,48 @@ export function Quiz({ quizInfo, questions, onExit }) {
   //   dispatch({ type: "UPDATE_SCORE", payload: finalScore });
   //   dispatch({ type: "COMPLETE_QUIZ" });
   // };
+  // const handleSubmitQuiz = () => {
+  //   if (state.isCompleted) return;
+
+  //   // Keep only the latest answer per questionId
+  //   const latest = new Map();
+  //   state.answers.forEach((a) => latest.set(a.questionId, a));
+
+  //   let correctCount = 0;
+  //   for (const [qid, ans] of latest.entries()) {
+  //     const q = questions.find((qq) => getQId(qq) === qid);
+  //     if (q && ans.answer === q?.correctAnswer) correctCount++;
+  //   }
+
+  //   const finalScore = correctCount * pointsPerQuestion;
+
+  //   dispatch({ type: "UPDATE_SCORE", payload: finalScore });
+  //   dispatch({ type: "COMPLETE_QUIZ" });
+  // };
 
   const handleSubmitQuiz = () => {
-    if (state.isCompleted) return; // ✅ prevent multiple submits
+    if (state.isCompleted) return; // prevent double submit
 
-    const finalScore = state.answers.length * pointsPerQuestion;
+    // Keep only the latest answer per questionId
+    const latest = new Map();
+    state.answers.forEach((a) => latest.set(a.questionId, a));
+
+    let correctCount = 0;
+    for (const [qid, ans] of latest.entries()) {
+      const q = questions.find((qq) => getQId(qq) === qid);
+      if (q && ans.answer === q.correctAnswer) correctCount++;
+    }
+
+    const finalScore = correctCount * pointsPerQuestion;
+    const completedAt = Date.now();
+    const durationSeconds = Math.floor((completedAt - state.startTime) / 1000);
+
     dispatch({ type: "UPDATE_SCORE", payload: finalScore });
-    dispatch({ type: "COMPLETE_QUIZ" });
+
+    dispatch({
+      type: "COMPLETE_QUIZ",
+      payload: { completedAt, durationSeconds },
+    });
   };
 
   const handleQuestionSelect = (index) => {
@@ -199,7 +275,7 @@ export function Quiz({ quizInfo, questions, onExit }) {
       payload: {
         currentQuestionIndex: 0,
         answers: [],
-        timeRemaining: quizInfo.timeLimit * 60,
+        timeRemaining: quizInfo.settings?.timeLimit * 60,
         isCompleted: false,
         score: 0,
         startTime: Date.now(),
@@ -208,9 +284,9 @@ export function Quiz({ quizInfo, questions, onExit }) {
   };
 
   const answeredQuestions = new Set(
-    state.answers.map((answer) =>
-      questions.findIndex((q) => q.id === answer.questionId)
-    )
+    state.answers
+      .map((ans) => questions.findIndex((q) => getQId(q) === ans.questionId))
+      .filter((idx) => idx >= 0)
   );
 
   const quizStats = {

@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useReducer, ReactNode } from 'react';
+import React, { createContext, useContext, useReducer, ReactNode } from "react";
 // import { QuizState, UserAnswer } from '../types/quiz';
 
 // interface QuizContextType {
@@ -20,34 +20,55 @@ const initialState = {
   timeRemaining: 0,
   isCompleted: false,
   score: 0,
-  startTime: Date.now()
+  startTime: Date.now(),
 };
 
-function quizReducer(state, action){
+function quizReducer(state, action) {
   switch (action.type) {
-    case 'SET_CURRENT_QUESTION':
+    case "SET_CURRENT_QUESTION":
       return { ...state, currentQuestionIndex: action.payload };
-    case 'SET_ANSWER':
-      const existingAnswerIndex = state.answers.findIndex(
-        (answer) => answer.questionId === action.payload.questionId
+    // case 'SET_ANSWER':
+    //   const existingAnswerIndex = state.answers.findIndex(
+    //     (answer) => answer.questionId === action.payload.questionId
+    //   );
+
+    //   let newAnswers;
+    //   if (existingAnswerIndex !== -1) {
+    //     newAnswers = [...state.answers];
+    //     newAnswers[existingAnswerIndex] = action.payload;
+    //   } else {
+    //     newAnswers = [...state.answers, action.payload];
+    //   }
+
+    //   return { ...state, answers: newAnswers };
+    case "SET_ANSWER": {
+      const idx = state.answers.findIndex(
+        (a) => a.questionId === action.payload.questionId
       );
-      
-      let newAnswers;
-      if (existingAnswerIndex !== -1) {
-        newAnswers = [...state.answers];
-        newAnswers[existingAnswerIndex] = action.payload;
-      } else {
-        newAnswers = [...state.answers, action.payload];
-      }
-      
-      return { ...state, answers: newAnswers };
-    case 'SET_TIME_REMAINING':
+      const answers =
+        idx >= 0
+          ? state.answers.map((a, i) => (i === idx ? action.payload : a))
+          : [...state.answers, action.payload];
+      return { ...state, answers };
+    }
+    case "SET_TIME_REMAINING":
       return { ...state, timeRemaining: action.payload };
-    case 'COMPLETE_QUIZ':
-      return { ...state, isCompleted: true };
-    case 'UPDATE_SCORE':
+    case "COMPLETE_QUIZ": {
+      const completedAt = action.payload?.completedAt ?? Date.now();
+      const durationSeconds =
+        action.payload?.durationSeconds ??
+        Math.max(0, Math.floor((completedAt - state.startTime) / 1000));
+
+      return {
+        ...state,
+        isCompleted: true,
+        completedAt,
+        durationSeconds,
+      };
+    }
+    case "UPDATE_SCORE":
       return { ...state, score: action.payload };
-    case 'RESET_QUIZ':
+    case "RESET_QUIZ":
       return { ...initialState, ...action.payload };
     default:
       return state;
@@ -69,7 +90,7 @@ export function QuizProvider({ children }) {
 export function useQuiz() {
   const context = useContext(QuizContext);
   if (context === undefined) {
-    throw new Error('useQuiz must be used within a QuizProvider');
+    throw new Error("useQuiz must be used within a QuizProvider");
   }
   return context;
 }

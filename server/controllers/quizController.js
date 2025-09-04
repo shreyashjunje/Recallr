@@ -14,6 +14,7 @@ cloudinary.config({
 });
 const stream = require("stream");
 const User = require("../models/User");
+const QuizResult = require("../models/QuizResult");
 
 const generateFileHash = (buffer) => {
   return crypto.createHash("sha256").update(buffer).digest("hex");
@@ -587,4 +588,98 @@ const getQuiz = async (req, res) => {
   }
 };
 
-module.exports = { generateQuiz, getAllQuizzes, getQuiz };
+const saveQuizResult = async (req, res) => {
+  try {
+    const userId = req.user.id; // from auth middleware
+    const {
+      quizId,
+      score,
+      totalQuestions,
+      correct: clientCorrect,
+      wrong: clientWrong,
+      skipped: clientSkipped,
+      answers,
+      startedAt,
+      completedAt,
+      durationSeconds,
+      clientAttemptId,
+    } = req.body;
+
+    if (!quizId) return res.status(400).json({ message: "quizId required" });
+
+    // OPTIONAL: idempotency check
+    if (clientAttemptId) {
+      const existing = await QuizResult.findOne({
+        quiz: quizId,
+        user: userId,
+        clientAttemptId,
+      });
+      if (existing)
+        return res.status(200).json({ success: true, attempt: existing });
+    }
+
+    // Validate quiz exists
+    const quiz = await Quiz.findById(quizId).select("questions").lean();
+    if (!quiz) return res.status(404).json({ message: "Quiz not found" });
+
+    // Server-side basic scoring (recommended)
+    const pointsPerQuestion = 100;
+    let correctCount = 0;
+    const sanitizedAnswers = (answers || []).map((a) => {
+      const qid = a.questionId;
+      const question = quiz.questions.find(
+        (q) => q._id?.toString() === qid?.toString() || q.id === qid
+      );
+      const selected = a.selectedAnswer;
+      const isCorrect = question
+        ? String(selected) === String(question.correctAnswer)
+        : !!a.isCorrect;
+      if (isCorrect) correctCount++;
+      return {
+        questionId: qid,
+        selectedAnswer: selected,
+        isCorrect,
+        timeTaken: a.timeTaken ?? a.timeSpent ?? null,
+      };
+    });
+
+    // compute aggregates server side so client can't fake them
+    const attempted = sanitizedAnswers.length;
+    const serverCorrect = correctCount;
+    const serverSkipped = Math.max(
+      0,
+      (totalQuestions || quiz.questions.length) - attempted
+    );
+    const serverWrong = Math.max(0, attempted - serverCorrect);
+
+    const serverScore = serverCorrect * pointsPerQuestion;
+
+    const attemptDoc = await QuizResult.create({
+      quiz: quizId,
+      user: userId,
+      score: serverScore,
+      totalQuestions: totalQuestions || quiz.questions.length,
+      correct: serverCorrect,
+      wrong: serverWrong,
+      skipped: serverSkipped,
+      answers: sanitizedAnswers,
+      startedAt: startedAt ? new Date(startedAt) : undefined,
+      completedAt: completedAt ? new Date(completedAt) : new Date(),
+      durationSeconds:
+        typeof durationSeconds === "number" ? durationSeconds : undefined,
+      clientAttemptId,
+    });
+
+    // Push reference to user's attempts
+    await User.findByIdAndUpdate(userId, {
+      $push: { attempts: attemptDoc._id },
+    });
+
+    return res.status(201).json({ success: true, attempt: attemptDoc });
+  } catch (err) {
+    console.error("saveQuizResult error:", err);
+    return res.status(500).json({ success: false, message: "Server error" });
+  }
+};
+
+module.exports = { generateQuiz, getAllQuizzes, getQuiz, saveQuizResult };
