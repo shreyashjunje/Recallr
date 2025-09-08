@@ -34,7 +34,7 @@ import {
 import { AuthContext } from "@/context/AuthContext";
 import { jwtDecode } from "jwt-decode";
 import axios from "axios";
-import { useNavigate } from "react-router";
+import { useNavigate } from "react-router-dom";
 import PDFUploadModal from "../components/modals/PdfUploadModal";
 import { toast } from "react-toastify";
 // import PdfReaderModal from "../components/helper/PdfReaderModal";

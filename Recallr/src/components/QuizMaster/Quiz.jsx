@@ -8,6 +8,7 @@ import { QuizNavigation } from "./QuizNavigation";
 import { QuizStats } from "./QuizStats";
 import { QuizResults } from "./QuizResults";
 import { ArrowLeft, Sun, Moon } from "lucide-react";
+import { QuizReview } from "./QuizReview";
 const getQId = (q) => q?.id ?? q?._id;
 
 const pointsPerQuestion = 100;
@@ -16,10 +17,18 @@ export function Quiz({ quizInfo, questions, onExit }) {
   const { state, dispatch } = useQuiz();
   const { isDark, toggleTheme } = useTheme();
   const [showQuestionGrid, setShowQuestionGrid] = useState(false);
+
   const [savedAnswers, setSavedAnswers] = useLocalStorage(
     `quiz-${quizInfo._id}-answers`,
     []
   );
+  const [currentView, setCurrentView] = useState("quiz");
+  const [reviewData, setReviewData] = useState(null);
+
+  const handleReview = (quizState, quizInfo) => {
+    setCurrentView("review");
+    setReviewData({ quizState, quizInfo });
+  };
 
   // Initialize quiz state
   // useEffect(() => {
@@ -297,21 +306,72 @@ export function Quiz({ quizInfo, questions, onExit }) {
   };
 
   // Add this useEffect to log state changes for debugging
-  useEffect(() => {
-    console.log("Quiz state:", state);
-  }, [state]);
+  // useEffect(() => {
+  //   console.log("Quiz state:", state);
+  // }, [state]);
 
   // If quiz is completed, ONLY show the results - return early
-  if (state.isCompleted) {
-    console.log("Quiz completed! Showing results...");
-    console.log("Final state:", state);
+  // if (state.isCompleted) {
+  //   // console.log("Quiz completed! Showing results...");
+  //   // console.log("Final state:", state);
 
+  //   // return (
+  //   //   <QuizResults
+  //   //     quizState={state}
+  //   //     totalQuestions={questions.length}
+  //   //     onRestart={handleRestart}
+  //   //     onHome={onExit}
+  //   //     quizInfo={quizInfo}
+  //   //   />
+  //   // );
+
+  //   {
+  //     currentView === "results" && (
+  //       <QuizResults
+  //         quizState={quizState}
+  //         totalQuestions={totalQuestions}
+  //         onRestart={handleRestart}
+  //         onHome={handleHome}
+  //         quizInfo={quizInfo}
+  //         onReview={handleReview} // ✅ now wired
+  //       />
+  //     );
+  //   }
+
+  //   {
+  //     currentView === "review" && (
+  //       <QuizReview
+  //         quizState={reviewData.quizState}
+  //         quizInfo={reviewData.quizInfo}
+  //         onBack={() => setCurrentView("results")}
+  //       />
+  //     );
+  //   }
+  // }
+
+  // If quiz is completed, show Results or Review (default to Results)
+  if (state.isCompleted) {
+    // If user explicitly switched to review view, show review
+    if (currentView === "review") {
+      return (
+        <QuizReview
+          // fallback to state/quizInfo if reviewData isn't set for some reason
+          quizState={reviewData?.quizState ?? state}
+          quizInfo={reviewData?.quizInfo ?? quizInfo}
+          onBack={() => setCurrentView("results")}
+        />
+      );
+    }
+
+    // Default: show results view
     return (
       <QuizResults
-        quizState={state}
+        quizState={state} // pass the quiz state from context
         totalQuestions={questions.length}
         onRestart={handleRestart}
-        onHome={onExit}
+        onHome={onExit} // use onExit prop from this component
+        quizInfo={quizInfo}
+        onReview={handleReview} // handleReview will set currentView + reviewData
       />
     );
   }

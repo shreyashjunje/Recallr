@@ -16,7 +16,7 @@ import logo from "../../assets/logoR.png";
 import { jwtDecode } from "jwt-decode";
 import axios from "axios";
 import { toast } from "react-toastify";
-import { useNavigate } from "react-router";
+import { useNavigate } from "react-router-dom";
 const API_URL = import.meta.env.VITE_API_URL;
 
 const AiSummaryHome = () => {
@@ -54,7 +54,7 @@ const AiSummaryHome = () => {
   const [summary, setSummary] = useState("");
   const [showSummary, setShowSummary] = useState(false);
   const fileInputRef = useRef(null);
-  const navigate=useNavigate();
+  const navigate = useNavigate();
 
   const promptTemplates = [
     "Create a concise summary highlighting the main points and key takeaways",
@@ -91,7 +91,6 @@ const AiSummaryHome = () => {
 
     setIsGenerating(true);
 
-   
     const token = localStorage.getItem("token");
     if (!token) return;
 
@@ -111,11 +110,13 @@ const AiSummaryHome = () => {
       }
     );
 
-    console.log("id:",res.data.data._id)
+    console.log("id:", res.data.data._id);
 
-    if(res.status==200){
-      navigate(`/summary/${res.data.data._id}`,{state :{summary:res.data}})
-      toast.success("summary generated successfully")
+    if (res.status == 200) {
+      navigate(`/summary/${res.data.data._id}`, {
+        state: { summary: res.data },
+      });
+      toast.success("summary generated successfully");
     }
 
     console.log("res:", res.data);

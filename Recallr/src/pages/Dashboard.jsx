@@ -1,7 +1,5 @@
 import React, { useState, useEffect } from "react";
 import {
-  BookOpen,
-  Clock,
   Star,
   FileText,
   Calendar,
@@ -15,56 +13,33 @@ import {
   Target,
   Brain,
   Edit2,
-  Bell,
-  Play,
+  // Bell,
+  // Play,
   Users,
   BarChart3,
   Zap,
   Flame,
   Trophy,
-  BookMarked,
-  Activity,
-  Sparkles,
   ChevronRight,
   Eye,
-  Download,
-  Share2,
+  // Download,
+  // Share2,
   Heart,
-  Timer,
+  // Timer,
   Coffee,
   RefreshCw,
+  // Clock,
+  CheckCircle,
+  Blocks,
+  SquareStack,
+  // XCircle,
 } from "lucide-react";
-import QuoteCard from "../components/dashboard/helper/QuoteCard";
+import QuizStatisticsCard from "../components/dashboard/helper/QuizStatisticsCard";
 import DashboardHeader from "@/components/dashboard/helper/DashboardHeader";
 import axios from "axios";
 import { jwtDecode } from "jwt-decode";
-import { useNavigate } from "react-router";
+import { useNavigate } from "react-router-dom";
 const API_URL = import.meta.env.VITE_API_URL;
-
-// interface TodoItem {
-//   id: string;
-//   text: string;
-//   completed: boolean;
-//   priority: 'low' | 'medium' | 'high';
-// }
-
-// interface StatCard {
-//   title: string;
-//   value: string;
-//   change: string;
-//   icon: React.ReactNode;
-//   gradient: string;
-//   trend: 'up' | 'down';
-// }
-
-// interface ContentItem {
-//   id: string;
-//   title: string;
-//   date: string;
-//   type?: string;
-//   progress?: number;
-//   score?: number;
-// }
 
 const motivationalQuotes = [
   "Success is not final, failure is not fatal: it is the courage to continue that counts.",
@@ -80,23 +55,25 @@ const motivationalQuotes = [
 ];
 
 const Dashboard = () => {
+  const navigate = useNavigate();
+
   const [currentQuote, setCurrentQuote] = useState("");
   const [showReminder, setShowReminder] = useState(false);
   const [studyTime, setStudyTime] = useState("");
   const [activeTab, setActiveTab] = useState("uploads");
-
-  const navigate = useNavigate();
-
   const [newTodo, setNewTodo] = useState("");
   const [newTodoPriority, setNewTodoPriority] = useState("low");
   const [editingTodo, setEditingTodo] = useState(null);
   const [editText, setEditText] = useState("");
   const [todoFilter, setTodoFilter] = useState("all");
   const [refreshing, setRefreshing] = useState(false);
-  const [favpdfs,setFavpdfs]=useState([])
-
+  const [favpdfs, setFavpdfs] = useState([]);
   const [tasks, setTasks] = useState([]);
   const [pdfs, setPdfs] = useState([]);
+  const [quizStats, setQuizStats] = useState(null);
+  const [quiz, setQuiz] = useState([]);
+  const [totalflashcards, setTotalFlashcards] = useState([]);
+  const [quizLoading, setQuizLoading] = useState(true);
 
   useEffect(() => {
     const today = new Date().toDateString();
@@ -132,7 +109,6 @@ const Dashboard = () => {
       console.log("err=>", err.message);
     }
   };
-
   const fetchPdfs = async () => {
     const token = localStorage.getItem("token");
     if (!token) return;
@@ -149,21 +125,69 @@ const Dashboard = () => {
       });
 
       if (res.status == 200) {
-        console.log("res.data.pdfs::",res.data.pdfs)
+        console.log("res.data.pdfs::", res.data.pdfs);
         setPdfs(res.data.pdfs);
-        console.log("pdfs::::",pdfs)
-        const favouritePDFs = res.data.pdfs.filter((pdf) => pdf.isFavourite === true);
-        console.log("fav pdfs::",favouritePDFs)
-        setFavpdfs(favouritePDFs)
+        console.log("pdfs::::", pdfs);
+        const favouritePDFs = res.data.pdfs.filter(
+          (pdf) => pdf.isFavourite === true
+        );
+
+        const totalflashacards = res.data.pdfs.filter(
+          (pdf) => pdf.isFlashcardGenerated === true
+        );
+        console.log("totalflashacards::::::", totalflashacards);
+
+        setTotalFlashcards(totalflashacards);
+        setFavpdfs(favouritePDFs);
       }
     } catch (err) {
       console.log("err", err);
+    }
+  };
+  const fetchQuizStats = async () => {
+    try {
+      const token = localStorage.getItem("token");
+      const res = await axios.get(`${API_URL}/quiz/quiz-stats`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+
+      if (res.status === 200) {
+        console.log(res.data);
+        setQuizStats(res.data);
+      }
+    } catch (err) {
+      console.log("Error fetching quiz stats:", err.message);
+    } finally {
+      setQuizLoading(false);
+    }
+  };
+  const fetchQuiz = async () => {
+    try {
+      const token = localStorage.getItem("token");
+      const res = await axios.get(`${API_URL}/quiz/get-all-quizzes`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+
+      if (res.status === 200) {
+        console.log(res.data.data);
+        setQuiz(res.data.data);
+      }
+    } catch (err) {
+      console.log("Error fetching quiz stats:", err.message);
+    } finally {
+      setQuizLoading(false);
     }
   };
 
   useEffect(() => {
     fetchTasks();
     fetchPdfs();
+    fetchQuizStats();
+    fetchQuiz();
   }, []);
 
   const addTask = async () => {
@@ -221,7 +245,6 @@ const Dashboard = () => {
   const pdfsThisWeek = getPDFsUploadedThisWeek(pdfs);
   const totalpdfsthisweek = pdfsThisWeek.length;
 
-  // const favouritePDFs = pdfs.filter((pdf) => pdf.isFavourite === true);
   const recentPDFs = [...pdfs]
     .sort((a, b) => new Date(b.uploadedAt) - new Date(a.uploadedAt))
     .slice(0, 3);
@@ -232,6 +255,7 @@ const Dashboard = () => {
     .slice(0, 3);
 
   const isflashcard = pdfs.filter((pdf) => pdf.isFlashcardGenerated === true);
+  console.log("isflashcard", isflashcard);
   const recentFlashcard = [...isflashcard]
     .sort((a, b) => new Date(b.uploadedAt) - new Date(a.uploadedAt))
     .slice(0, 3);
@@ -243,6 +267,7 @@ const Dashboard = () => {
 
   const stats = [
     {
+      id: 1,
       title: "PDFs Uploaded",
       value: `${totalPdfs}`,
       change: `${totalpdfsthisweek} this week`,
@@ -251,6 +276,7 @@ const Dashboard = () => {
       trend: "up",
     },
     {
+      id: 2,
       title: "Categories",
       value: `${totalCategories}`,
       change: "",
@@ -259,43 +285,22 @@ const Dashboard = () => {
       trend: "up",
     },
     {
+      id: 3,
       title: "Quizzes Created",
-      value: "89",
+      value: `${quiz.length}`,
       change: "+7 this week",
-      icon: <Award className="w-7 h-7" />,
+      icon: <Blocks className="w-7 h-7" />,
       gradient: "from-purple-500 to-pink-500",
       trend: "up",
     },
     {
-      title: "Study Hours",
-      value: "342",
+      id: 4,
+      title: "Flashcards generated",
+      value: `${totalflashcards.length}`,
       change: "+28 this week",
-      icon: <Clock className="w-7 h-7" />,
-      gradient: "from-orange-500 to-red-500",
+      icon: <SquareStack className="w-7 h-7" />,
+      gradient: "from-teal-500 to-green-500",
       trend: "up",
-    },
-  ];
-
-  // Add this state variable
-
-  const upcomingEvents = [
-    {
-      id: "1",
-      title: "JavaScript Exam",
-      date: "Tomorrow 10:00 AM",
-      type: "exam",
-    },
-    {
-      id: "2",
-      title: "Project Presentation",
-      date: "Dec 15, 2:00 PM",
-      type: "presentation",
-    },
-    {
-      id: "3",
-      title: "Study Group Meeting",
-      date: "Dec 16, 4:00 PM",
-      type: "meeting",
     },
   ];
 
@@ -369,19 +374,6 @@ const Dashboard = () => {
     }
   };
 
-  const getEventIcon = (type) => {
-    switch (type) {
-      case "exam":
-        return <Trophy className="w-4 h-4" />;
-      case "presentation":
-        return <Users className="w-4 h-4" />;
-      case "meeting":
-        return <Coffee className="w-4 h-4" />;
-      default:
-        return <Calendar className="w-4 h-4" />;
-    }
-  };
-
   const setReminder = () => {
     if (studyTime) {
       // Here you would typically save to backend or local storage
@@ -401,32 +393,6 @@ const Dashboard = () => {
   const completedCount = tasks.filter((t) => t.status === "completed").length;
   const totalCount = tasks.length;
 
-  // const tabData = {
-  //   uploads: {
-  //     title: "Recent Uploads",
-  //     icon: <Upload className="w-5 h-5" />,
-  //     data: recentPDFs,
-  //     gradient: "from-blue-500 to-cyan-500",
-  //   },
-  //   quizzes: {
-  //     title: "Recent Quizzes",
-  //     icon: <Award className="w-5 h-5" />,
-  //     data: recentQuizes,
-  //     gradient: "from-purple-500 to-pink-500",
-  //   },
-  //   flashcards: {
-  //     title: "Flashcards",
-  //     icon: <Brain className="w-5 h-5" />,
-  //     data: recentFlashcard,
-  //     gradient: "from-teal-500 to-green-500",
-  //   },
-  //   summaries: {
-  //     title: "AI Summaries",
-  //     icon: <FileText className="w-5 h-5" />,
-  //     data: recenSummaries,
-  //     gradient: "from-orange-500 to-red-500",
-  //   },
-  // };
   const tabData = {
     uploads: {
       title: "Recent Uploads",
@@ -436,13 +402,13 @@ const Dashboard = () => {
     },
     quizzes: {
       title: "Recent Quizzes",
-      icon: <Award className="w-5 h-5" />,
+      icon: <Blocks className="w-5 h-5" />,
       data: recentQuizes.filter((q) => q !== undefined && q !== null), // Filter out undefined/null
       gradient: "from-purple-500 to-pink-500",
     },
     flashcards: {
       title: "Flashcards",
-      icon: <Brain className="w-5 h-5" />,
+      icon: <SquareStack className="w-5 h-5" />,
       data: recentFlashcard.filter((f) => f !== undefined && f !== null), // Filter out undefined/null
       gradient: "from-teal-500 to-green-500",
     },
@@ -476,74 +442,6 @@ const Dashboard = () => {
     }
   }
 
-  // const renderTabContent = () => {
-  //   const currentTab = tabData[activeTab];
-  //   console.log("currentTAB:::",currentTab)
-  //   console.log("in the tab quiz-->", currentTab.data);
-
-  //   return (
-  //     <div className="space-y-3">
-  //       {currentTab?.data.map((item) => (
-  //         <div
-  //           key={item._id}
-  //           className={`group p-4 bg-gradient-to-r ${
-  //             activeTab === "uploads"
-  //               ? "from-blue-50 to-cyan-50 hover:from-blue-100 hover:to-cyan-100"
-  //               : activeTab === "quizzes"
-  //               ? "from-purple-50 to-pink-50 hover:from-purple-100 hover:to-pink-100"
-  //               : activeTab === "flashcards"
-  //               ? "from-teal-50 to-green-50 hover:from-teal-100 hover:to-green-100"
-  //               : "from-orange-50 to-red-50 hover:from-orange-100 hover:to-red-100"
-  //           } rounded-xl transition-all duration-300`}
-  //         >
-  //           <div className="flex items-center justify-between mb-2">
-  //             <p className="font-medium text-gray-900 text-sm group-hover:text-blue-700 transition-colors">
-  //               {item.title}
-  //             </p>
-  //             <div className="flex items-center gap-2">
-  //               {item.score && (
-  //                 <span
-  //                   className={`text-xs px-2 py-1 rounded-full font-medium ${
-  //                     activeTab === "quizzes"
-  //                       ? "bg-purple-200 text-purple-800"
-  //                       : "bg-blue-200 text-blue-800"
-  //                   }`}
-  //                 >
-  //                   {item.score}%
-  //                 </span>
-  //               )}
-  //               {item.type && (
-  //                 <span className="text-xs bg-gray-200 text-gray-700 px-2 py-1 rounded-full">
-  //                   {/* {console.log(item.type)} */}
-  //                   {item.type}
-  //                 </span>
-  //               )}
-  //               <Eye className="w-4 h-4 text-gray-400 group-hover:text-blue-600 transition-colors" />
-  //             </div>
-  //           </div>
-  //           <div className="flex items-center justify-between">
-  //             <span className="text-xs text-gray-500">
-  //               {timeAgo(item.uploadedAt)}
-  //             </span>
-  //             {/* {item.progress && (
-  //               <div className="flex items-center gap-2">
-  //                 <div className="w-16 bg-gray-200 rounded-full h-2">
-  //                   <div
-  //                     className={`bg-gradient-to-r ${currentTab.gradient} h-2 rounded-full transition-all duration-500`}
-  //                     style={{ width: `${item.progress}%` }}
-  //                   ></div>
-  //                 </div>
-  //                 <span className="text-xs text-gray-600">
-  //                   {item.progress}%
-  //                 </span>
-  //               </div>
-  //             )} */}
-  //           </div>
-  //         </div>
-  //       ))}
-  //     </div>
-  //   );
-  // };
   const renderTabContent = () => {
     const currentTab = tabData[activeTab];
 
@@ -567,11 +465,11 @@ const Dashboard = () => {
                 if (activeTab === "uploads") {
                   navigate(`/pdf/${item._id}`);
                 } else if (activeTab === "quizzes") {
-                  navigate(`/quiz/${item._id}`);
+                  navigate(`/quizmaster`);
                 } else if (activeTab === "flashcards") {
-                  navigate(`/flashcard/${item._id}`);
+                  navigate(`/flashgenius/get-flashcards/${item._id}`);
                 } else if (activeTab === "summaries") {
-                  navigate(`/summary/${item._id}`);
+                  navigate(`/summify/${item._id}`);
                 }
               }}
             >
@@ -653,6 +551,7 @@ const Dashboard = () => {
     await fetchTasks();
     setRefreshing(false);
   };
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-100 p-4 sm:p-6 overflow-hidden">
       <div className="max-w-7xl mx-auto space-y-8">
@@ -663,7 +562,7 @@ const Dashboard = () => {
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
           {stats.map((stat, index) => (
             <div
-              key={index}
+              key={`${stat?.id}`}
               className="group relative overflow-hidden bg-white rounded-2xl shadow-lg hover:shadow-2xl transition-all duration-500 hover:-translate-y-2"
             >
               <div
@@ -681,8 +580,8 @@ const Dashboard = () => {
                       stat.trend === "up" ? "text-green-600" : "text-red-600"
                     }`}
                   >
-                    <TrendingUp className="w-4 h-4" />
-                    {stat.change}
+                    {/* <TrendingUp className="w-4 h-4" />
+                    {stat.change} */}
                   </div>
                 </div>
                 <div>
@@ -699,31 +598,34 @@ const Dashboard = () => {
         </div>
 
         {/* Todo Section with Enhanced Design */}
-        <div className="bg-white rounded-3xl shadow-xl p-8 border border-gray-100 hover:shadow-2xl transition-all duration-500">
-          <div className="flex items-center gap-4 mb-8">
-            <div className="p-3 bg-gradient-to-br from-green-500 to-emerald-500 rounded-2xl text-white shadow-lg">
-              <Check className="w-6 h-6" />
-            </div>
-            <div>
-              <div className="flex items-center gap-4">
-                <div>
-                  <h2 className="text-2xl font-bold text-gray-900">
-                    Task Management
-                  </h2>
-                  <p className="text-gray-600">Stay organized and productive</p>
-                </div>
-                <div className="flex items-center gap-2 bg-gradient-to-r from-green-50 to-emerald-50 px-4 py-2 rounded-xl">
-                  <div className="w-3 h-3 bg-green-500 rounded-full"></div>
-                  <span className="text-sm font-medium text-green-700">
-                    {completedCount}/{totalCount} completed
-                  </span>
-                </div>
+        <div className="bg-white rounded-3xl shadow-xl p-6 sm:p-8 border border-gray-100 hover:shadow-2xl transition-all duration-500">
+          {/* Header */}
+          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-8">
+            <div className="flex items-center gap-4">
+              <div className="p-3 bg-gradient-to-br from-green-500 to-emerald-500 rounded-2xl text-white shadow-lg">
+                <Check className="w-6 h-6" />
               </div>
+              <div>
+                <h2 className="text-xl sm:text-2xl font-bold text-gray-900">
+                  Task Management
+                </h2>
+                <p className="text-gray-600 text-sm sm:text-base">
+                  Stay organized and productive
+                </p>
+              </div>
+            </div>
+
+            {/* Completed Badge */}
+            <div className="flex items-center gap-2 bg-gradient-to-r from-green-50 to-emerald-50 px-3 sm:px-4 py-2 rounded-xl w-fit mx-auto sm:mx-0">
+              <div className="w-3 h-3 bg-green-500 rounded-full"></div>
+              <span className="text-xs sm:text-sm font-medium text-green-700">
+                {completedCount}/{totalCount} completed
+              </span>
             </div>
           </div>
 
           {/* Task Filter Tabs */}
-          <div className="flex gap-2 mb-6">
+          <div className="flex flex-wrap gap-2 mb-6">
             {[
               { key: "all", label: "All Tasks", count: totalCount },
               {
@@ -736,7 +638,7 @@ const Dashboard = () => {
               <button
                 key={filter.key}
                 onClick={() => setTodoFilter(filter.key)}
-                className={`px-4 py-2 rounded-xl font-medium text-sm transition-all duration-300 ${
+                className={`px-3 sm:px-4 py-2 rounded-xl font-medium text-sm transition-all duration-300 ${
                   todoFilter === filter.key
                     ? "bg-gradient-to-r from-green-500 to-emerald-500 text-white shadow-lg"
                     : "bg-gray-100 text-gray-600 hover:bg-gray-200"
@@ -748,49 +650,51 @@ const Dashboard = () => {
           </div>
 
           {/* Add Todo */}
-          <div className="bg-gradient-to-r from-gray-50 to-blue-50 rounded-2xl p-6 mb-6">
-            <div className="flex gap-4">
+          <div className="bg-gradient-to-r from-gray-50 to-blue-50 rounded-2xl p-4 sm:p-6 mb-6">
+            <div className="flex flex-col sm:flex-row gap-3">
               <input
                 type="text"
                 value={newTodo}
                 onChange={(e) => setNewTodo(e.target.value)}
                 placeholder="What do you want to accomplish today?"
-                className="flex-1 p-4 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white shadow-sm"
+                className="flex-1 p-3 sm:p-4 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white shadow-sm text-sm sm:text-base"
                 onKeyPress={(e) => e.key === "Enter" && addTask()}
               />
-              <select
-                value={newTodoPriority}
-                onChange={(e) => setNewTodoPriority(e.target.value)}
-                className="p-4 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 bg-white shadow-sm"
-              >
-                <option value="low">Low</option>
-                <option value="medium">Medium</option>
-                <option value="high">High</option>
-              </select>
-              <button
-                onClick={addTask}
-                className="bg-gradient-to-r from-blue-600 to-purple-600 text-white p-4 rounded-xl hover:from-blue-700 hover:to-purple-700 transition-all duration-300 shadow-lg hover:shadow-xl"
-              >
-                <Plus className="w-6 h-6" />
-              </button>
+              <div className="flex gap-3">
+                <select
+                  value={newTodoPriority}
+                  onChange={(e) => setNewTodoPriority(e.target.value)}
+                  className="p-3 sm:p-4 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 bg-white shadow-sm text-sm sm:text-base"
+                >
+                  <option value="low">Low</option>
+                  <option value="medium">Medium</option>
+                  <option value="high">High</option>
+                </select>
+                <button
+                  onClick={addTask}
+                  className="bg-gradient-to-r from-blue-600 to-purple-600 text-white p-3 sm:p-4 rounded-xl hover:from-blue-700 hover:to-purple-700 transition-all duration-300 shadow-lg hover:shadow-xl"
+                >
+                  <Plus className="w-5 h-5 sm:w-6 sm:h-6" />
+                </button>
+              </div>
             </div>
           </div>
 
           {/* Todo List */}
-          <div className="space-y-4">
+          <div className="space-y-3 sm:space-y-4">
             {filteredTodos.length === 0 ? (
-              <div className="text-center py-12">
-                <div className="p-4 bg-gray-100 rounded-full w-16 h-16 mx-auto mb-4 flex items-center justify-center">
-                  <Check className="w-8 h-8 text-gray-400" />
+              <div className="text-center py-10 sm:py-12">
+                <div className="p-3 sm:p-4 bg-gray-100 rounded-full w-14 h-14 sm:w-16 sm:h-16 mx-auto mb-4 flex items-center justify-center">
+                  <Check className="w-6 h-6 sm:w-8 sm:h-8 text-gray-400" />
                 </div>
-                <p className="text-gray-500 font-medium">
+                <p className="text-gray-500 font-medium text-sm sm:text-base">
                   {todoFilter === "completed"
                     ? "No completed tasks yet"
                     : todoFilter === "active"
                     ? "No active tasks"
                     : "No tasks yet"}
                 </p>
-                <p className="text-gray-400 text-sm mt-1">
+                <p className="text-gray-400 text-xs sm:text-sm mt-1">
                   {todoFilter === "active"
                     ? "Great job! All tasks completed."
                     : "Add a task to get started"}
@@ -800,12 +704,13 @@ const Dashboard = () => {
               filteredTodos.map((task) => (
                 <div
                   key={task._id}
-                  className={`group flex items-center gap-4 p-4 rounded-2xl border-2 transition-all duration-300 ${
+                  className={`group flex flex-col sm:flex-row sm:items-center gap-3 sm:gap-4 p-4 rounded-2xl border-2 transition-all duration-300 ${
                     task.status === "completed"
                       ? "bg-green-50 border-green-200 opacity-75"
                       : "bg-white border-gray-200 hover:border-blue-300 hover:shadow-md"
                   }`}
                 >
+                  {/* Checkbox */}
                   <button
                     onClick={() => toggleTodo(task._id)}
                     className={`w-6 h-6 rounded-full border-2 flex items-center justify-center transition-all duration-300 ${
@@ -819,20 +724,22 @@ const Dashboard = () => {
                     )}
                   </button>
 
+                  {/* Priority */}
                   <span
-                    className={`inline-block px-3 py-1 rounded-full text-xs font-medium border ${getPriorityColor(
+                    className={`inline-block px-2 sm:px-3 py-1 rounded-full text-xs font-medium border ${getPriorityColor(
                       task.priority
                     )}`}
                   >
                     {task.priority}
                   </span>
 
+                  {/* Title + Actions */}
                   {editingTodo === task._id ? (
                     <div className="flex-1 flex gap-2">
                       <input
                         value={editText}
                         onChange={(e) => setEditText(e.target.value)}
-                        className="flex-1 p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+                        className="flex-1 p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 text-sm sm:text-base"
                         onKeyPress={(e) => e.key === "Enter" && saveEdit()}
                       />
                       <button
@@ -851,7 +758,7 @@ const Dashboard = () => {
                   ) : (
                     <>
                       <span
-                        className={`flex-1 font-medium ${
+                        className={`flex-1 font-medium text-sm sm:text-base ${
                           task.status === "completed"
                             ? "line-through text-gray-500"
                             : "text-gray-900"
@@ -859,7 +766,7 @@ const Dashboard = () => {
                       >
                         {task.title}
                       </span>
-                      <div className="opacity-0 group-hover:opacity-100 transition-opacity flex gap-2">
+                      <div className="flex gap-2 opacity-100 sm:opacity-0 sm:group-hover:opacity-100 transition-opacity">
                         <button
                           onClick={() => startEdit(task)}
                           className="text-blue-600 hover:text-blue-800 p-2 rounded-lg hover:bg-blue-50"
@@ -881,6 +788,9 @@ const Dashboard = () => {
           </div>
         </div>
 
+        {/* Quiz Statistics Card */}
+        <QuizStatisticsCard stats={quizStats} loading={quizLoading} />
+
         {/* Content Grid with Enhanced Cards */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
           {/* Favorite PDFs */}
@@ -897,27 +807,30 @@ const Dashboard = () => {
               </div>
             </div>
             <div className="space-y-3">
-              {favpdfs?.map((pdf) => (
-                <div
-                  key={pdf._id}
-                  className="group flex items-center gap-3 p-4 bg-gradient-to-r from-yellow-50 to-orange-50 rounded-xl hover:from-yellow-100 hover:to-orange-100 transition-all duration-300"
-                >
-                  <Heart className="w-5 h-5 text-red-500 fill-current" />
-                  <div className="flex-1">
-                    <p className="font-medium text-gray-900 text-sm group-hover:text-orange-700 transition-colors">
-                      {pdf.title}
-                    </p>
-                    <p className="text-xs text-gray-500">
-                      {new Date(pdf.uploadedAt).toLocaleDateString("en-GB", {
-                        day: "2-digit",
-                        month: "short",
-                        year: "numeric",
-                      })}
-                    </p>
+              {favpdfs
+                ?.map((pdf) => (
+                  <div
+                    key={pdf._id}
+                    onClick={() => navigate(`/pdf/${pdf._id}`)}
+                    className="group flex items-center gap-3 p-4 bg-gradient-to-r from-yellow-50 to-orange-50 rounded-xl hover:from-yellow-100 hover:to-orange-100 transition-all duration-300"
+                  >
+                    <Heart className="w-5 h-5 text-red-500 fill-current" />
+                    <div className="flex-1">
+                      <p className="font-medium text-gray-900 text-sm group-hover:text-orange-700 transition-colors">
+                        {pdf.title}
+                      </p>
+                      <p className="text-xs text-gray-500">
+                        {new Date(pdf.uploadedAt).toLocaleDateString("en-GB", {
+                          day: "2-digit",
+                          month: "short",
+                          year: "numeric",
+                        })}
+                      </p>
+                    </div>
+                    <ChevronRight className="w-4 h-4 text-gray-400 group-hover:text-orange-600 transition-colors" />
                   </div>
-                  <ChevronRight className="w-4 h-4 text-gray-400 group-hover:text-orange-600 transition-colors" />
-                </div>
-              ))}
+                ))
+                .slice(0, 6)}
             </div>
           </div>
 
@@ -975,75 +888,6 @@ const Dashboard = () => {
 
             {/* Tab Content */}
             {renderTabContent()}
-          </div>
-        </div>
-
-        {/* Upcoming Events */}
-        <div className="bg-white rounded-3xl shadow-xl p-6 border border-gray-100 hover:shadow-2xl transition-all duration-500">
-          <div className="flex items-center gap-3 mb-6">
-            <div className="p-3 bg-gradient-to-br from-indigo-500 to-purple-500 rounded-2xl text-white shadow-lg">
-              <Calendar className="w-6 h-6" />
-            </div>
-            <div>
-              <h3 className="text-xl font-bold text-gray-900">
-                Upcoming Events
-              </h3>
-              <p className="text-gray-600 text-sm">Your schedule</p>
-            </div>
-          </div>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-            {upcomingEvents.map((event) => (
-              <div
-                key={event.id}
-                className="group flex items-center gap-3 p-4 bg-gradient-to-r from-indigo-50 to-purple-50 rounded-xl hover:from-indigo-100 hover:to-purple-100 transition-all duration-300"
-              >
-                <div className="p-2 bg-white rounded-lg shadow-sm">
-                  {getEventIcon(event.type)}
-                </div>
-                <div className="flex-1">
-                  <p className="font-medium text-gray-900 text-sm group-hover:text-indigo-700 transition-colors">
-                    {event.title}
-                  </p>
-                  <p className="text-xs text-gray-500">{event.date}</p>
-                </div>
-                <div className="w-2 h-2 bg-indigo-600 rounded-full animate-pulse"></div>
-              </div>
-            ))}
-          </div>
-        </div>
-
-        {/* Performance Analytics */}
-        <div className="bg-white rounded-2xl shadow-lg p-6 border border-gray-100 hover:shadow-xl transition-all duration-300">
-          <div className="flex items-center gap-3 mb-4">
-            <div className="p-2 bg-gradient-to-br from-indigo-500 to-blue-500 rounded-xl text-white">
-              <BarChart3 className="w-5 h-5" />
-            </div>
-            <h3 className="text-lg font-semibold text-gray-900">
-              Performance Analytics
-            </h3>
-          </div>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-            <div className="flex justify-between items-center p-3 bg-indigo-50 rounded-xl">
-              <div className="flex items-center gap-2">
-                <Flame className="w-4 h-4 text-orange-500" />
-                <span className="text-sm text-gray-600">Study Streak</span>
-              </div>
-              <span className="font-bold text-orange-600">12 days</span>
-            </div>
-            <div className="flex justify-between items-center p-3 bg-green-50 rounded-xl">
-              <div className="flex items-center gap-2">
-                <Trophy className="w-4 h-4 text-yellow-500" />
-                <span className="text-sm text-gray-600">Avg. Score</span>
-              </div>
-              <span className="font-bold text-green-600">91.5%</span>
-            </div>
-            <div className="flex justify-between items-center p-3 bg-blue-50 rounded-xl">
-              <div className="flex items-center gap-2">
-                <Activity className="w-4 h-4 text-blue-500" />
-                <span className="text-sm text-gray-600">This Week</span>
-              </div>
-              <span className="font-bold text-blue-600">+18%</span>
-            </div>
           </div>
         </div>
       </div>

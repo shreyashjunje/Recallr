@@ -23,7 +23,7 @@ import {
 } from "lucide-react";
 import { toast } from "react-toastify";
 import axios from "axios";
-import { useNavigate } from "react-router";
+import { useNavigate } from "react-router-dom";
 import { jwtDecode } from "jwt-decode";
 
 const API_URL = import.meta.env.VITE_API_URL;
@@ -267,7 +267,7 @@ const FlashcardHome = () => {
 
   const handleStudy = useCallback(
     (id) => {
-      navigate(`/flashcards/get-flashcards/${id}`);
+      navigate(`/flashgenius/get-flashcards/${id}`);
     },
     [navigate]
   );
@@ -303,9 +303,11 @@ const FlashcardHome = () => {
 
           <h2 className="text-5xl md:text-6xl font-bold text-slate-900 mb-6 leading-tight">
             Smart Flashcard
-            <span className="bg-gradient-to-r  bg-clip-text text-transparent 
+            <span
+              className="bg-gradient-to-r  bg-clip-text text-transparent 
             from-pink-500 to-orange-400
-">
+"
+            >
               {" "}
               Generator
             </span>

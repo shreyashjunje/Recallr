@@ -18,7 +18,7 @@ const Layout = () => {
       <Sidebar />
 
       {/* Main Content */}
-      <div className="flex-1 overflow-y-auto px-6 py-2 lg:ml-72">
+      <div className="flex-1 overflow-y-auto px-6 lg:py-2 py-16 lg:ml-72">
         <Outlet />
       </div>
     </div>

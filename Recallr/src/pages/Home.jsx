@@ -21,7 +21,7 @@ import {
 } from "lucide-react";
 import RecallrAnimation from "../components/home/RecallrAnimation";
 import Navbar from "../components/Navabar";
-import { useNavigate } from "react-router";
+import { useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
 import RecallrActionAnimation from "@/components/home/RecallrActionAnimation";
 
@@ -150,7 +150,7 @@ const Home = () => {
               <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 justify-center lg:justify-start">
                 <button
                   onClick={() => {
-                    token ? navigate("/dashboard") : navigate("/signup");
+                    token ? navigate("/dashboard") : navigate("/register");
                   }}
                   className="bg-gradient-to-r from-blue-500 to-purple-600 text-white px-6 py-3 sm:px-8 sm:py-4 rounded-lg sm:rounded-xl text-base sm:text-lg font-semibold hover:shadow-lg transition-all transform hover:-translate-y-0.5"
                 >

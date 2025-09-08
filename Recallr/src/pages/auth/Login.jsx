@@ -2,11 +2,10 @@ import React, { useEffect, useState } from "react";
 import { Eye, EyeOff, ArrowLeft } from "lucide-react";
 import LoginAnimation from "../../components/auth/LoginAnimation";
 import axios from "axios";
-import { useNavigate } from "react-router";
+import { useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
 import logo from "../../assets/logoR.png";
 import useAuth from "@/hooks/useAuth";
-
 
 export default function LoginPage() {
   const { login, user, authChecked } = useAuth();
@@ -120,7 +119,6 @@ export default function LoginPage() {
           </span>
         </div>
       )}
-      
 
       <div className="bg-white shadow-2xl w-full max-w-6xl rounded-2xl overflow-hidden flex flex-col lg:flex-row relative">
         {/* Back Button for Mobile */}
@@ -142,7 +140,6 @@ export default function LoginPage() {
           {/* Login Form */}
           <form onSubmit={handleSubmit} autoComplete="on">
             <div className="flex-1">
-            
               <h1 className="text-2xl sm:text-3xl font-bold text-gray-900 mb-3 mt-6 lg:mt-0">
                 Login
               </h1>

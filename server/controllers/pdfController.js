@@ -31,7 +31,11 @@ const uploadPdf = async (req, res) => {
       return res.status(400).json({ message: "No file uploaded" });
     }
 
+    console.log("Title:", req.body.title);
+    console.log("Category:", req.body.category);
+    console.log("Tags:", req.body.tags); // will be a string like "React,JavaScript"
     const { title, category, tags } = req.body;
+    // console.log("req.body:::", req.body);
     console.log("userId======:", id);
     if (!title || !category || !tags) {
       return res
@@ -171,7 +175,6 @@ const deletePdf = async (req, res) => {
       user.pdfs.map((id) => id.toString())
     );
     console.log("Requested PDF ID:", pdfId);
-
 
     // check ownership
     if (!user.pdfs.some((id) => id.equals(pdfId))) {
@@ -421,6 +424,42 @@ const updatePdfProgress = async (req, res) => {
   }
 };
 
+const getCategories =async (req,res)=>{
+  try{
+
+    const userId=req.user.id;
+
+    if(!userId){
+      return res.status(400).json({message:"user id not found"})
+    }
+
+    const user=await User.findById(userId)
+
+    if(!user){
+      return res.status(400).json({message:"user not found"})
+    }
+
+    const categories=await Pdf.distinct("category", { user:userId })
+
+    // if(!categories){
+    //   return res.status(400).json({message:"No categories found"})
+    // }
+
+    return res.status(200).json({
+      success:true,
+      data:categories,
+      message:"categories fetched successfully"
+    })
+
+  }catch(err){
+    console.log("errorL",err)
+    res,status(500).jaon({
+      success:false,
+      message:"server error while fetching catgories"
+    })
+  }
+}
+
 module.exports = {
   uploadPdf,
   deletePdf,
@@ -431,4 +470,5 @@ module.exports = {
   generateSummaryOnly,
   generateFlashCardsOnly,
   updatePdfProgress,
+  getCategories
 };

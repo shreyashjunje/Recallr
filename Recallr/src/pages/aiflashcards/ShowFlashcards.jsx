@@ -11,11 +11,11 @@ import {
 } from "lucide-react";
 import { toast } from "react-toastify";
 import axios from "axios";
-import { useParams } from "react-router";
+import { useParams } from "react-router-dom";
 const API_URL = import.meta.env.VITE_API_URL;
 const ShowFlashcards = () => {
   const { id } = useParams();
-  
+
   // Sample data - replace with your actual flashcards data
   const [flashcardsData] = useState({
     title: "React Fundamentals",
@@ -60,7 +60,7 @@ const ShowFlashcards = () => {
   const [currentIndex, setCurrentIndex] = useState(0);
   const [isFlipped, setIsFlipped] = useState(false);
   const [isShuffled, setIsShuffled] = useState(false);
-  const [pdf,setPdf]=useState({})
+  const [pdf, setPdf] = useState({});
   const [flashcards, setFlashcards] = useState([]);
 
   const fetchFlashcards = async () => {
@@ -80,8 +80,8 @@ const ShowFlashcards = () => {
       );
 
       if (res.status === 200) {
-        setPdf(res.data.data)
-        setFlashcards(res.data.data.flashcards)
+        setPdf(res.data.data);
+        setFlashcards(res.data.data.flashcards);
         toast.success("flashcards fetched successfully");
       }
 
@@ -94,7 +94,6 @@ const ShowFlashcards = () => {
   useEffect(() => {
     fetchFlashcards();
   }, []);
-
 
   const difficultyColors = {
     Easy: "from-emerald-400 to-green-500",

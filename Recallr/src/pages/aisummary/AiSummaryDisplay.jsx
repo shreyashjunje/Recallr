@@ -15,7 +15,7 @@ import {
   ExternalLink,
   MoreHorizontal,
 } from "lucide-react";
-import { useLocation, useParams } from "react-router";
+import { useLocation, useParams } from "react-router-dom";
 import { toast } from "react-toastify";
 import axios from "axios";
 const API_URL=import.meta.env.VITE_API_URL

@@ -12,33 +12,31 @@ import {
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { User, Settings, HelpCircle, LogOut } from "lucide-react";
 import useAuth from "@/hooks/useAuth";
-import { useNavigate } from "react-router";
+import { useNavigate } from "react-router-dom";
 
 export default function SidebarUserNav({ trigger, user }) {
-
-  const navigate=useNavigate()
-  console.log("user in the user navvvvvvv:::",user)
+  const navigate = useNavigate();
+  // console.log("user in the user navvvvvvv:::", user);
 
   const { logout } = useAuth();
   // Ensure trigger is a single valid React element
-  const triggerElement =
-    React.isValidElement(trigger) ? trigger : (
-      <div className="flex items-center gap-2 cursor-pointer">
-        <Avatar className="h-8 w-8">
-          <AvatarImage src={user?.avatar} alt={user?.userName} />
-          <AvatarFallback>
-            {user?.userName?.[0]?.toUpperCase() || "U"}
-          </AvatarFallback>
-        </Avatar>
-        <span className="font-medium">{user?.userName || "User"}</span>
-      </div>
-    );
+  const triggerElement = React.isValidElement(trigger) ? (
+    trigger
+  ) : (
+    <div className="flex items-center gap-2 cursor-pointer">
+      <Avatar className="h-8 w-8">
+        <AvatarImage src={user?.avatar} alt={user?.userName} />
+        <AvatarFallback>
+          {user?.userName?.[0]?.toUpperCase() || "U"}
+        </AvatarFallback>
+      </Avatar>
+      <span className="font-medium">{user?.userName || "User"}</span>
+    </div>
+  );
 
   return (
     <DropdownMenu>
-      <DropdownMenuTrigger asChild>
-        {triggerElement}
-      </DropdownMenuTrigger>
+      <DropdownMenuTrigger asChild>{triggerElement}</DropdownMenuTrigger>
 
       <DropdownMenuContent align="start" className="w-64">
         <DropdownMenuLabel>
@@ -50,17 +48,17 @@ export default function SidebarUserNav({ trigger, user }) {
 
         <DropdownMenuSeparator />
 
-        <DropdownMenuItem onClick={()=>navigate("/profile")}>
+        <DropdownMenuItem onClick={() => navigate("/profile")}>
           <User className="mr-2 h-4 w-4" />
           <span>Profile</span>
         </DropdownMenuItem>
 
-        <DropdownMenuItem onClick={()=>navigate("/settings")}>
+        <DropdownMenuItem onClick={() => navigate("/settings")}>
           <Settings className="mr-2 h-4 w-4" />
           <span>Settings</span>
         </DropdownMenuItem>
 
-        <DropdownMenuItem onClick={()=>navigate("/help&support")}>
+        <DropdownMenuItem onClick={() => navigate("/help&support")}>
           <HelpCircle className="mr-2 h-4 w-4" />
           <span>Help & Support</span>
         </DropdownMenuItem>

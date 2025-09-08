@@ -3,7 +3,7 @@ import { Eye, EyeOff, ArrowLeft } from "lucide-react";
 import { motion } from "framer-motion";
 import RegisterAnimation from "../../components/auth/RegisterAnimation";
 import axios from "axios";
-import { useNavigate } from "react-router";
+import { useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
 import logo from "../../assets/logoR.png"; // Make sure to import your logo
 import useAuth from "../../hooks/useAuth";
@@ -140,7 +140,8 @@ export default function SignUpPage() {
                     Sign up
                   </h1>
                   <p className="text-gray-600 mb-6 sm:mb-8">
-                    Sign up in seconds and explore everything we’ve built for you.
+                    Sign up in seconds and explore everything we’ve built for
+                    you.
                   </p>
                 </div>
 

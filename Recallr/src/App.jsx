@@ -33,6 +33,7 @@ import PrivacyPolicy from "./components/auth/PrivacyPolicies";
 import HelpSupportPage from "./pages/usernav/HelpSupport";
 import ProfilePage from "./pages/usernav/Profile";
 import SettingsPage from "./pages/usernav/Settings";
+import QuizStatistics from "./components/QuizMaster/QuizStatistics";
 
 function App() {
   // const [quizStarted, setQuizStarted] = useState(false);
@@ -57,16 +58,13 @@ function App() {
         <Route path="library" element={<MyLibrary />} />
         <Route path="pdf/:id" element={<PDFDetailsPage />} />
 
-        <Route path="ai-summaries" element={<SummaryHome />} />
-        <Route path="ai-summaries/:id" element={<AiSummaryDisplay />} />
+        <Route path="summify" element={<SummaryHome />} />
+        <Route path="summify/:id" element={<AiSummaryDisplay />} />
+        <Route path="summify/generate-summary" element={<AiSummaryHome />} />
+        <Route path="flashgenius" element={<FlashcardHome />} />
+        <Route path="flashgenius/settings" element={<FlashcardsSettings />} />
         <Route
-          path="ai-summaries/generate-summary"
-          element={<AiSummaryHome />}
-        />
-        <Route path="flashcards" element={<FlashcardHome />} />
-        <Route path="flashcards/settings" element={<FlashcardsSettings />} />
-        <Route
-          path="flashcards/get-flashcards/:id"
+          path="flashgenius/get-flashcards/:id"
           element={<ShowFlashcards />}
         />
         <Route path="quizmaster" element={<QuizMasterHome />} />
@@ -75,6 +73,7 @@ function App() {
         <Route path="help&support" element={<HelpSupportPage />} />
         <Route path="profile" element={<ProfilePage />} />
         <Route path="settings" element={<SettingsPage />} />
+        <Route path="quizstatistics" element={<QuizStatistics />} />
 
         <Route
           path="study-groups"

@@ -590,7 +590,10 @@ const getQuiz = async (req, res) => {
 
 const saveQuizResult = async (req, res) => {
   try {
+    console.log("in the quiz result controller");
     const userId = req.user.id; // from auth middleware
+    console.log("userID in quiz result ::", userId);
+    console.log("quizID in the quiz controller :::", req.body.quizId);
     const {
       quizId,
       score,
@@ -682,4 +685,154 @@ const saveQuizResult = async (req, res) => {
   }
 };
 
-module.exports = { generateQuiz, getAllQuizzes, getQuiz, saveQuizResult };
+// const getQuizStats = async (req, res) => {
+//   try {
+//     const userId = req.user.id; // ensure your auth middleware sets this
+
+//     // Fetch all completed attempts for this user (sorted ascending by date)
+//     const attempts = await QuizResult.find({
+//       user: userId,
+//       completedAt: { $exists: true, $ne: null },
+//     })
+//       .sort({ createdAt: 1 })
+//       .lean();
+
+//     const totalAttempts = attempts.length;
+
+//     // Averages and sums (safe with missing/null fields)
+//     const avgScore =
+//       totalAttempts > 0
+//         ? attempts.reduce((acc, a) => acc + (a.score ?? 0), 0) / totalAttempts
+//         : 0;
+
+//     const totalCorrect = attempts.reduce((acc, a) => acc + (a.correct ?? 0), 0);
+//     const totalQuestions = attempts.reduce(
+//       (acc, a) => acc + (a.totalQuestions ?? 0),
+//       0
+//     );
+//     const accuracyPercent = totalQuestions
+//       ? (totalCorrect / totalQuestions) * 100
+//       : 0;
+
+//     // Fastest attempt (use durationSeconds if present, otherwise compute from startedAt/completedAt)
+//     let fastestAttemptSeconds = null;
+//     for (const a of attempts) {
+//       let dur = null;
+//       if (a.durationSeconds != null) dur = a.durationSeconds;
+//       else if (a.startedAt && a.completedAt)
+//         dur = (new Date(a.completedAt) - new Date(a.startedAt)) / 1000;
+//       if (dur != null)
+//         fastestAttemptSeconds =
+//           fastestAttemptSeconds == null
+//             ? dur
+//             : Math.min(fastestAttemptSeconds, dur);
+//     }
+
+//     const scoresOverTime = attempts.map((a) => ({
+//       date: a.createdAt,
+//       score: a.score ?? 0,
+//     }));
+
+//     const recentAttempts = attempts.slice(-5).reverse(); // last 5 attempts, newest first
+
+//     res.json({
+//       totalAttempts,
+//       avgScore: Number(avgScore.toFixed(2)),
+//       accuracyPercent: Number(accuracyPercent.toFixed(2)),
+//       fastestAttemptSeconds:
+//         fastestAttemptSeconds != null
+//           ? Math.round(fastestAttemptSeconds)
+//           : null,
+//       scoresOverTime,
+//       recentAttempts,
+//     });
+//   } catch (err) {
+//     console.error("getQuizStats error:", err);
+//     res.status(500).json({ error: "Server error" });
+//   }
+// };
+const getQuizStats = async (req, res) => {
+  try {
+    const userId = req.user.id; // ensure your auth middleware sets this
+
+    // Fetch all completed attempts for this user (sorted ascending by date)
+    const attempts = await QuizResult.find({
+      user: userId,
+      completedAt: { $exists: true, $ne: null },
+    })
+      .sort({ createdAt: 1 })
+      .populate("quiz", "title category totalMarks") // ✅ populate quiz with only useful fields
+      .lean();
+
+    const totalAttempts = attempts.length;
+
+    // Averages and sums
+    const avgScore =
+      totalAttempts > 0
+        ? attempts.reduce((acc, a) => acc + (a.score ?? 0), 0) / totalAttempts
+        : 0;
+
+    const totalCorrect = attempts.reduce((acc, a) => acc + (a.correct ?? 0), 0);
+    const totalQuestions = attempts.reduce(
+      (acc, a) => acc + (a.totalQuestions ?? 0),
+      0
+    );
+    const accuracyPercent = totalQuestions
+      ? (totalCorrect / totalQuestions) * 100
+      : 0;
+
+    // Fastest attempt
+    let fastestAttemptSeconds = null;
+    for (const a of attempts) {
+      let dur = null;
+      if (a.durationSeconds != null) dur = a.durationSeconds;
+      else if (a.startedAt && a.completedAt)
+        dur = (new Date(a.completedAt) - new Date(a.startedAt)) / 1000;
+      if (dur != null)
+        fastestAttemptSeconds =
+          fastestAttemptSeconds == null
+            ? dur
+            : Math.min(fastestAttemptSeconds, dur);
+    }
+
+    const scoresOverTime = attempts.map((a) => ({
+      date: a.createdAt,
+      score: a.score ?? 0,
+      quizTitle: a.quiz?.title || "Unknown Quiz", // ✅ include quiz info in timeline
+    }));
+
+    const recentAttempts = attempts
+      .slice(-5)
+      .reverse()
+      .map((a) => ({
+        score: a.score ?? 0,
+        correct: a.correct ?? 0,
+        totalQuestions: a.totalQuestions ?? 0,
+        createdAt: a.createdAt,
+        quiz: a.quiz, // ✅ populated quiz details
+      }));
+
+    res.json({
+      totalAttempts,
+      avgScore: Number(avgScore.toFixed(2)),
+      accuracyPercent: Number(accuracyPercent.toFixed(2)),
+      fastestAttemptSeconds:
+        fastestAttemptSeconds != null
+          ? Math.round(fastestAttemptSeconds)
+          : null,
+      scoresOverTime,
+      recentAttempts,
+    });
+  } catch (err) {
+    console.error("getQuizStats error:", err);
+    res.status(500).json({ error: "Server error" });
+  }
+};
+
+module.exports = {
+  generateQuiz,
+  getAllQuizzes,
+  getQuiz,
+  saveQuizResult,
+  getQuizStats,
+};

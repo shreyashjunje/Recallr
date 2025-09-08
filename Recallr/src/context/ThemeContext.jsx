@@ -1,4 +1,10 @@
-import React, { createContext, useContext, useState, ReactNode, useEffect } from 'react';
+import React, {
+  createContext,
+  useContext,
+  useState,
+  ReactNode,
+  useEffect,
+} from "react";
 
 // interface ThemeContextType {
 //   isDark: boolean;
@@ -9,17 +15,31 @@ const ThemeContext = createContext(undefined);
 
 export function ThemeProvider({ children }) {
   const [isDark, setIsDark] = useState(() => {
-    const saved = localStorage.getItem('quiz-theme');
+    const saved = localStorage.getItem("quiz-theme");
     return saved ? JSON.parse(saved) : true;
   });
 
+  // useEffect(() => {
+  //   localStorage.setItem('quiz-theme', JSON.stringify(isDark));
+  //   if (isDark) {
+  //     document.documentElement.classList.add('dark');
+  //   } else {
+  //     document.documentElement.classList.remove('dark');
+  //   }
+  // }, [isDark]);
   useEffect(() => {
-    localStorage.setItem('quiz-theme', JSON.stringify(isDark));
     if (isDark) {
-      document.documentElement.classList.add('dark');
+      document.documentElement.classList.add("dark");
     } else {
-      document.documentElement.classList.remove('dark');
+      document.documentElement.classList.remove("dark");
     }
+
+    localStorage.setItem("quiz-theme", JSON.stringify(isDark));
+
+    // cleanup when ThemeProvider unmounts
+    return () => {
+      document.documentElement.classList.remove("dark");
+    };
   }, [isDark]);
 
   const toggleTheme = () => setIsDark(!isDark);
@@ -34,7 +54,7 @@ export function ThemeProvider({ children }) {
 export function useTheme() {
   const context = useContext(ThemeContext);
   if (context === undefined) {
-    throw new Error('useTheme must be used within a ThemeProvider');
+    throw new Error("useTheme must be used within a ThemeProvider");
   }
   return context;
 }

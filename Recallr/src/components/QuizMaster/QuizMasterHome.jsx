@@ -28,7 +28,7 @@ import {
   FileQuestion,
   ArrowRight,
 } from "lucide-react";
-import { useNavigate } from "react-router";
+import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import { toast } from "react-toastify";
 import { jwtDecode } from "jwt-decode";
@@ -50,7 +50,14 @@ const QuizMasterHome = () => {
   const [totalCategories, setTotalCategories] = useState(0);
   const [pdfs, setPdfs] = useState([]);
 
-  const categories = ["All", "Programming", "Computer Science", "AI/ML", "Database", "Cloud"];
+  const categories = [
+    "All",
+    "Programming",
+    "Computer Science",
+    "AI/ML",
+    "Database",
+    "Cloud",
+  ];
   const difficulties = ["All", "Easy", "Medium", "Hard"];
   const modes = ["All", "Practice", "Exam"];
 
@@ -67,10 +74,10 @@ const QuizMasterHome = () => {
         setQuizzes(res.data.data);
         const all = res.data.data;
         setTotalQuizzes(all.length);
-        
+
         const uniqueCategories = new Set(all.map((quiz) => quiz.category));
         setTotalCategories(uniqueCategories.size);
-        
+
         toast.success("All quizzes fetched successfully");
       }
     } catch (err) {
@@ -150,29 +157,30 @@ const QuizMasterHome = () => {
 
   // Filter quizzes based on selected filters and search term
   const filteredQuizzes = quizzes.filter((quiz) => {
-    const matchesCategory = 
-      filters.category === "All" || 
+    const matchesCategory =
+      filters.category === "All" ||
       quiz.category === filters.category ||
       (filters.category === "Programming" && quiz.category === "Programming") ||
-      (filters.category === "Computer Science" && quiz.category === "Computer Science") ||
+      (filters.category === "Computer Science" &&
+        quiz.category === "Computer Science") ||
       (filters.category === "AI/ML" && quiz.category === "AI/ML") ||
       (filters.category === "Database" && quiz.category === "Database") ||
       (filters.category === "Cloud" && quiz.category === "Cloud");
-    
-    const matchesDifficulty = 
-      filters.difficulty === "All" || 
+
+    const matchesDifficulty =
+      filters.difficulty === "All" ||
       quiz.settings?.difficulty === filters.difficulty;
-    
-    const matchesMode = 
-      filters.mode === "All" || 
-      quiz.settings?.mode === filters.mode;
-    
+
+    const matchesMode =
+      filters.mode === "All" || quiz.settings?.mode === filters.mode;
+
     const matchesSearch =
       filters.search === "" ||
       quiz.title.toLowerCase().includes(filters.search.toLowerCase()) ||
-      (quiz.tags && quiz.tags.some((tag) =>
-        tag.toLowerCase().includes(filters.search.toLowerCase())
-      ));
+      (quiz.tags &&
+        quiz.tags.some((tag) =>
+          tag.toLowerCase().includes(filters.search.toLowerCase())
+        ));
 
     return matchesCategory && matchesDifficulty && matchesMode && matchesSearch;
   });
@@ -422,7 +430,9 @@ const QuizMasterHome = () => {
                     </span>
                     <div className="flex items-center gap-1 text-gray-600 bg-white/70 px-2 py-1 rounded-full shadow-sm">
                       {getModeIcon(quiz.settings?.mode)}
-                      <span className="text-xs">{quiz.settings?.mode || "Practice"}</span>
+                      <span className="text-xs">
+                        {quiz.settings?.mode || "Practice"}
+                      </span>
                     </div>
                   </div>
 
@@ -494,7 +504,9 @@ const QuizMasterHome = () => {
                           )}
                         </>
                       ) : (
-                        <span className="text-xs text-gray-500">No tags available</span>
+                        <span className="text-xs text-gray-500">
+                          No tags available
+                        </span>
                       )}
                     </div>
                   </div>
@@ -516,14 +528,15 @@ const QuizMasterHome = () => {
                       {formatDate(quiz.createdAt)}
                     </span>
                     <div className="flex items-center gap-2">
-                      {quiz.settings?.questionTypes && quiz.settings.questionTypes.map((type, index) => (
-                        <span
-                          key={index}
-                          className="px-2 py-1 bg-white/70 text-gray-800 rounded-full shadow-sm text-xs"
-                        >
-                          {type}
-                        </span>
-                      ))}
+                      {quiz.settings?.questionTypes &&
+                        quiz.settings.questionTypes.map((type, index) => (
+                          <span
+                            key={index}
+                            className="px-2 py-1 bg-white/70 text-gray-800 rounded-full shadow-sm text-xs"
+                          >
+                            {type}
+                          </span>
+                        ))}
                     </div>
                   </div>
                 </div>

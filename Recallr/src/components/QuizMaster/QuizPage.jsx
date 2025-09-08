@@ -3,7 +3,7 @@ import { QuizInfo } from "./QuizInfo";
 import { sampleQuestions, sampleQuizInfo } from "@/data/sampleQuiz";
 import { Quiz } from "./Quiz";
 import { toast } from "react-toastify";
-import { useNavigate, useParams } from "react-router";
+import { useNavigate, useParams } from "react-router-dom";
 import axios from "axios";
 const API_URL=import.meta.env.VITE_API_URL
 

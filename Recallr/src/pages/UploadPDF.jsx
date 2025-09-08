@@ -560,8 +560,8 @@
 // };
 
 // export default PDFUploadForm;
-
-import React, { useState, useRef } from "react";
+///////////////////////////////////////////////////////////////////////////////////////////////////////////
+import React, { useState, useRef, useEffect } from "react";
 import {
   Upload,
   File,
@@ -578,11 +578,12 @@ import {
   BookOpen,
   Send,
   CheckCircle,
-  CloudUpload
+  CloudUpload,
 } from "lucide-react";
 import axios from "axios";
 import { jwtDecode } from "jwt-decode";
 import PageHeader from "@/components/helper/PageHeader";
+import { toast } from "react-toastify";
 
 // Simple toast notification system
 const showToast = (message, type = "info") => {
@@ -607,11 +608,11 @@ const showToast = (message, type = "info") => {
   }, 3000);
 };
 
-const toast = {
-  success: (msg) => showToast(msg, "success"),
-  error: (msg) => showToast(msg, "error"),
-  info: (msg) => showToast(msg, "info"),
-};
+// const toast = {
+//   success: (msg) => showToast(msg, "success"),
+//   error: (msg) => showToast(msg, "error"),
+//   info: (msg) => showToast(msg, "info"),
+// };
 
 const API_URL = import.meta.env.VITE_API_URL;
 
@@ -625,7 +626,35 @@ const PDFUploadForm = () => {
   const [isConnecting, setIsConnecting] = useState(false);
   const [uploadProgress, setUploadProgress] = useState(0);
   const [isUploading, setIsUploading] = useState(false);
+  const [categories, setCategories] = useState([]);
   const fileInputRef = useRef(null);
+  const [customCategory, setCustomCategory] = useState("");
+
+  const fetchCategories = async () => {
+    try {
+      const token = localStorage.getItem("token");
+      if (!token) {
+        return;
+      }
+
+      const res = await axios.get(`${API_URL}/pdf/get-categories`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+
+      console.log("categoriesss:", res.data.data);
+      if (res.status == 200) {
+        setCategories(res.data.data);
+        toast.success("categories fetched successfully");
+      }
+    } catch (err) {
+      console.log("Error:", err);
+    }
+  };
+  useEffect(() => {
+    fetchCategories();
+  }, []);
 
   const suggestedTags = [
     "React",
@@ -638,13 +667,13 @@ const PDFUploadForm = () => {
     "Node.js",
   ];
 
-  const categories = [
-    "Web Development",
-    "Data Structures & Algorithms",
-    "Cloud Computing",
-    "Machine Learning",
-    "Other"
-  ];
+  // const categories = [
+  //   "Web Development",
+  //   "Data Structures & Algorithms",
+  //   "Cloud Computing",
+  //   "Machine Learning",
+  //   "Other"
+  // ];
 
   const handleDragOver = (e) => {
     e.preventDefault();
@@ -731,7 +760,12 @@ const PDFUploadForm = () => {
     const formData = new FormData();
     formData.append("file", selectedFile);
     formData.append("title", title);
-    formData.append("category", selectedCategory);
+    // formData.append("category", selectedCategory);
+    formData.append(
+      "category",
+      selectedCategory === "Other" ? customCategory : selectedCategory
+    );
+
     formData.append("tags", tags.join(","));
     formData.append("userID", userID);
 
@@ -810,7 +844,7 @@ const PDFUploadForm = () => {
     <div className="min-h-screen bg-gradient-to-br from-indigo-50 to-purple-50 py-8">
       <div className="max-w-6xl mx-auto px-4">
         <PageHeader />
-        
+
         <div className="flex flex-col md:flex-row gap-8 mt-8">
           {/* Web Upload Form */}
           <div className="bg-white rounded-2xl shadow-lg border border-gray-100 p-8 flex-1">
@@ -917,13 +951,13 @@ const PDFUploadForm = () => {
                 <p className="text-xs text-gray-500 mt-2">
                   Supports single PDF file up to 50MB
                 </p>
-                
+
                 {/* Upload Progress Bar */}
                 {isUploading && (
                   <div className="mt-4">
                     <div className="w-full bg-gray-200 rounded-full h-2.5">
-                      <div 
-                        className="bg-purple-600 h-2.5 rounded-full transition-all duration-300" 
+                      <div
+                        className="bg-purple-600 h-2.5 rounded-full transition-all duration-300"
                         style={{ width: `${uploadProgress}%` }}
                       ></div>
                     </div>
@@ -939,7 +973,7 @@ const PDFUploadForm = () => {
                 <label className="block text-sm font-medium text-gray-700 mb-2">
                   Category
                 </label>
-                <div className="relative">
+                {/* <div className="relative">
                   <select
                     value={selectedCategory}
                     onChange={(e) => setSelectedCategory(e.target.value)}
@@ -952,7 +986,44 @@ const PDFUploadForm = () => {
                     ))}
                   </select>
                   <ChevronDown className="absolute right-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400 pointer-events-none" />
+                </div> */}
+                <div className="relative">
+                  <select
+                    value={selectedCategory}
+                    onChange={(e) => {
+                      setSelectedCategory(e.target.value);
+                      if (e.target.value !== "Other") {
+                        setCustomCategory(""); // reset if not "Other"
+                      }
+                    }}
+                    className="w-full px-4 py-3 border border-gray-300 rounded-xl 
+               focus:ring-2 focus:ring-purple-500 focus:border-transparent 
+               appearance-none bg-white cursor-pointer"
+                    required
+                  >
+                    <option value="">Select a category...</option>
+                    {categories.map((category) => (
+                      <option key={category._id} value={category.name}>
+                        {category}
+                      </option>
+                    ))}
+                    <option value="Other">Other</option>
+                  </select>
+                  <ChevronDown className="absolute right-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400 pointer-events-none" />
                 </div>
+                {selectedCategory === "Other" && (
+                  <div className="mt-3">
+                    <input
+                      type="text"
+                      value={customCategory}
+                      onChange={(e) => setCustomCategory(e.target.value)}
+                      placeholder="Enter your custom category..."
+                      className="w-full px-4 py-3 border border-gray-300 rounded-xl 
+                 focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                      required
+                    />
+                  </div>
+                )}
               </div>
 
               {/* Tags Input */}
@@ -1057,7 +1128,8 @@ const PDFUploadForm = () => {
 
             <div className="mb-6">
               <p className="text-gray-700 mb-6 text-lg">
-                Connect with our Telegram bot for a seamless mobile upload experience. Send PDFs directly from your phone!
+                Connect with our Telegram bot for a seamless mobile upload
+                experience. Send PDFs directly from your phone!
               </p>
 
               {/* Features */}
@@ -1067,7 +1139,9 @@ const PDFUploadForm = () => {
                     <Zap className="w-5 h-5 text-blue-600" />
                   </div>
                   <div>
-                    <p className="font-semibold text-gray-900">Instant Upload</p>
+                    <p className="font-semibold text-gray-900">
+                      Instant Upload
+                    </p>
                     <p className="text-sm text-gray-600">
                       Send PDFs directly from your mobile device
                     </p>
@@ -1078,7 +1152,9 @@ const PDFUploadForm = () => {
                     <MessageCircle className="w-5 h-5 text-blue-600" />
                   </div>
                   <div>
-                    <p className="font-semibold text-gray-900">Chat Interface</p>
+                    <p className="font-semibold text-gray-900">
+                      Chat Interface
+                    </p>
                     <p className="text-sm text-gray-600">
                       Easy commands and interactive responses
                     </p>

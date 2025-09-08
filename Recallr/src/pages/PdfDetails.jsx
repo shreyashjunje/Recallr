@@ -24,7 +24,8 @@ import {
   Folder,
   Info,
 } from "lucide-react";
-import { useNavigate, useParams } from "react-router";
+import { useParams } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
 import axios from "axios";
 const API_URL = import.meta.env.VITE_API_URL;
@@ -103,6 +104,7 @@ const PDFDetailsPage = () => {
       console.log("pdf details:", res.data.data);
       if (res.status === 200) {
         setPdf(res.data?.data);
+        // console.log("pdfdetails:",pdf.data?.data)
         toast.success("pdf details fetched successfully");
       }
     } catch (err) {
@@ -127,7 +129,6 @@ const PDFDetailsPage = () => {
 
   const toggleFavorite = () => {
     setPdfData((prev) => ({ ...prev, isFavorite: !prev.isFavorite }));
-    
   };
 
   const handleGenerate = async (type) => {
@@ -144,7 +145,7 @@ const PDFDetailsPage = () => {
           customPrompt: "Summarize this for quick revision",
         });
       } else if (type === "flashcards") {
-        // response = await axios.post("/api/pdf/flashcards-only", {
+        // response = await axios.post("/api/pdf/flashgenius-only", {
         //   pdfId: pdfData._id,
         //   fileUrl: pdfData.cloudinaryUrl,
         // });
@@ -191,12 +192,12 @@ const PDFDetailsPage = () => {
 
   const handleStudyFlashcards = (id) => {
     console.log("idd----of flashcard:", id);
-    navigate(`/flashcards/get-flashcards/${id}`);
+    navigate(`/flashgenius/get-flashcards/${id}`);
   };
 
   const handleStudySummary = (summaryId) => {
     console.log("summaryId:", summaryId);
-    navigate(`/ai-summaries/${summaryId}`);
+    navigate(`/summify/${summaryId}`);
   };
 
   return (
@@ -293,7 +294,7 @@ const PDFDetailsPage = () => {
 
         <div className="grid lg:grid-cols-3 gap-6">
           {/* Left Column - File Details & Progress */}
-          <div className="lg:col-span-1 space-y-6">
+          <div className="my-2">
             {/* File Metadata */}
             <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6">
               <h2 className="text-xl font-semibold text-gray-900 mb-6 flex items-center gap-2">
@@ -322,7 +323,7 @@ const PDFDetailsPage = () => {
                   </span>
                 </div>
 
-                <div className="flex justify-between items-center py-3 border-b border-gray-100">
+                {/* <div className="flex justify-between items-center py-3 border-b border-gray-100">
                   <div className="flex items-center gap-2 text-gray-600">
                     <HardDrive size={16} />
                     <span>File Size</span>
@@ -330,7 +331,7 @@ const PDFDetailsPage = () => {
                   <span className="font-medium text-gray-900">
                     {pdfData.fileSize} dummy
                   </span>
-                </div>
+                </div> */}
 
                 <div className="flex justify-between items-center py-3 border-b border-gray-100">
                   <div className="flex items-center gap-2 text-gray-600">
@@ -338,11 +339,11 @@ const PDFDetailsPage = () => {
                     <span>Pages</span>
                   </div>
                   <span className="font-medium text-gray-900">
-                    {pdfData.pagesCount} dummy
+                    {pdf?.totalPages}
                   </span>
                 </div>
 
-                <div className="flex justify-between items-center py-3 border-b border-gray-100">
+                {/* <div className="flex justify-between items-center py-3 border-b border-gray-100">
                   <div className="flex items-center gap-2 text-gray-600">
                     <Eye size={16} />
                     <span>Access Count</span>
@@ -350,9 +351,9 @@ const PDFDetailsPage = () => {
                   <span className="font-medium text-gray-900">
                     {pdfData.accessCount} dummy
                   </span>
-                </div>
+                </div> */}
 
-                <div className="flex justify-between items-center py-3">
+                {/* <div className="flex justify-between items-center py-3">
                   <div className="flex items-center gap-2 text-gray-600">
                     <Clock size={16} />
                     <span>Last Opened</span>
@@ -360,7 +361,7 @@ const PDFDetailsPage = () => {
                   <span className="font-medium text-gray-900">
                     {formatDate(pdfData.lastOpenedAt)} dummy
                   </span>
-                </div>
+                </div> */}
               </div>
             </div>
 
@@ -377,14 +378,14 @@ const PDFDetailsPage = () => {
                   <div className="flex justify-between items-center mb-2">
                     <span className="text-gray-600">Overall Progress</span>
                     <span className="font-bold text-emerald-600">
-                      {pdfData.progress.completedPercentage}%
+                      {pdf.progress}%
                     </span>
                   </div>
                   <div className="w-full bg-gray-200 rounded-full h-3 overflow-hidden">
                     <div
                       className="h-full bg-gradient-to-r from-emerald-400 to-emerald-600 rounded-full transition-all duration-500 ease-out"
                       style={{
-                        width: `${pdfData.progress.completedPercentage}%`,
+                        width: `${pdf.progress}%`,
                       }}
                     ></div>
                   </div>
@@ -397,22 +398,22 @@ const PDFDetailsPage = () => {
                       Current Page
                     </span>
                     <span className="text-emerald-800 font-bold text-lg">
-                      {pdfData.progress.currentPage} / {pdfData.pagesCount}
+                      {pdf.currentPage} / {pdf.totalPages}
                     </span>
                   </div>
                 </div>
 
                 {/* Time Spent */}
-                <div className="bg-blue-50 rounded-xl p-4">
+                {/* <div className="bg-blue-50 rounded-xl p-4">
                   <div className="flex justify-between items-center">
                     <span className="text-blue-700 font-medium">
                       Time Spent
                     </span>
                     <span className="text-blue-800 font-bold text-lg">
-                      {pdfData.progress.timeSpent}
+                      {pdf.progress}
                     </span>
                   </div>
-                </div>
+                </div> */}
 
                 {/* Continue Reading Button */}
                 <button
@@ -430,7 +431,7 @@ const PDFDetailsPage = () => {
           </div>
 
           {/* Right Column - AI Features */}
-          <div className="lg:col-span-2 space-y-6">
+          <div className="lg:col-span-2 w-full space-y-6">
             {/* Summary Section */}
             <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6">
               <div className="flex justify-between items-center mb-6">
@@ -618,49 +619,47 @@ const PDFDetailsPage = () => {
                 )}
               </div>
             </div>
+          </div>
 
-            {/* Learning Statistics */}
-            <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6">
-              <h3 className="text-lg font-semibold text-gray-900 mb-4 flex items-center gap-2">
-                <BarChart3 size={18} className="text-blue-500" />
-                Learning Stats
-              </h3>
+          {/* Learning Statistics */}
+          <div className="lg:col-span-4 bg-white rounded-2xl shadow-sm border border-gray-100 p-6 ">
+            <h3 className="text-lg font-semibold text-gray-900 mb-4 flex items-center gap-2">
+              <BarChart3 size={18} className="text-blue-500" />
+              Learning Stats
+            </h3>
 
-              <div className="grid grid-cols-2 gap-4">
-                <div className="text-center p-4 bg-blue-50 rounded-xl">
-                  <div className="text-2xl font-bold text-blue-600 mb-1">
-                    {pdf.isSummarized ? "✓" : "—"}
-                  </div>
-                  <div className="text-blue-700 text-sm font-medium">
-                    Summary
-                  </div>
+            <div className="grid grid-cols-2 gap-4">
+              <div className="text-center p-4 bg-blue-50 rounded-xl">
+                <div className="text-2xl font-bold text-blue-600 mb-1">
+                  {pdf.isSummarized ? "✓" : "—"}
                 </div>
+                <div className="text-blue-700 text-sm font-medium">Summary</div>
+              </div>
 
-                <div className="text-center p-4 bg-orange-50 rounded-xl">
-                  <div className="text-2xl font-bold text-orange-600 mb-1">
-                    {pdf.isFlashcardGenerated ? "✓" : "—"}
-                  </div>
-                  <div className="text-orange-700 text-sm font-medium">
-                    Flashcards
-                  </div>
+              <div className="text-center p-4 bg-orange-50 rounded-xl">
+                <div className="text-2xl font-bold text-orange-600 mb-1">
+                  {pdf.isFlashcardGenerated ? "✓" : "—"}
                 </div>
-
-                <div className="text-center p-4 bg-indigo-50 rounded-xl">
-                  <div className="text-2xl font-bold text-indigo-600 mb-1">
-                    {pdf.isQuizGenerated ? "✓" : "—"}
-                  </div>
-                  <div className="text-indigo-700 text-sm font-medium">
-                    Quiz Questions
-                  </div>
+                <div className="text-orange-700 text-sm font-medium">
+                  Flashcards
                 </div>
+              </div>
 
-                <div className="text-center p-4 bg-emerald-50 rounded-xl">
-                  <div className="text-2xl font-bold text-emerald-600 mb-1">
-                    {pdfData.progress.timeSpent}
-                  </div>
-                  <div className="text-emerald-700 text-sm font-medium">
-                    Time Spent
-                  </div>
+              <div className="text-center p-4 bg-indigo-50 rounded-xl">
+                <div className="text-2xl font-bold text-indigo-600 mb-1">
+                  {pdf.isQuizGenerated ? "✓" : "—"}
+                </div>
+                <div className="text-indigo-700 text-sm font-medium">
+                  Quiz Questions
+                </div>
+              </div>
+
+              <div className="text-center p-4 bg-emerald-50 rounded-xl">
+                <div className="text-2xl font-bold text-emerald-600 mb-1">
+                  {pdfData.progress.timeSpent}
+                </div>
+                <div className="text-emerald-700 text-sm font-medium">
+                  Time Spent
                 </div>
               </div>
             </div>
@@ -781,7 +780,7 @@ const PDFDetailsPage = () => {
                 </div>
 
                 {/* Generate All Button */}
-                {(!pdf.isSummarized ||
+                {/* {(!pdf.isSummarized ||
                   !pdf.isFlashcardGenerated ||
                   !pdf.isQuizGenerated) && (
                   <div className="bg-gradient-to-r from-purple-50 to-blue-50 rounded-xl p-6 border border-purple-100">
@@ -810,7 +809,7 @@ const PDFDetailsPage = () => {
                       )}
                     </button>
                   </div>
-                )}
+                )} */}
 
                 {/* Learning Actions */}
                 {(pdf?.isSummarized ||
@@ -818,7 +817,10 @@ const PDFDetailsPage = () => {
                   pdf?.isQuizGenerated) && (
                   <div className="grid md:grid-cols-3 gap-4 ">
                     {pdf?.isFlashcardGenerated && (
-                      <button   onClick={() => handleStudyFlashcards(pdf._id)} className="flex items-center justify-center gap-3 bg-gradient-to-r from-orange-500 to-amber-500 text-white py-4 rounded-xl font-medium hover:from-orange-600 hover:to-amber-600 transition-all duration-200 shadow-lg hover:shadow-xl">
+                      <button
+                        onClick={() => handleStudyFlashcards(pdf._id)}
+                        className="flex items-center justify-center gap-3 bg-gradient-to-r from-orange-500 to-amber-500 text-white py-4 rounded-xl font-medium hover:from-orange-600 hover:to-amber-600 transition-all duration-200 shadow-lg hover:shadow-xl"
+                      >
                         <Target size={18} />
                         Study Flashcards
                       </button>
@@ -832,7 +834,10 @@ const PDFDetailsPage = () => {
                     )}
 
                     {pdf?.isSummarized && (
-                      <button onClick={()=>handleStudySummary(pdf._id)} className="flex items-center justify-center gap-3 bg-gradient-to-r from-indigo-500 to-green-600 text-white py-4 rounded-xl font-medium hover:from-indigo-600 hover:to-purple-700 transition-all duration-200 shadow-lg hover:shadow-xl">
+                      <button
+                        onClick={() => handleStudySummary(pdf._id)}
+                        className="flex items-center justify-center gap-3 bg-gradient-to-r from-indigo-500 to-green-600 text-white py-4 rounded-xl font-medium hover:from-indigo-600 hover:to-purple-700 transition-all duration-200 shadow-lg hover:shadow-xl"
+                      >
                         <Brain size={18} />
                         Read Summary
                       </button>

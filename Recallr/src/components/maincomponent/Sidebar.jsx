@@ -26,12 +26,13 @@ import SidebarUserNav from "../dashboard/helper/SidebarUserNav";
 export default function Sidebar() {
   const { user } = useAuth();
   const token = localStorage.getItem("token");
-  if (!token) return;
+
+  // Return early if no token
+  if (!token) {
+    return null;
+  }
 
   const decodedToken = jwtDecode(token);
-  // console.log("Decoded Token:", decodedToken);
-  // console.log("User in Sidebar:", user);
-
   const navigate = useNavigate();
   const location = useLocation();
   const [hoveredItem, setHoveredItem] = useState(null);
@@ -39,6 +40,7 @@ export default function Sidebar() {
   const [isMobile, setIsMobile] = useState(window.innerWidth < 1024);
   const sidebarRef = useRef(null);
   const scrollPositionRef = useRef(0);
+  const isScrollRestorationScheduled = useRef(false);
 
   // Handle window resize
   useEffect(() => {
@@ -53,6 +55,7 @@ export default function Sidebar() {
     };
 
     window.addEventListener("resize", handleResize);
+    console.log("in the first useEffect");
     return () => window.removeEventListener("resize", handleResize);
   }, []);
 
@@ -61,6 +64,7 @@ export default function Sidebar() {
     if (isMobile) {
       setIsMobileMenuOpen(false);
     }
+    console.log("in the 2nd useEffect");
   }, [location.pathname, isMobile]);
 
   // Route mapping
@@ -68,9 +72,9 @@ export default function Sidebar() {
     Dashboard: "/dashboard",
     "Upload PDFs": "/upload",
     "My Library": "/library",
-    "AI Summaries": "/ai-summaries",
+    "Summify": "/summify",
     "Quiz Master": "/quizmaster",
-    Flashcards: "/flashcards",
+    Flashgenius: "/flashgenius",
     "Voice Assistant": "/voice-assistant",
     "Study Groups": "/study-groups",
     "Chat with PDFs": "/chat-pdfs",
@@ -94,21 +98,38 @@ export default function Sidebar() {
     }
   };
 
-  // Restore scroll position after re-render
+  // Restore scroll position after route change
   const restoreScrollPosition = () => {
-    if (sidebarRef.current && scrollPositionRef.current > 0) {
-      sidebarRef.current.scrollTop = scrollPositionRef.current;
+    if (
+      sidebarRef.current &&
+      scrollPositionRef.current > 0 &&
+      !isScrollRestorationScheduled.current
+    ) {
+      isScrollRestorationScheduled.current = true;
+
+      // Use requestAnimationFrame to ensure DOM is ready
+      requestAnimationFrame(() => {
+        if (sidebarRef.current) {
+          sidebarRef.current.scrollTop = scrollPositionRef.current;
+        }
+        isScrollRestorationScheduled.current = false;
+      });
     }
   };
 
   useEffect(() => {
-    saveScrollPosition();
     setActiveItem(getActiveItemFromPath());
+    console.log("in the 3rd useEffect");
   }, [location.pathname]);
 
+  // Restore scroll position only when needed
   useEffect(() => {
-    restoreScrollPosition();
-  });
+    // Only restore scroll position if we're not at the top
+    if (scrollPositionRef.current > 0) {
+      restoreScrollPosition();
+    }
+    console.log("in the fourth useEffect");
+  }, [location.pathname]);
 
   const handleItemClick = (itemName) => {
     saveScrollPosition();
@@ -122,12 +143,6 @@ export default function Sidebar() {
   const toggleMobileMenu = () => {
     setIsMobileMenuOpen(!isMobileMenuOpen);
   };
-
-  const achievements = [
-    { icon: Trophy, label: "Level 12", color: "text-yellow-500" },
-    { icon: Star, label: "890 XP", color: "text-purple-500" },
-    { icon: Zap, label: "23 Streak", color: "text-orange-500" },
-  ];
 
   const menuItems = [
     {
@@ -152,7 +167,6 @@ export default function Sidebar() {
           icon: BookOpen,
           color: "from-purple-500 to-violet-500",
           bgAccent: "bg-gradient-to-r from-purple-50 to-violet-50",
-          // badge: "24",
           badge: null,
         },
       ],
@@ -161,13 +175,11 @@ export default function Sidebar() {
       section: "AI FEATURES",
       items: [
         {
-          name: "AI Summaries",
+          name: "Summify",
           icon: Sparkles,
           color: "from-pink-500 to-rose-500",
           bgAccent: "bg-gradient-to-r from-pink-50 to-rose-50",
-          // badge: "NEW",
           badge: null,
-
           special: true,
         },
         {
@@ -178,7 +190,7 @@ export default function Sidebar() {
           badge: null,
         },
         {
-          name: "Flashcards",
+          name: "Flashgenius",
           icon: CreditCard,
           color: "from-teal-500 to-cyan-500",
           bgAccent: "bg-gradient-to-r from-teal-50 to-cyan-50",
@@ -189,7 +201,6 @@ export default function Sidebar() {
           icon: Mic,
           color: "from-indigo-500 to-blue-500",
           bgAccent: "bg-gradient-to-r from-indigo-50 to-blue-50",
-          // badge: "BETA",
           badge: "soon",
         },
       ],
@@ -217,7 +228,7 @@ export default function Sidebar() {
 
   // Mobile navbar component
   const MobileNavbar = () => (
-    <div className="lg:hidden fixed top-0 left-0 right-0 bg-gradient-to-br from-slate-50 to-blue-50/30 border-b border-gray-200/60 z-50 ">
+    <div className="lg:hidden fixed top-0 left-0 right-0 bg-gradient-to-br from-slate-50 to-blue-50/30 border-b border-gray-200/60 z-50">
       <div className="flex items-center justify-between p-4">
         <div className="flex items-center justify-center">
           <button
@@ -232,7 +243,7 @@ export default function Sidebar() {
           </button>
         </div>
 
-        <div className="flex items-center ">
+        <div className="flex items-center">
           <div className="w-15 h-12 rounded-xl flex items-center justify-center">
             <img src={logo} alt="Recallr Logo" className="h-10" />
           </div>
@@ -328,7 +339,7 @@ export default function Sidebar() {
         <div className="flex items-center space-x-1">
           <div className="relative">
             <div className="w-14 h-12 pb-4 rounded-2xl flex items-center justify-center shadow-lg">
-              <img src={logo} alt="Recallr Logo" />
+              <img src={logo} alt="Recallr Logo" className="h-10" />
             </div>
           </div>
           <div className="">
@@ -469,10 +480,10 @@ export default function Sidebar() {
                   </div>
                   <div className="flex-1 min-w-0">
                     <p className="text-sm font-bold text-gray-900 truncate">
-                      {user?.userName}
+                      {user?.userName || "User"}
                     </p>
                     <p className="text-xs text-gray-500 truncate">
-                      {user?.email}
+                      {user?.email || "user@example.com"}
                     </p>
                   </div>
                   <div className="w-2 h-2 bg-gradient-to-r from-green-400 to-emerald-500 rounded-full animate-pulse"></div>
@@ -487,15 +498,6 @@ export default function Sidebar() {
 
   return (
     <>
-      {/* Mobile Navbar (fixed at top on mobile) */}
-      {/* <MobileNavbar /> */}
-
-      {/* Desktop Sidebar (always visible on desktop) */}
-      {/* <DesktopSidebar /> */}
-
-      {/* Add padding to content on mobile to account for fixed navbar */}
-      {/* {isMobile && <div className="h-16 md:h-0"></div>} */}
-
       {isMobile ? (
         <>
           {/* Navbar Mode (mobile + md) */}

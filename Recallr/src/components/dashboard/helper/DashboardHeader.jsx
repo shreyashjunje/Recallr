@@ -47,13 +47,13 @@ const DashboardHeader = () => {
               </motion.div>
               <div>
                 <h1 className="text-3xl sm:text-4xl font-bold">
-                  Welcome back to{" "}
-                  <span className="text-yellow-300">Recallr</span> 🚀
+                  Welcome to{" "}
+                  <span className="text-yellow-300">Recallr</span> 
                 </h1>
-                <p className="text-white/80 text-lg">
-                  Ready to achieve{" "}
-                  <span className="font-semibold text-pink-200">greatness</span>{" "}
-                  today?
+                <p className="text-white/70 font-semibold text-lg">
+                  Your journey to smarter learning starts now.{" "}
+                  {/* <span className="font-semibold text-pink-200">greatness</span>{" "} */}
+                  {/* today? */}
                 </p>
               </div>
             </div>

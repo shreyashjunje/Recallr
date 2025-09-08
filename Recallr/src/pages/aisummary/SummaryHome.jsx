@@ -27,7 +27,7 @@ import {
   Sparkles,
   ArrowRight,
 } from "lucide-react";
-import { useNavigate } from "react-router";
+import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import { toast } from "react-toastify";
 const API_URL = import.meta.env.VITE_API_URL;
@@ -273,12 +273,12 @@ const SummaryHome = () => {
   ];
 
   const handleCreateSummary = () => {
-    navigate("/ai-summaries/generate-summary");
+    navigate("/summify/generate-summary");
   };
 
   const handleStudySummary = (summaryId) => {
     console.log("summaryId:", summaryId);
-    navigate(`/ai-summaries/${summaryId}`);
+    navigate(`/summify/${summaryId}`);
   };
 
   const toggleTags = (summaryId) => {
@@ -447,82 +447,82 @@ const SummaryHome = () => {
               />
             </div>
           </div>
-<div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-  {summaries.map((summary, idx) => (
-    <div
-      key={summary._id}
-      className={`relative rounded-3xl shadow-md transition-all duration-500 ease-out p-6 flex flex-col justify-between transform hover:-translate-y-2 hover:scale-[1.02] hover:shadow-2xl`}
-      style={{
-        backgroundColor: [
-          "#FFE5D9", // soft peach
-          "#DFF7E3", // mint green
-          "#E5E0FF", // lavender
-          "#FDE2E4", // pink
-          "#E0F7FA", // teal
-          "#FFF5E1", // cream
-        ][idx % 6],
-      }}
-    >
-      {/* Top Section */}
-      <div className="flex justify-between items-start mb-6">
-        <span className="text-xs font-medium bg-white/70 px-3 py-1 rounded-full shadow-sm">
-          {formatDate(summary.uploadedAt)}
-        </span>
-        <div className="w-8 h-8 flex items-center justify-center rounded-full bg-white shadow-md group-hover:rotate-12 transition-transform duration-300">
-          <BookOpen className="w-5 h-5 text-gray-600" />
-        </div>
-      </div>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+            {summaries.map((summary, idx) => (
+              <div
+                key={summary._id}
+                className={`relative rounded-3xl shadow-md transition-all duration-500 ease-out p-6 flex flex-col justify-between transform hover:-translate-y-2 hover:scale-[1.02] hover:shadow-2xl`}
+                style={{
+                  backgroundColor: [
+                    "#FFE5D9", // soft peach
+                    "#DFF7E3", // mint green
+                    "#E5E0FF", // lavender
+                    "#FDE2E4", // pink
+                    "#E0F7FA", // teal
+                    "#FFF5E1", // cream
+                  ][idx % 6],
+                }}
+              >
+                {/* Top Section */}
+                <div className="flex justify-between items-start mb-6">
+                  <span className="text-xs font-medium bg-white/70 px-3 py-1 rounded-full shadow-sm">
+                    {formatDate(summary.uploadedAt)}
+                  </span>
+                  <div className="w-8 h-8 flex items-center justify-center rounded-full bg-white shadow-md group-hover:rotate-12 transition-transform duration-300">
+                    <BookOpen className="w-5 h-5 text-gray-600" />
+                  </div>
+                </div>
 
-      {/* Title */}
-      <h3 className="text-xl font-bold text-gray-900 mb-4 group-hover:text-gray-800 transition-colors">
-        {summary.title}
-      </h3>
+                {/* Title */}
+                <h3 className="text-xl font-bold text-gray-900 mb-4 group-hover:text-gray-800 transition-colors">
+                  {summary.title}
+                </h3>
 
-      {/* Category */}
-      <p className="text-sm text-gray-700 font-medium mb-4">
-        {summary.category}
-      </p>
+                {/* Category */}
+                <p className="text-sm text-gray-700 font-medium mb-4">
+                  {summary.category}
+                </p>
 
-      {/* Tags */}
-      <div className="flex flex-wrap gap-2 mb-6">
-        {(expandedTags[summary._id]
-          ? summary.tags
-          : summary.tags.slice(0, 3)
-        ).map((tag, index) => (
-          <span
-            key={index}
-            className="px-3 py-1 text-xs font-medium bg-white/70 text-gray-800 rounded-full shadow-sm transition-transform duration-300 hover:scale-105"
-          >
-            {tag}
-          </span>
-        ))}
-        {summary.tags.length > 3 && (
-          <button
-            onClick={() => toggleTags(summary._id)}
-            className="px-2 py-1 text-xs text-gray-700 bg-white/60 hover:bg-white rounded-full transition-transform duration-300 hover:scale-105"
-          >
-            {expandedTags[summary._id]
-              ? "See less"
-              : `+${summary.tags.length - 3} more`}
-          </button>
-        )}
-      </div>
+                {/* Tags */}
+                <div className="flex flex-wrap gap-2 mb-6">
+                  {(expandedTags[summary._id]
+                    ? summary.tags
+                    : summary.tags.slice(0, 3)
+                  ).map((tag, index) => (
+                    <span
+                      key={index}
+                      className="px-3 py-1 text-xs font-medium bg-white/70 text-gray-800 rounded-full shadow-sm transition-transform duration-300 hover:scale-105"
+                    >
+                      {tag}
+                    </span>
+                  ))}
+                  {summary.tags.length > 3 && (
+                    <button
+                      onClick={() => toggleTags(summary._id)}
+                      className="px-2 py-1 text-xs text-gray-700 bg-white/60 hover:bg-white rounded-full transition-transform duration-300 hover:scale-105"
+                    >
+                      {expandedTags[summary._id]
+                        ? "See less"
+                        : `+${summary.tags.length - 3} more`}
+                    </button>
+                  )}
+                </div>
 
-      {/* Bottom Section */}
-      <div className="flex items-center justify-between">
-        <span className="text-sm font-semibold text-gray-800">
-          📘 Study Material
-        </span>
-        <button
-          onClick={() => handleStudySummary(summary._id)}
-          className="px-4 py-2 text-sm font-semibold rounded-full bg-black text-white transition-all duration-300 hover:bg-gray-800 transform hover:scale-105 hover:shadow-lg"
-        >
-          Study
-        </button>
-      </div>
-    </div>
-  ))}
-</div>
+                {/* Bottom Section */}
+                <div className="flex items-center justify-between">
+                  <span className="text-sm font-semibold text-gray-800">
+                    📘 Study Material
+                  </span>
+                  <button
+                    onClick={() => handleStudySummary(summary._id)}
+                    className="px-4 py-2 text-sm font-semibold rounded-full bg-black text-white transition-all duration-300 hover:bg-gray-800 transform hover:scale-105 hover:shadow-lg"
+                  >
+                    Study
+                  </button>
+                </div>
+              </div>
+            ))}
+          </div>
 
           {/* Show More Button */}
           {summaries.length < 3 && (

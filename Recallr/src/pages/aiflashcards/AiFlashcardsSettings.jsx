@@ -7,12 +7,14 @@ import axios from "axios";
 import { toast } from "react-toastify";
 const API_URL = import.meta.env.VITE_API_URL;
 
-const FlashcardsSettings = ({ 
-  onClose = false, 
-  existingPdfId = null, 
-  onGenerate 
+const FlashcardsSettings = ({
+  onClose = false,
+  existingPdfId = null,
+  onGenerate,
 }) => {
-  const [sourceType, setSourceType] = useState(existingPdfId ? "library" : "upload");
+  const [sourceType, setSourceType] = useState(
+    existingPdfId ? "library" : "upload"
+  );
   const [numCards, setNumCards] = useState(5);
   const [questionType, setQuestionType] = useState("Q/A");
   const [difficulty, setDifficulty] = useState("Mixed");
@@ -36,7 +38,7 @@ const FlashcardsSettings = ({
     if (sourceType === "library" && !existingPdfId) {
       fetchUserLibrary();
     }
-    
+
     // If we have an existing PDF ID (from PDF details page), preselect it
     if (existingPdfId) {
       setSelectedLibraryPdf(existingPdfId);
@@ -49,10 +51,10 @@ const FlashcardsSettings = ({
       if (!token) return;
 
       const response = await axios.get(`${API_URL}/pdf/pdfs`, {
-        headers: { Authorization: `Bearer ${token}` }
+        headers: { Authorization: `Bearer ${token}` },
       });
-      console.log("pdf in library:::::",response.data)
-      
+      console.log("pdf in library:::::", response.data);
+
       setLibraryPdfs(response.data.pdfs);
     } catch (error) {
       console.error("Error fetching user library:", error);
@@ -66,14 +68,14 @@ const FlashcardsSettings = ({
       toast.error("Please select a PDF file before generating.");
       return;
     }
-    
+
     if (sourceType === "library" && !selectedLibraryPdf && !existingPdfId) {
       toast.error("Please select a PDF from your library.");
       return;
     }
 
     setIsLoading(true);
-    
+
     try {
       const token = localStorage.getItem("token");
       if (!token) {
@@ -85,17 +87,17 @@ const FlashcardsSettings = ({
       const userId = decodedToken.id;
 
       const formData = new FormData();
-      
+
       // Add file if uploading new PDF
       if (sourceType === "upload" && file) {
         formData.append("file", file);
       }
-      
+
       // Add PDF ID if using existing PDF
       if (sourceType === "library" && (selectedLibraryPdf || existingPdfId)) {
         formData.append("pdfId", selectedLibraryPdf || existingPdfId);
       }
-      
+
       formData.append("userId", userId);
       formData.append("sourceType", sourceType);
       formData.append("numCards", numCards);
@@ -103,28 +105,29 @@ const FlashcardsSettings = ({
       formData.append("difficulty", difficulty);
 
       const res = await axios.post(
-        `${API_URL}/flashcards/generate-flashcards`,
+        `${API_URL}/flashgenius/generate-flashcards`,
         formData,
         {
-          headers: { 
+          headers: {
             "Content-Type": "multipart/form-data",
-            Authorization: `Bearer ${token}`
+            Authorization: `Bearer ${token}`,
           },
         }
       );
 
       if (res.status === 200) {
         toast.success("Flashcards generated successfully!");
-        
+
         if (onGenerate) {
           onGenerate(res.data); // pass the generated flashcards data back
         }
-        
+
         handleClose();
       }
     } catch (err) {
       console.error("Error generating flashcards:", err);
-      const errorMessage = err.response?.data?.message || "Something went wrong!";
+      const errorMessage =
+        err.response?.data?.message || "Something went wrong!";
       toast.error(errorMessage);
     } finally {
       setIsLoading(false);
@@ -189,7 +192,9 @@ const FlashcardsSettings = ({
                     }`}
                   >
                     <Upload className="mx-auto mb-3 text-blue-500" size={32} />
-                    <div className="text-slate-800 font-medium">Upload File</div>
+                    <div className="text-slate-800 font-medium">
+                      Upload File
+                    </div>
                     <div className="text-slate-600 text-sm mt-1">
                       From your device
                     </div>
@@ -215,7 +220,10 @@ const FlashcardsSettings = ({
                         : "border-slate-200 bg-slate-50 hover:bg-slate-100"
                     }`}
                   >
-                    <Library className="mx-auto mb-3 text-purple-500" size={32} />
+                    <Library
+                      className="mx-auto mb-3 text-purple-500"
+                      size={32}
+                    />
                     <div className="text-slate-800 font-medium">My Library</div>
                     <div className="text-slate-600 text-sm mt-1">
                       Saved content

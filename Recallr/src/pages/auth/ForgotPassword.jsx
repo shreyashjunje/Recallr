@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { ChevronLeft, Mail, Lock, Key, Settings, Shield } from "lucide-react";
 import logo from "../../assets/logoR.png";
-import { useNavigate } from "react-router";
+import { useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
 import axios from "axios";
 import ForgotPasswordAnimation from "@/components/auth/ForgotPasswordAnimation";
@@ -149,8 +149,7 @@ export default function ForgotPassword() {
             </div>
 
             {/* Right Side - Illustration */}
-            <ForgotPasswordAnimation/>
-         
+            <ForgotPasswordAnimation />
           </div>
         </div>
 
