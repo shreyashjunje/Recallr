@@ -22,7 +22,8 @@ connectDb();
 
 app.use(
   cors({
-    origin: "http://localhost:5173", // your frontend origin
+    // origin: "http://localhost:5173", // your frontend origin
+    origin: "https://recallr-two.vercel.app/", // your frontend origin
     credentials: true,
   })
 );
