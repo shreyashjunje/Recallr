@@ -19,11 +19,21 @@ require("./config/passport");
 let cors = require("cors");
 
 connectDb();
+const allowedOrigins = [
+  "http://localhost:5173",
+  "https://recallr-two.vercel.app",
+];
 
 app.use(
   cors({
     // origin: "http://localhost:5173", // your frontend origin
-    origin: "https://recallr-two.vercel.app/", // your frontend origin
+    origin: function (origin, callback) {
+      if (!origin || allowedOrigins.includes(origin)) {
+        callback(null, true);
+      } else {
+        callback(new Error("Not allowed by CORS"));
+      }
+    },
     credentials: true,
   })
 );
@@ -51,7 +61,7 @@ app.get("/", (req, res) => {
   res.send("Hello, World!");
 });
 
-const PORT = process.env.PORT;
+const PORT = process.env.PORT || 5000;
 
 app.listen(PORT, () => {
   console.log(`Server is running on port ${PORT}`);
