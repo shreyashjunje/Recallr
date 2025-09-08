@@ -285,7 +285,7 @@ const QuizMasterHome = () => {
         </div>
 
         {/* Main Content */}
-        <div className="container mx-auto px-6 py-12">
+        <div className="container mx-auto px-2 md:px-4 lg:px-6 py-12">
           {/* Header Section */}
           <div className="flex flex-col lg:flex-row justify-between items-start lg:items-center mb-8 gap-4">
             <div>
@@ -402,11 +402,13 @@ const QuizMasterHome = () => {
           </div>
 
           {/* Quiz Cards Grid */}
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-8">
             {filteredQuizzes.map((quiz, index) => (
               <div
                 key={quiz._id}
-                className="group relative rounded-3xl shadow-md transition-all duration-500 ease-out p-6 flex flex-col justify-between transform hover:-translate-y-2 hover:scale-[1.02] hover:shadow-2xl"
+                className="group relative rounded-2xl sm:rounded-3xl shadow-md transition-all duration-500 ease-out 
+                 p-4 sm:p-6 flex flex-col justify-between 
+                 transform hover:-translate-y-2 hover:scale-[1.02] hover:shadow-2xl"
                 style={{
                   backgroundColor: [
                     "#FFE5D9", // soft peach
@@ -419,29 +421,29 @@ const QuizMasterHome = () => {
                 }}
               >
                 {/* Card Header */}
-                <div className="mb-6">
-                  <div className="flex justify-between items-start mb-3">
+                <div className="mb-4 sm:mb-6">
+                  <div className="flex justify-between items-start mb-2 sm:mb-3">
                     <span
-                      className={`px-3 py-1 rounded-full text-xs font-medium bg-white/70 shadow-sm ${getDifficultyColor(
+                      className={`px-2 sm:px-3 py-0.5 sm:py-1 rounded-full text-[10px] sm:text-xs font-medium bg-white/70 shadow-sm ${getDifficultyColor(
                         quiz.settings?.difficulty
                       )}`}
                     >
                       {quiz.settings?.difficulty || "Mixed"}
                     </span>
-                    <div className="flex items-center gap-1 text-gray-600 bg-white/70 px-2 py-1 rounded-full shadow-sm">
+                    <div className="flex items-center gap-1 text-gray-600 bg-white/70 px-2 py-0.5 sm:py-1 rounded-full shadow-sm">
                       {getModeIcon(quiz.settings?.mode)}
-                      <span className="text-xs">
+                      <span className="text-[10px] sm:text-xs">
                         {quiz.settings?.mode || "Practice"}
                       </span>
                     </div>
                   </div>
 
-                  <h3 className="text-xl font-bold text-gray-900 mb-2 group-hover:text-gray-800 transition-colors h-[60px]">
+                  <h3 className="text-lg sm:text-xl font-bold text-gray-900 mb-1 sm:mb-2 group-hover:text-gray-800 transition-colors h-[50px] sm:h-[60px]">
                     {quiz.title}
                   </h3>
 
-                  <p className="text-sm text-gray-700 flex items-center gap-2">
-                    <BookOpen className="w-4 h-4" />
+                  <p className="text-xs sm:text-sm text-gray-700 flex items-center gap-1 sm:gap-2">
+                    <BookOpen className="w-3 h-3 sm:w-4 sm:h-4" />
                     {quiz.category || "General"}
                   </p>
                 </div>
@@ -449,36 +451,40 @@ const QuizMasterHome = () => {
                 {/* Card Body */}
                 <div className="flex flex-col flex-grow">
                   {/* Quiz Stats */}
-                  <div className="grid grid-cols-2 gap-4 mb-4">
-                    <div className="text-center p-3 bg-white/70 rounded-xl shadow-sm">
-                      <div className="flex items-center justify-center gap-1 text-blue-600 mb-1">
-                        <Target className="w-4 h-4" />
-                        <span className="text-xs font-medium">Questions</span>
+                  <div className="grid grid-cols-2 gap-3 sm:gap-4 mb-3 sm:mb-4">
+                    <div className="text-center p-2 sm:p-3 bg-white/70 rounded-lg sm:rounded-xl shadow-sm">
+                      <div className="flex items-center justify-center gap-1 text-blue-600 mb-0.5 sm:mb-1">
+                        <Target className="w-3 h-3 sm:w-4 sm:h-4" />
+                        <span className="text-[10px] sm:text-xs font-medium">
+                          Questions
+                        </span>
                       </div>
-                      <p className="text-lg font-bold text-gray-900">
+                      <p className="text-base sm:text-lg font-bold text-gray-900">
                         {quiz.settings?.numQuestions || 10}
                       </p>
                     </div>
-                    <div className="text-center p-3 bg-white/70 rounded-xl shadow-sm">
-                      <div className="flex items-center justify-center gap-1 text-green-600 mb-1">
-                        <Timer className="w-4 h-4" />
-                        <span className="text-xs font-medium">Time</span>
+                    <div className="text-center p-2 sm:p-3 bg-white/70 rounded-lg sm:rounded-xl shadow-sm">
+                      <div className="flex items-center justify-center gap-1 text-green-600 mb-0.5 sm:mb-1">
+                        <Timer className="w-3 h-3 sm:w-4 sm:h-4" />
+                        <span className="text-[10px] sm:text-xs font-medium">
+                          Time
+                        </span>
                       </div>
-                      <p className="text-lg font-bold text-gray-900">
+                      <p className="text-base sm:text-lg font-bold text-gray-900">
                         {Math.floor((quiz.settings?.timeLimit || 600) / 60)}m
                       </p>
                     </div>
                   </div>
 
                   {/* Tags */}
-                  <div className="mb-6 h-[80px]">
-                    <div className="flex items-center gap-2 mb-2">
-                      <Tag className="w-4 h-4 text-gray-400" />
-                      <span className="text-sm font-medium text-gray-700">
+                  <div className="mb-4 sm:mb-6 h-[70px] sm:h-[80px]">
+                    <div className="flex items-center gap-1 sm:gap-2 mb-1 sm:mb-2">
+                      <Tag className="w-3 h-3 sm:w-4 sm:h-4 text-gray-400" />
+                      <span className="text-xs sm:text-sm font-medium text-gray-700">
                         Topics
                       </span>
                     </div>
-                    <div className="flex flex-wrap gap-2">
+                    <div className="flex flex-wrap gap-1.5 sm:gap-2">
                       {quiz.tags && quiz.tags.length > 0 ? (
                         <>
                           {(expandedTags[quiz._id]
@@ -487,7 +493,7 @@ const QuizMasterHome = () => {
                           ).map((tag, index) => (
                             <span
                               key={index}
-                              className="px-3 py-1 bg-white/70 text-gray-800 text-xs rounded-full font-medium shadow-sm"
+                              className="px-2 sm:px-3 py-0.5 sm:py-1 bg-white/70 text-gray-800 text-[10px] sm:text-xs rounded-full font-medium shadow-sm"
                             >
                               {tag}
                             </span>
@@ -495,7 +501,7 @@ const QuizMasterHome = () => {
                           {quiz.tags.length > 3 && (
                             <button
                               onClick={() => toggleTags(quiz._id)}
-                              className="px-2 py-1 text-xs text-gray-700 bg-white/60 hover:bg-white rounded-full"
+                              className="px-2 py-0.5 text-[10px] sm:text-xs text-gray-700 bg-white/60 hover:bg-white rounded-full"
                             >
                               {expandedTags[quiz._id]
                                 ? "See less"
@@ -504,7 +510,7 @@ const QuizMasterHome = () => {
                           )}
                         </>
                       ) : (
-                        <span className="text-xs text-gray-500">
+                        <span className="text-[10px] sm:text-xs text-gray-500">
                           No tags available
                         </span>
                       )}
@@ -514,25 +520,25 @@ const QuizMasterHome = () => {
                   {/* Action Button */}
                   <button
                     onClick={() => handleStudyQuiz(quiz._id)}
-                    className="w-full mb-4 bg-black text-white font-semibold py-3 px-4 rounded-full transition-all duration-300 flex items-center justify-center gap-2 group-hover:opacity-100 transform translate-y-2 group-hover:translate-y-0 hover:scale-105 hover:shadow-lg"
+                    className="w-full mb-3 sm:mb-4 bg-black text-white font-semibold py-2 sm:py-3 px-3 sm:px-4 rounded-full transition-all duration-300 flex items-center justify-center gap-1.5 sm:gap-2 group-hover:opacity-100 transform translate-y-1 sm:translate-y-2 group-hover:translate-y-0 hover:scale-105 hover:shadow-lg text-sm sm:text-base"
                   >
-                    <Zap className="w-5 h-5" />
+                    <Zap className="w-4 h-4 sm:w-5 sm:h-5" />
                     Start Studying
                   </button>
                 </div>
 
                 {/* Card Footer */}
-                <div className="pt-4">
-                  <div className="flex items-center justify-between text-xs text-gray-600">
-                    <span className="text-xs font-medium bg-white/70 px-3 py-1 rounded-full shadow-sm">
+                <div className="pt-3 sm:pt-4">
+                  <div className="flex items-center justify-between text-[10px] sm:text-xs text-gray-600">
+                    <span className="font-medium bg-white/70 px-2 sm:px-3 py-0.5 sm:py-1 rounded-full shadow-sm">
                       {formatDate(quiz.createdAt)}
                     </span>
-                    <div className="flex items-center gap-2">
+                    <div className="flex items-center gap-1 sm:gap-2 flex-wrap">
                       {quiz.settings?.questionTypes &&
                         quiz.settings.questionTypes.map((type, index) => (
                           <span
                             key={index}
-                            className="px-2 py-1 bg-white/70 text-gray-800 rounded-full shadow-sm text-xs"
+                            className="px-2 py-0.5 bg-white/70 text-gray-800 rounded-full shadow-sm text-[10px] sm:text-xs"
                           >
                             {type}
                           </span>

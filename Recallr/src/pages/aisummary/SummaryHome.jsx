@@ -336,7 +336,7 @@ const SummaryHome = () => {
 
   return (
     <div className="min-h-screen bg-gray-50">
-      <div className="relative max-w-6xl mx-auto px-6 py-12">
+      <div className="relative max-w-6xl mx-auto px-2 lg:px-6 py-12">
         {/* Header */}
         <header className="text-center mb-16 ">
           <div className="flex items-center justify-center mb-8 group">
@@ -421,7 +421,7 @@ const SummaryHome = () => {
         </div>
 
         {/* Main Content */}
-        <div className="container mx-auto px-6 py-12">
+        <div className="container mx-auto px-2 md:px-4 lg:px-6 py-12">
           {/* Header Section */}
           <div className="flex flex-col lg:flex-row justify-between items-start lg:items-center mb-8 gap-4">
             <div>
@@ -451,7 +451,7 @@ const SummaryHome = () => {
             {summaries.map((summary, idx) => (
               <div
                 key={summary._id}
-                className={`relative rounded-3xl shadow-md transition-all duration-500 ease-out p-6 flex flex-col justify-between transform hover:-translate-y-2 hover:scale-[1.02] hover:shadow-2xl`}
+                className={`relative rounded-3xl shadow-md transition-all duration-500 ease-out p-4 lg:p-6 flex flex-col justify-between transform hover:-translate-y-2 hover:scale-[1.02] hover:shadow-2xl`}
                 style={{
                   backgroundColor: [
                     "#FFE5D9", // soft peach

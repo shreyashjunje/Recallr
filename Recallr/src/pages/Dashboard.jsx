@@ -553,7 +553,7 @@ const Dashboard = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-100 p-4 sm:p-6 overflow-hidden">
+    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-100 p-4 sm:p-4 overflow-hidden">
       <div className="max-w-7xl mx-auto space-y-8">
         {/* Header with Motivational Quote and Study Reminder */}
         <DashboardHeader />
@@ -598,18 +598,18 @@ const Dashboard = () => {
         </div>
 
         {/* Todo Section with Enhanced Design */}
-        <div className="bg-white rounded-3xl shadow-xl p-6 sm:p-8 border border-gray-100 hover:shadow-2xl transition-all duration-500">
+        <div className="bg-white rounded-3xl shadow-xl p-5 sm:p-8 border border-gray-100 hover:shadow-2xl transition-all duration-500">
           {/* Header */}
           <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-8">
             <div className="flex items-center gap-4">
               <div className="p-3 bg-gradient-to-br from-green-500 to-emerald-500 rounded-2xl text-white shadow-lg">
-                <Check className="w-6 h-6" />
+                <Check className="w-6 h-6 sm:w-7 sm:h-7" />
               </div>
               <div>
-                <h2 className="text-xl sm:text-2xl font-bold text-gray-900">
+                <h2 className="text-lg sm:text-xl md:text-2xl font-bold text-gray-900">
                   Task Management
                 </h2>
-                <p className="text-gray-600 text-sm sm:text-base">
+                <p className="text-gray-600 text-xs sm:text-sm md:text-base">
                   Stay organized and productive
                 </p>
               </div>
@@ -617,7 +617,7 @@ const Dashboard = () => {
 
             {/* Completed Badge */}
             <div className="flex items-center gap-2 bg-gradient-to-r from-green-50 to-emerald-50 px-3 sm:px-4 py-2 rounded-xl w-fit mx-auto sm:mx-0">
-              <div className="w-3 h-3 bg-green-500 rounded-full"></div>
+              <div className="w-2.5 h-2.5 sm:w-3 sm:h-3 bg-green-500 rounded-full"></div>
               <span className="text-xs sm:text-sm font-medium text-green-700">
                 {completedCount}/{totalCount} completed
               </span>
@@ -638,7 +638,7 @@ const Dashboard = () => {
               <button
                 key={filter.key}
                 onClick={() => setTodoFilter(filter.key)}
-                className={`px-3 sm:px-4 py-2 rounded-xl font-medium text-sm transition-all duration-300 ${
+                className={`px-3 sm:px-4 py-2 rounded-xl font-medium text-xs sm:text-sm transition-all duration-300 ${
                   todoFilter === filter.key
                     ? "bg-gradient-to-r from-green-500 to-emerald-500 text-white shadow-lg"
                     : "bg-gray-100 text-gray-600 hover:bg-gray-200"
@@ -683,8 +683,8 @@ const Dashboard = () => {
           {/* Todo List */}
           <div className="space-y-3 sm:space-y-4">
             {filteredTodos.length === 0 ? (
-              <div className="text-center py-10 sm:py-12">
-                <div className="p-3 sm:p-4 bg-gray-100 rounded-full w-14 h-14 sm:w-16 sm:h-16 mx-auto mb-4 flex items-center justify-center">
+              <div className="text-center py-8 sm:py-12">
+                <div className="p-3 sm:p-4 bg-gray-100 rounded-full w-12 h-12 sm:w-16 sm:h-16 mx-auto mb-4 flex items-center justify-center">
                   <Check className="w-6 h-6 sm:w-8 sm:h-8 text-gray-400" />
                 </div>
                 <p className="text-gray-500 font-medium text-sm sm:text-base">
@@ -713,20 +713,20 @@ const Dashboard = () => {
                   {/* Checkbox */}
                   <button
                     onClick={() => toggleTodo(task._id)}
-                    className={`w-6 h-6 rounded-full border-2 flex items-center justify-center transition-all duration-300 ${
+                    className={`w-6 h-6 sm:w-7 sm:h-7 rounded-full border-2 flex items-center justify-center transition-all duration-300 ${
                       task.status === "completed"
                         ? "bg-green-600 border-green-600 text-white"
                         : "border-gray-300 hover:border-green-600 hover:bg-green-50"
                     }`}
                   >
                     {task.status === "completed" && (
-                      <Check className="w-4 h-4" />
+                      <Check className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
                     )}
                   </button>
 
                   {/* Priority */}
                   <span
-                    className={`inline-block px-2 sm:px-3 py-1 rounded-full text-xs font-medium border ${getPriorityColor(
+                    className={`inline-block px-2 sm:px-3 py-1 rounded-full text-[10px] sm:text-xs font-medium border ${getPriorityColor(
                       task.priority
                     )}`}
                   >
@@ -766,18 +766,18 @@ const Dashboard = () => {
                       >
                         {task.title}
                       </span>
-                      <div className="flex gap-2 opacity-100 sm:opacity-0 sm:group-hover:opacity-100 transition-opacity">
+                      <div className="flex gap-2 sm:gap-3 opacity-100 sm:opacity-0 sm:group-hover:opacity-100 transition-opacity">
                         <button
                           onClick={() => startEdit(task)}
                           className="text-blue-600 hover:text-blue-800 p-2 rounded-lg hover:bg-blue-50"
                         >
-                          <Edit2 className="w-4 h-4" />
+                          <Edit2 className="w-4 h-4 sm:w-5 sm:h-5" />
                         </button>
                         <button
                           onClick={() => deleteTodo(task._id)}
                           className="text-red-600 hover:text-red-800 p-2 rounded-lg hover:bg-red-50"
                         >
-                          <Trash2 className="w-4 h-4" />
+                          <Trash2 className="w-4 h-4 sm:w-5 sm:h-5" />
                         </button>
                       </div>
                     </>

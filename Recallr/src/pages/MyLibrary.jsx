@@ -596,46 +596,62 @@ const MyLibrary = () => {
     <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100">
       {/* Header */}
       <div className="sticky top-0 z-10 bg-white/95 backdrop-blur-sm border-b border-gray-200 shadow-sm">
-        <div className="max-w-7xl mx-auto px-6 py-6">
-          <div className="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-4 mb-6">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 py-4 sm:py-6">
+          {/* Header */}
+          <div className="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-3 sm:gap-4 mb-4 sm:mb-6">
             <div>
-              <h1 className="text-4xl font-bold bg-gradient-to-r from-gray-800 to-gray-600 bg-clip-text text-transparent">
+              <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold bg-gradient-to-r from-gray-800 to-gray-600 bg-clip-text text-transparent">
                 My Library
               </h1>
-              <p className="text-gray-600 mt-1">
+              <p className="text-sm sm:text-base text-gray-600 mt-1">
                 {filteredPdfs.length}{" "}
                 {filteredPdfs.length === 1 ? "document" : "documents"} in your
                 collection
               </p>
             </div>
+
+            {/* Upload Button */}
             <button
-              className="flex items-center space-x-2 px-6 py-3 bg-gradient-to-r from-blue-600 to-blue-700 text-white rounded-xl font-medium hover:from-blue-700 hover:to-blue-800 transition-all duration-200 shadow-lg hover:shadow-blue-500/25 hover:scale-[1.02] active:scale-95"
+              className="flex items-center space-x-2 px-4 sm:px-6 py-2.5 sm:py-3 
+                   bg-gradient-to-r from-blue-600 to-blue-700 text-white rounded-lg sm:rounded-xl 
+                   font-medium text-sm sm:text-base 
+                   hover:from-blue-700 hover:to-blue-800 transition-all duration-200 shadow-md hover:shadow-blue-500/25 
+                   hover:scale-[1.02] active:scale-95 w-full sm:w-auto justify-center"
               onClick={() => setIsModalOpen(true)}
             >
-              <Upload className="w-5 h-5" />
+              <Upload className="w-4 h-4 sm:w-5 sm:h-5" />
               <span>Upload New PDF</span>
             </button>
           </div>
 
-          {/* Search and Filters */}
-          <div className="flex flex-col lg:flex-row gap-4 items-stretch lg:items-center">
+          {/* Search + Filters */}
+          <div className="flex flex-col lg:flex-row gap-3 sm:gap-4 items-stretch lg:items-center">
+            {/* Search */}
             <div className="flex-1 relative">
-              <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
+              <Search className="absolute left-3 sm:left-4 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4 sm:w-5 sm:h-5" />
               <input
                 type="text"
                 placeholder="Search PDFs, tags, or content..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                className="w-full pl-12 pr-4 py-3 bg-white border border-gray-300 rounded-xl text-gray-900 placeholder-gray-500 focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 transition-all duration-200 shadow-sm"
+                className="w-full pl-10 sm:pl-12 pr-3 sm:pr-4 py-2.5 sm:py-3 bg-white border border-gray-300 rounded-lg sm:rounded-xl 
+                     text-sm sm:text-base text-gray-900 placeholder-gray-500 
+                     focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 
+                     transition-all duration-200 shadow-sm"
               />
             </div>
 
-            <div className="flex gap-3 flex-wrap lg:flex-nowrap">
-              <div className="relative flex-1 lg:flex-none min-w-[180px]">
+            {/* Filters */}
+            <div className="flex flex-wrap lg:flex-nowrap gap-3 w-full lg:w-auto">
+              {/* Category Filter */}
+              <div className="relative flex-1 lg:flex-none min-w-[140px] sm:min-w-[180px]">
                 <select
                   value={selectedCategory}
                   onChange={(e) => setSelectedCategory(e.target.value)}
-                  className="appearance-none bg-white border border-gray-300 rounded-xl px-4 py-3 pr-10 text-gray-700 focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 transition-all duration-200 shadow-sm w-full"
+                  className="appearance-none bg-white border border-gray-300 rounded-lg sm:rounded-xl px-3 sm:px-4 py-2.5 sm:py-3 pr-8 sm:pr-10 
+                       text-sm sm:text-base text-gray-700 
+                       focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 
+                       transition-all duration-200 shadow-sm w-full"
                 >
                   {categories.map((category) => (
                     <option key={category} value={category}>
@@ -643,14 +659,18 @@ const MyLibrary = () => {
                     </option>
                   ))}
                 </select>
-                <ChevronDown className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5 pointer-events-none" />
+                <ChevronDown className="absolute right-2 sm:right-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4 sm:w-5 sm:h-5 pointer-events-none" />
               </div>
 
-              <div className="relative flex-1 lg:flex-none min-w-[160px]">
+              {/* Sort Filter */}
+              <div className="relative flex-1 lg:flex-none min-w-[120px] sm:min-w-[160px]">
                 <select
                   value={sortBy}
                   onChange={(e) => setSortBy(e.target.value)}
-                  className="appearance-none bg-white border border-gray-300 rounded-xl px-4 py-3 pr-10 text-gray-700 focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 transition-all duration-200 shadow-sm w-full"
+                  className="appearance-none bg-white border border-gray-300 rounded-lg sm:rounded-xl px-3 sm:px-4 py-2.5 sm:py-3 pr-8 sm:pr-10 
+                       text-sm sm:text-base text-gray-700 
+                       focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 
+                       transition-all duration-200 shadow-sm w-full"
                 >
                   {sortOptions.map((option) => (
                     <option key={option} value={option}>
@@ -658,38 +678,39 @@ const MyLibrary = () => {
                     </option>
                   ))}
                 </select>
-                <ChevronDown className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5 pointer-events-none" />
+                <ChevronDown className="absolute right-2 sm:right-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4 sm:w-5 sm:h-5 pointer-events-none" />
               </div>
 
               {/* View Mode Toggle */}
-              <div className="flex border border-gray-300 rounded-xl p-1 bg-white shadow-sm">
+              <div className="flex border border-gray-300 rounded-lg sm:rounded-xl p-0.5 sm:p-1 bg-white shadow-sm w-full sm:w-auto justify-center">
                 <button
                   onClick={() => setViewMode("grid")}
-                  className={`p-2 rounded-lg transition-all duration-200 ${
+                  className={`p-2 sm:p-2.5 rounded-md sm:rounded-lg transition-all duration-200 ${
                     viewMode === "grid"
                       ? "bg-blue-600 text-white shadow-sm"
                       : "text-gray-500 hover:text-gray-700 hover:bg-gray-50"
                   }`}
                 >
-                  <Grid className="w-4 h-4" />
+                  <Grid className="w-4 h-4 sm:w-5 sm:h-5" />
                 </button>
                 <button
                   onClick={() => setViewMode("list")}
-                  className={`p-2 rounded-lg transition-all duration-200 ${
+                  className={`p-2 sm:p-2.5 rounded-md sm:rounded-lg transition-all duration-200 ${
                     viewMode === "list"
                       ? "bg-blue-600 text-white shadow-sm"
                       : "text-gray-500 hover:text-gray-700 hover:bg-gray-50"
                   }`}
                 >
-                  <List className="w-4 h-4" />
+                  <List className="w-4 h-4 sm:w-5 sm:h-5" />
                 </button>
               </div>
             </div>
           </div>
         </div>
       </div>
+
       {/* PDF Grid/List */}
-      <div className="max-w-7xl mx-auto px-6 py-8 ">
+      <div className="max-w-7xl mx-auto px-2 md:px-4 lg:px-6 py-8 ">
         {loading ? (
           <div className="flex justify-center items-center py-20">
             <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500"></div>
