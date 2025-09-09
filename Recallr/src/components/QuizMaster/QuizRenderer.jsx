@@ -44,19 +44,19 @@ export function QuestionRenderer({
             onClick={() =>
               handleMCQChange(option, question.multipleSelect || false)
             }
-            className={`w-full p-4 text-left rounded-xl border-2 transition-all duration-200 ${
+            className={`w-full p-3 sm:p-4 text-left rounded-xl border-2 transition-all duration-200 text-sm sm:text-base ${
               isSelected
                 ? "border-purple-500 bg-purple-500/10 text-white"
                 : "border-slate-600/50 hover:border-purple-500/50 bg-slate-800/30 text-slate-300 hover:text-white"
             }`}
           >
             <div className="flex items-center gap-3">
-              <span className="w-8 h-8 rounded-full bg-slate-700/50 flex items-center justify-center text-sm font-medium text-purple-300">
+              <span className="w-7 h-7 sm:w-8 sm:h-8 rounded-full bg-slate-700/50 flex items-center justify-center text-xs sm:text-sm font-medium text-purple-300">
                 {String.fromCharCode(65 + index)}
               </span>
               <span className="flex-1">{option}</span>
               {question.multipleSelect && isSelected && (
-                <Check className="w-5 h-5 text-purple-400" />
+                <Check className="w-4 h-4 sm:w-5 sm:h-5 text-purple-400" />
               )}
             </div>
           </button>
@@ -66,27 +66,27 @@ export function QuestionRenderer({
   );
 
   const renderTrueFalse = () => (
-    <div className="flex gap-4 justify-center">
+    <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 justify-center">
       <button
         onClick={() => handleTrueFalseChange(true)}
-        className={`flex items-center gap-3 px-8 py-4 rounded-xl border-2 transition-all duration-200 ${
+        className={`flex items-center gap-2 sm:gap-3 px-6 sm:px-8 py-3 sm:py-4 rounded-xl border-2 transition-all duration-200 text-sm sm:text-base ${
           userAnswer?.answer === "true"
             ? "border-green-500 bg-green-500/10 text-white"
             : "border-slate-600/50 hover:border-green-500/50 bg-slate-800/30 text-slate-300 hover:text-white"
         }`}
       >
-        <Check className="w-6 h-6" />
+        <Check className="w-5 h-5 sm:w-6 sm:h-6" />
         <span className="font-medium">True</span>
       </button>
       <button
         onClick={() => handleTrueFalseChange(false)}
-        className={`flex items-center gap-3 px-8 py-4 rounded-xl border-2 transition-all duration-200 ${
+        className={`flex items-center gap-2 sm:gap-3 px-6 sm:px-8 py-3 sm:py-4 rounded-xl border-2 transition-all duration-200 text-sm sm:text-base ${
           userAnswer?.answer === "false"
             ? "border-red-500 bg-red-500/10 text-white"
             : "border-slate-600/50 hover:border-red-500/50 bg-slate-800/30 text-slate-300 hover:text-white"
         }`}
       >
-        <X className="w-6 h-6" />
+        <X className="w-5 h-5 sm:w-6 sm:h-6" />
         <span className="font-medium">False</span>
       </button>
     </div>
@@ -98,7 +98,9 @@ export function QuestionRenderer({
       value={typeof userAnswer?.answer === "string" ? userAnswer.answer : ""}
       onChange={(e) => handleTextChange(e.target.value)}
       placeholder="Type your answer here..."
-      className="w-full p-4 bg-slate-800/30 border-2 border-slate-600/50 rounded-xl text-white placeholder-slate-400 focus:border-purple-500 focus:outline-none transition-colors duration-200"
+      className="w-full p-3 sm:p-4 bg-slate-800/30 border-2 border-slate-600/50 rounded-xl 
+                 text-sm sm:text-base text-white placeholder-slate-400 
+                 focus:border-purple-500 focus:outline-none transition-colors duration-200"
     />
   );
 
@@ -117,11 +119,13 @@ export function QuestionRenderer({
           onChange={(e) => handleTextChange(e.target.value)}
           placeholder="Type your detailed answer here..."
           rows={4}
-          className="w-full p-4 bg-slate-800/30 border-2 border-slate-600/50 rounded-xl text-white placeholder-slate-400 focus:border-purple-500 focus:outline-none transition-colors duration-200 resize-none"
+          className="w-full p-3 sm:p-4 bg-slate-800/30 border-2 border-slate-600/50 rounded-xl 
+                     text-sm sm:text-base text-white placeholder-slate-400 
+                     focus:border-purple-500 focus:outline-none transition-colors duration-200 resize-none"
         />
         {question.wordLimit && (
           <div
-            className={`text-right text-sm ${
+            className={`text-right text-xs sm:text-sm ${
               isOverLimit ? "text-red-400" : "text-slate-400"
             }`}
           >
@@ -132,9 +136,9 @@ export function QuestionRenderer({
     );
   };
 
-  // Determine which component to render based on question type
+  // Decide what to render
   const renderQuestionContent = () => {
-    switch(question.type) {
+    switch (question.type) {
       case "MCQ":
         return renderMCQ();
       case "TrueFalse":
@@ -149,19 +153,21 @@ export function QuestionRenderer({
   };
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-6 w-full">
+      {/* Header */}
       <div className="text-center">
-        <div className="inline-flex items-center gap-2 px-4 py-2 bg-purple-500/20 rounded-full text-purple-300 text-sm font-medium mb-4">
+        <div className="inline-flex items-center gap-2 px-3 sm:px-4 py-1.5 sm:py-2 
+                        bg-purple-500/20 rounded-full text-purple-300 
+                        text-xs sm:text-sm font-medium mb-3 sm:mb-4">
           <span>{question.points} points</span>
         </div>
-        <h2 className="text-2xl font-semibold text-white leading-relaxed">
+        <h2 className="text-lg sm:text-xl md:text-2xl font-semibold text-white leading-relaxed">
           {question.questionText}
         </h2>
       </div>
 
-      <div className="mt-8 space-y-6">
-        {renderQuestionContent()}
-      </div>
+      {/* Question Content */}
+      <div className="mt-6 sm:mt-8 space-y-6">{renderQuestionContent()}</div>
     </div>
   );
 }

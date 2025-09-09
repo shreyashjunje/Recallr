@@ -463,47 +463,7 @@ const MyLibrary = () => {
     navigate("/view", { state: { url: pdf.cloudinaryUrl, pdfId: pdf._id } });
     // navigate("/view", { state: { pdfUrl: pdf.cloudinaryUrl ,fileName:pdf.title });
   };
-  // Edit handler
-  // const editHandler = async (pdfData) => {
-  //   if (!selectedPdf) return;
 
-  //   const token = localStorage.getItem("token");
-  //   if (!token) {
-  //     toast.error("You are not logged in");
-  //     return;
-  //   }
-
-  //   const decodedToken = jwtDecode(token);
-  //   const userID = decodedToken.id;
-
-  //   console.log("selectedpdfF", selectedPdf);
-  //   console.log("userID", userID);
-
-  //   try {
-  //     const pdfData = {
-  //       title,
-  //       category,
-  //       tags: tags.split(",").map((t) => t.trim()),
-  //     };
-
-  //     const res = await axios.patch(
-  //       `${API_URL}/pdf/edit-pdf`,
-  //       { userId: userID, pdfId: selectedPdf._id, ...pdfData },
-  //       { headers: { Authorization: `Bearer ${token}` } }
-  //     );
-
-  //     if (res.status === 200) {
-  //       toast.success("PDF details updated successfully");
-  //     }
-
-  //     setShowModal(false);
-  //     setSelectedPdf(null);
-  //     fetchPdfs(); // refresh list
-  //   } catch (error) {
-  //     console.error("Error updating PDF:", error);
-  //     toast.error("Failed to update PDF details");
-  //   }
-  // };
   const editHandler = async () => {
     if (!selectedPdf) return;
 
@@ -544,26 +504,6 @@ const MyLibrary = () => {
     }
   };
 
-  // const handledownload = async (pdf) => {
-
-  //   const pdfUrl=pdf.cloudinaryUrl
-  //   const pdfname=pdf?.originalName
-  //   console.log("downloded pdf:::",pdf)
-  //   try {
-  //     const response = await fetch(pdfUrl);
-  //     const blob = await response.blob();
-  //     const url = window.URL.createObjectURL(blob);
-  //     const a = document.createElement("a");
-  //     a.href = url;
-  //     a.download =  "myfile.pdf"// You can also dynamically name the file here
-  //     document.body.appendChild(a);
-  //     a.click();
-  //     a.remove();
-  //     window.URL.revokeObjectURL(url);
-  //   } catch (err) {
-  //     console.error("Download failed:", err);
-  //   }
-  // };
   const handledownload = async (pdf) => {
     const pdfName =
       pdf.originalName && pdf.originalName.trim() !== ""
@@ -612,10 +552,10 @@ const MyLibrary = () => {
 
             {/* Upload Button */}
             <button
-              className="flex items-center space-x-2 px-4 sm:px-6 py-2.5 sm:py-3 
-                   bg-gradient-to-r from-blue-600 to-blue-700 text-white rounded-lg sm:rounded-xl 
-                   font-medium text-sm sm:text-base 
-                   hover:from-blue-700 hover:to-blue-800 transition-all duration-200 shadow-md hover:shadow-blue-500/25 
+              className="flex items-center space-x-2 px-4 sm:px-6 py-2.5 sm:py-3
+                   bg-gradient-to-r from-blue-600 to-blue-700 text-white rounded-lg sm:rounded-xl
+                   font-medium text-sm sm:text-base
+                   hover:from-blue-700 hover:to-blue-800 transition-all duration-200 shadow-md hover:shadow-blue-500/25
                    hover:scale-[1.02] active:scale-95 w-full sm:w-auto justify-center"
               onClick={() => setIsModalOpen(true)}
             >
@@ -634,9 +574,9 @@ const MyLibrary = () => {
                 placeholder="Search PDFs, tags, or content..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                className="w-full pl-10 sm:pl-12 pr-3 sm:pr-4 py-2.5 sm:py-3 bg-white border border-gray-300 rounded-lg sm:rounded-xl 
-                     text-sm sm:text-base text-gray-900 placeholder-gray-500 
-                     focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 
+                className="w-full pl-10 sm:pl-12 pr-3 sm:pr-4 py-2.5 sm:py-3 bg-white border border-gray-300 rounded-lg sm:rounded-xl
+                     text-sm sm:text-base text-gray-900 placeholder-gray-500
+                     focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20
                      transition-all duration-200 shadow-sm"
               />
             </div>
@@ -648,9 +588,9 @@ const MyLibrary = () => {
                 <select
                   value={selectedCategory}
                   onChange={(e) => setSelectedCategory(e.target.value)}
-                  className="appearance-none bg-white border border-gray-300 rounded-lg sm:rounded-xl px-3 sm:px-4 py-2.5 sm:py-3 pr-8 sm:pr-10 
-                       text-sm sm:text-base text-gray-700 
-                       focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 
+                  className="appearance-none bg-white border border-gray-300 rounded-lg sm:rounded-xl px-3 sm:px-4 py-2.5 sm:py-3 pr-8 sm:pr-10
+                       text-sm sm:text-base text-gray-700
+                       focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20
                        transition-all duration-200 shadow-sm w-full"
                 >
                   {categories.map((category) => (
@@ -667,9 +607,9 @@ const MyLibrary = () => {
                 <select
                   value={sortBy}
                   onChange={(e) => setSortBy(e.target.value)}
-                  className="appearance-none bg-white border border-gray-300 rounded-lg sm:rounded-xl px-3 sm:px-4 py-2.5 sm:py-3 pr-8 sm:pr-10 
-                       text-sm sm:text-base text-gray-700 
-                       focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 
+                  className="appearance-none bg-white border border-gray-300 rounded-lg sm:rounded-xl px-3 sm:px-4 py-2.5 sm:py-3 pr-8 sm:pr-10
+                       text-sm sm:text-base text-gray-700
+                       focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20
                        transition-all duration-200 shadow-sm w-full"
                 >
                   {sortOptions.map((option) => (
@@ -960,243 +900,258 @@ const MyLibrary = () => {
             ))}
           </div>
         ) : (
-          <div className="space-y-5">
-            {filteredPdfs.map((pdf) => (
+        <div className="space-y-5">
+  {filteredPdfs.map((pdf) => (
+    <div
+      key={pdf._id}
+      className="group relative bg-white rounded-2xl transition-all duration-300 p-5 flex flex-col md:flex-row md:items-center gap-5 hover:shadow-lg hover:border-transparent cursor-pointer border border-gray-100"
+      onClick={(e) => {
+        if (!e.target.closest("button, a, [role='button']")) {
+          handlePdfDetails(pdf._id);
+        }
+      }}
+    >
+      {/* PDF Icon */}
+      <div
+        className={`w-14 h-14 md:w-16 md:h-16 rounded-xl bg-gradient-to-br ${pdf.color} flex items-center justify-center flex-shrink-0 shadow-md`}
+      >
+        <FileText className="w-6 h-6 md:w-7 md:h-7 text-white" />
+      </div>
+
+      {/* Content Section */}
+      <div className="flex-1 min-w-0">
+        <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-3">
+          <div className="min-w-0">
+            <div className="flex items-center gap-2 mb-1">
+              <h3 className="text-lg md:text-xl font-bold text-gray-900 group-hover:text-blue-600 transition-colors truncate">
+                {pdf.title}
+              </h3>
+              {pdf.isFavorite && (
+                <Star className="w-4 h-4 fill-yellow-400 text-yellow-500" />
+              )}
+            </div>
+
+            {/* Category + Size + Date */}
+            <div className="flex flex-wrap items-center gap-3 mt-1 text-sm text-gray-500">
+              <span className="px-2 py-0.5 bg-blue-50 text-blue-700 rounded-full text-xs font-medium">
+                {pdf.category || "Uncategorized"}
+              </span>
+              <span>{pdf.formattedSize}</span>
+              <div className="flex items-center gap-1 text-xs">
+                <Clock className="w-3 h-3" />
+                <span>{pdf.formattedDate}</span>
+              </div>
+            </div>
+
+            {/* Tags */}
+            <div className="flex flex-wrap gap-2 mt-3">
+              {pdf.tags.slice(0, 3).map((tag) => (
+                <span
+                  key={tag}
+                  className="inline-flex items-center px-2.5 py-1 text-xs font-medium bg-gray-100 text-gray-700 rounded-full"
+                >
+                  {tag}
+                </span>
+              ))}
+              {pdf.tags.length > 3 && (
+                <span className="inline-flex items-center px-2 py-1 text-xs font-medium bg-gray-100 text-gray-500 rounded-full">
+                  +{pdf.tags.length - 3}
+                </span>
+              )}
+            </div>
+          </div>
+
+          {/* Progress bar (stacked on mobile) */}
+          <div className="text-left sm:text-right min-w-[120px]">
+            <div className="text-xs md:text-sm font-medium text-gray-900 mb-1">
+              {pdf.progress}% Complete
+            </div>
+            <div className="w-full bg-gray-200 rounded-full h-2">
               <div
-                key={pdf._id}
-                className="group relative bg-white rounded-2xl transition-all duration-300 p-5 flex items-center space-x-5 hover:shadow-lg hover:border-transparent cursor-pointer border border-gray-100"
+                className={`h-2 rounded-full ${getProgressColor(pdf.progress)}`}
+                style={{ width: `${pdf.progress}%` }}
+              />
+            </div>
+          </div>
+        </div>
+
+        {/* Feature Chips */}
+        <div className="flex flex-wrap gap-2 mt-3">
+          {pdf?.isQuizGenerated && (
+            <div className="inline-flex items-center px-2.5 py-1 bg-gray-50 text-gray-700 rounded-lg text-xs font-medium border border-gray-100">
+              {getFeatureIcon("Quiz")}
+              <span className="ml-1">Quiz</span>
+            </div>
+          )}
+          {pdf?.isFlashcardGenerated && (
+            <div className="inline-flex items-center px-2.5 py-1 bg-gray-50 text-gray-700 rounded-lg text-xs font-medium border border-gray-100">
+              {getFeatureIcon("Flashcards")}
+              <span className="ml-1">Flashcards</span>
+            </div>
+          )}
+          {pdf.isSummarized && (
+            <div className="inline-flex items-center px-2.5 py-1 bg-gray-50 text-gray-700 rounded-lg text-xs font-medium border border-gray-100">
+              {getFeatureIcon("Summary")}
+              <span className="ml-1">Summary</span>
+            </div>
+          )}
+        </div>
+      </div>
+
+      {/* Action Buttons */}
+      <div className="flex flex-wrap sm:flex-nowrap items-center gap-3 sm:gap-4 mt-4 md:mt-0">
+        {/* Favorite */}
+        <button
+          className="p-2 text-gray-400 hover:text-yellow-500 hover:bg-yellow-50 rounded-lg transition-colors"
+          onClick={(e) => {
+            e.stopPropagation();
+            handleToggleFavorite(pdf);
+          }}
+          title={pdf.isFavorite ? "Remove from favorites" : "Add to favorites"}
+        >
+          {pdf.isFavorite ? (
+            <Star className="w-5 h-5 fill-yellow-400 text-yellow-400" />
+          ) : (
+            <Star className="w-5 h-5" />
+          )}
+        </button>
+
+        {/* Read */}
+        <button
+          className="flex items-center space-x-2 px-3 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg text-sm font-medium transition-colors shadow-md"
+          onClick={(e) => {
+            e.stopPropagation();
+            handleRead(pdf);
+          }}
+        >
+          <Eye className="w-4 h-4" />
+          <span>Read</span>
+        </button>
+
+        {/* Download */}
+        <button
+          className="p-2 bg-gray-100 hover:bg-gray-200 text-gray-600 rounded-lg transition-colors shadow-sm"
+          onClick={(e) => {
+            e.stopPropagation();
+            handledownload(pdf);
+          }}
+        >
+          <Download className="w-4 h-4" />
+        </button>
+
+        {/* More menu */}
+        <div className="relative">
+          <button
+            className="p-2 text-gray-500 hover:text-gray-700 hover:bg-gray-100 rounded-lg transition-colors"
+            onClick={(e) => {
+              e.stopPropagation();
+              setSelectedPdf(pdf);
+            }}
+          >
+            <MoreVertical className="w-4 h-4" />
+          </button>
+
+          {selectedPdf?._id === pdf._id && (
+            <div
+              ref={dropdownRef}
+              className="absolute right-0 mt-2 w-44 bg-white rounded-xl shadow-lg z-10 border border-gray-200 overflow-hidden"
+            >
+              {/* Close */}
+              <button
+                className="absolute top-2 right-2 text-gray-600 hover:text-gray-900"
                 onClick={(e) => {
-                  if (!e.target.closest('button, a, [role="button"]')) {
-                    handlePdfDetails(pdf._id);
-                  }
+                  e.stopPropagation();
+                  setSelectedPdf(null);
                 }}
               >
-                <div
-                  className={`w-16 h-16 rounded-xl bg-gradient-to-br ${pdf.color} flex items-center justify-center flex-shrink-0 shadow-md`}
+                <X className="w-5 h-5" />
+              </button>
+
+              <div className="py-2">
+                <button
+                  className="flex items-center px-4 py-3 text-sm text-gray-700 hover:bg-blue-50 w-full text-left"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    handlePdfAction("edit", pdf);
+                  }}
                 >
-                  <FileText className="w-7 h-7 text-white" />
-                </div>
-
-                <div className="flex-1 min-w-0">
-                  <div className="flex items-start justify-between">
-                    <div className="flex-1 min-w-0">
-                      <div className="flex items-center gap-2 mb-1">
-                        <h3 className="text-xl font-bold text-gray-900 group-hover:text-blue-600 transition-colors">
-                          {pdf.title}
-                        </h3>
-                        {pdf.isFavorite && (
-                          <Star className="w-4 h-4 fill-yellow-400 text-yellow-500" />
-                        )}
-                      </div>
-                      <div className="flex items-center gap-4 mt-2">
-                        <span className="px-3 py-1 bg-blue-50 text-blue-700 rounded-full text-xs font-medium">
-                          {pdf.category || "Uncategorized"}
-                        </span>
-                        <span className="text-sm text-gray-500">
-                          {pdf.formattedSize}
-                        </span>
-                        <div className="flex items-center gap-1 text-xs text-gray-400">
-                          <Clock className="w-3 h-3" />
-                          <span>{pdf.formattedDate}</span>
-                        </div>
-                      </div>
-                      <div className="flex flex-wrap gap-2 mt-3">
-                        {pdf.tags.slice(0, 3).map((tag) => (
-                          <span
-                            key={tag}
-                            className="inline-flex items-center px-2.5 py-1 text-xs font-medium bg-gray-100 text-gray-700 rounded-full"
-                          >
-                            {tag}
-                          </span>
-                        ))}
-                        {pdf.tags.length > 3 && (
-                          <span className="inline-flex items-center px-2 py-1 text-xs font-medium bg-gray-100 text-gray-500 rounded-full">
-                            +{pdf.tags.length - 3}
-                          </span>
-                        )}
-                      </div>
-                    </div>
-
-                    <div className="flex items-center space-x-4 ml-4">
-                      <div className="text-right min-w-[80px]">
-                        <div className="text-sm font-medium text-gray-900 mb-1">
-                          {pdf.progress}% Complete
-                        </div>
-                        <div className="w-full bg-gray-200 rounded-full h-2">
-                          <div
-                            className={`h-2 rounded-full ${getProgressColor(
-                              pdf.progress
-                            )}`}
-                            style={{ width: `${pdf.progress}%` }}
-                          />
-                        </div>
-                      </div>
-
-                      <div className="flex gap-1">
-                        {pdf.features.map((feature) => (
-                          <div
-                            key={feature}
-                            className="p-2 bg-gray-100 text-gray-600 rounded-lg text-xs transition-colors flex items-center"
-                            title={feature}
-                          >
-                            {getFeatureIcon(feature)}
-                          </div>
-                        ))}
-                      </div>
-
-                      {/* Favorite Button for List View */}
-                      <button
-                        className="p-2.5 text-gray-400 hover:text-yellow-500 hover:bg-yellow-50 rounded-xl transition-colors"
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          handleToggleFavorite(pdf);
-                        }}
-                        title={
-                          pdf.isFavorite
-                            ? "Remove from favorites"
-                            : "Add to favorites"
-                        }
-                      >
-                        {pdf.isFavorite ? (
-                          <Star className="w-5 h-5 fill-yellow-400 text-yellow-400" />
-                        ) : (
-                          <Star className="w-5 h-5" />
-                        )}
-                      </button>
-
-                      <button
-                        className="flex items-center space-x-2 px-4 py-2.5 bg-blue-600 hover:bg-blue-700 text-white rounded-xl text-sm font-medium transition-colors shadow-md shadow-blue-500/30"
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          handleRead(pdf);
-                        }}
-                      >
-                        <Eye className="w-4 h-4" />
-                        <span>Read</span>
-                      </button>
-
-                      <button
-                        className="p-2.5 bg-gray-100 hover:bg-gray-200 text-gray-600 rounded-xl transition-colors shadow-sm"
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          handledownload(pdf);
-                        }}
-                      >
-                        <Download className="w-4 h-4" />
-                      </button>
-
-                      <div className="relative">
-                        <button
-                          className="p-2.5 text-gray-500 hover:text-gray-700 hover:bg-gray-100 rounded-xl transition-colors"
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            setSelectedPdf(pdf);
-                          }}
-                        >
-                          <MoreVertical className="w-4 h-4" />
-                        </button>
-
-                        {selectedPdf?._id === pdf._id && (
-                          <div
-                            ref={dropdownRef}
-                            className="absolute right-0 mt-2 w-48 bg-white rounded-xl shadow-lg z-10 border border-gray-200 overflow-hidden"
-                          >
-                            {/* Close Icon */}
-                            <button
-                              className="absolute top-2 right-2 text-gray-600 hover:text-gray-900"
-                              onClick={(e) => {
-                                e.stopPropagation();
-                                setSelectedPdf(null);
-                              }}
-                            >
-                              <X className="w-5 h-5" />
-                            </button>
-
-                            <div className="py-2">
-                              <button
-                                className="flex items-center px-4 py-3 text-sm text-gray-700 hover:bg-blue-50 w-full text-left transition-colors"
-                                onClick={(e) => {
-                                  e.stopPropagation();
-                                  handlePdfAction("edit", pdf);
-                                }}
-                              >
-                                <Edit className="w-4 h-4 mr-3 text-blue-500" />
-                                Edit Details
-                              </button>
-                              <button
-                                className="flex items-center px-4 py-3 text-sm text-gray-700 hover:bg-blue-50 w-full text-left transition-colors"
-                                onClick={(e) => {
-                                  e.stopPropagation();
-                                  handlePdfAction("download", pdf);
-                                }}
-                              >
-                                <Download className="w-4 h-4 mr-3 text-blue-500" />
-                                Download
-                              </button>
-                              <button
-                                className="flex items-center px-4 py-3 text-sm text-red-600 hover:bg-red-50 w-full text-left transition-colors"
-                                onClick={(e) => {
-                                  e.stopPropagation();
-                                  setPdfToDelete(pdf);
-                                  setShowDeleteConfirm(true);
-                                  setSelectedPdf(null);
-                                }}
-                              >
-                                <Trash2 className="w-4 h-4 mr-3" />
-                                Delete
-                              </button>
-                            </div>
-                          </div>
-                        )}
-                      </div>
-                    </div>
-                  </div>
-                </div>
+                  <Edit className="w-4 h-4 mr-3 text-blue-500" />
+                  Edit Details
+                </button>
+                <button
+                  className="flex items-center px-4 py-3 text-sm text-gray-700 hover:bg-blue-50 w-full text-left"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    handlePdfAction("download", pdf);
+                  }}
+                >
+                  <Download className="w-4 h-4 mr-3 text-blue-500" />
+                  Download
+                </button>
+                <button
+                  className="flex items-center px-4 py-3 text-sm text-red-600 hover:bg-red-50 w-full text-left"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    setPdfToDelete(pdf);
+                    setShowDeleteConfirm(true);
+                    setSelectedPdf(null);
+                  }}
+                >
+                  <Trash2 className="w-4 h-4 mr-3" />
+                  Delete
+                </button>
               </div>
-            ))}
-          </div>
+            </div>
+          )}
+        </div>
+      </div>
+    </div>
+  ))}
+</div>
+
         )}
       </div>
 
       {/* Stats Footer */}
       <div className="border-t border-gray-200 bg-white">
-        <div className="max-w-7xl mx-auto px-6 py-8">
-          <div className="grid grid-cols-1 sm:grid-cols-4 gap-6">
-            <div className="text-center p-6 bg-gradient-to-br from-blue-50 to-blue-100 rounded-xl">
-              <div className="text-3xl font-bold text-blue-900 mb-1">
+        <div className="max-w-7xl mx-auto px-3 sm:px-4 lg:px-6 py-6 sm:py-8">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4 lg:gap-6">
+            {/* Total Documents */}
+            <div className="text-center p-4 sm:p-5 lg:p-6 bg-gradient-to-br from-blue-50 to-blue-100 rounded-lg lg:rounded-xl shadow-sm">
+              <div className="text-xl sm:text-2xl lg:text-3xl font-bold text-blue-900 mb-1">
                 {PDFS.length}
               </div>
-              <div className="text-sm text-blue-700 font-medium">
+              <div className="text-xs sm:text-sm lg:text-base text-blue-700 font-medium">
                 Total Documents
               </div>
             </div>
-            <div className="text-center p-6 bg-gradient-to-br from-green-50 to-green-100 rounded-xl">
-              <div className="text-3xl font-bold text-green-900 mb-1">
-                {/* {PDFS.length > 0
-                  ? Math.round(
-                      PDFS.reduce((acc, pdf) => acc + pdf.progress, 0) /
-                        PDFS.length
-                    )
-                  : 0} */}
+
+            {/* Average Progress */}
+            <div className="text-center p-4 sm:p-5 lg:p-6 bg-gradient-to-br from-green-50 to-green-100 rounded-lg lg:rounded-xl shadow-sm">
+              <div className="text-xl sm:text-2xl lg:text-3xl font-bold text-green-900 mb-1">
                 {averageProgress}%
               </div>
-              <div className="text-sm text-green-700 font-medium">
+              <div className="text-xs sm:text-sm lg:text-base text-green-700 font-medium">
                 Average Progress
               </div>
             </div>
-            <div className="text-center p-6 bg-gradient-to-br from-purple-50 to-purple-100 rounded-xl">
-              <div className="text-3xl font-bold text-purple-900 mb-1">
+
+            {/* Categories */}
+            <div className="text-center p-4 sm:p-5 lg:p-6 bg-gradient-to-br from-purple-50 to-purple-100 rounded-lg lg:rounded-xl shadow-sm">
+              <div className="text-xl sm:text-2xl lg:text-3xl font-bold text-purple-900 mb-1">
                 {categories.length - 1}
               </div>
-              <div className="text-sm text-purple-700 font-medium">
+              <div className="text-xs sm:text-sm lg:text-base text-purple-700 font-medium">
                 Categories
               </div>
             </div>
-            <div className="text-center p-6 bg-gradient-to-br from-orange-50 to-orange-100 rounded-xl">
-              <div className="text-3xl font-bold text-orange-900 mb-1">
+
+            {/* Completed */}
+            <div className="text-center p-4 sm:p-5 lg:p-6 bg-gradient-to-br from-orange-50 to-orange-100 rounded-lg lg:rounded-xl shadow-sm">
+              <div className="text-xl sm:text-2xl lg:text-3xl font-bold text-orange-900 mb-1">
                 {PDFS.filter((pdf) => pdf.progress === 100).length}
               </div>
-              <div className="text-sm text-orange-700 font-medium">
+              <div className="text-xs sm:text-sm lg:text-base text-orange-700 font-medium">
                 Completed
               </div>
             </div>
@@ -1204,94 +1159,6 @@ const MyLibrary = () => {
         </div>
       </div>
 
-      {/* Edit PDF Modal */}
-      {/* {showModal && (
-        <div
-          className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4"
-          onClick={() => {
-            setShowModal(false);
-            setSelectedPdf(null);
-          }}
-        >
-          <div
-            className="bg-white rounded-2xl shadow-xl w-full max-w-md"
-            onClick={(e) => e.stopPropagation()}
-          >
-            <div className="p-6">
-              <h3 className="text-xl font-semibold text-gray-900 mb-4">
-                {selectedPdf ? "Edit PDF Details" : "Upload New PDF"}
-              </h3>
-
-              <div className="space-y-4">
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
-                    Title
-                  </label>
-                  <input
-                    type="text"
-                    value={formData.title}
-                    onChange={(e) => handleInputChange("title", e.target.value)}
-                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                  />
-                </div>
-
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
-                    Category
-                  </label>
-                  <select
-                    value={formData.category}
-                    onChange={(e) =>
-                      handleInputChange("category", e.target.value)
-                    }
-                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                  >
-                    <option value="">Select category</option>
-                    {categories
-                      .filter((c) => c !== "All Categories")
-                      .map((category) => (
-                        <option key={category} value={category}>
-                          {category}
-                        </option>
-                      ))}
-                  </select>
-                </div>
-
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
-                    Tags (comma separated)
-                  </label>
-                  <input
-                    type="text"
-                    value={formData.tags}
-                    onChange={(e) => handleInputChange("tags", e.target.value)}
-                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                    use
-                  />
-                </div>
-              </div>
-
-              <div className="flex justify-end space-x-3 mt-6">
-                <button
-                  onClick={() => {
-                    setShowModal(false);
-                    setSelectedPdf(null);
-                  }}
-                  className="px-4 py-2 text-gray-700 hover:bg-gray-100 rounded-lg"
-                >
-                  Cancel
-                </button>
-                <button
-                  onClick={editHandler}
-                  className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
-                >
-                  {selectedPdf ? "Save Changes" : "Upload"}
-                </button>
-              </div>
-            </div>
-          </div>
-        </div>
-      )} */}
       {showModal && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
           <div className="bg-white rounded-2xl shadow-xl w-full max-w-md">
@@ -1420,11 +1287,6 @@ const MyLibrary = () => {
           </div>
         </div>
       )}
-
-      {/* {showViewer && <PdfViewer url={`${showViewer}.pdf`} />} */}
-      {/* {showViewer && <PdfViewer url={showViewer} />} */}
-
-      {/* {selectedPdf && <PdfReader pdfUrl={selectedPdf} />} */}
 
       <PDFUploadModal
         isOpen={isModalOpen}

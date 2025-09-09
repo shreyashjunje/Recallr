@@ -13,49 +13,9 @@ import { toast } from "react-toastify";
 import axios from "axios";
 import { useParams } from "react-router-dom";
 const API_URL = import.meta.env.VITE_API_URL;
+
 const ShowFlashcards = () => {
   const { id } = useParams();
-
-  // Sample data - replace with your actual flashcards data
-  const [flashcardsData] = useState({
-    title: "React Fundamentals",
-    category: "Web Development",
-    tags: ["JavaScript", "Frontend", "Components", "Hooks"],
-    generatedAt: "2024-08-24T10:30:00Z",
-    flashcards: [
-      {
-        question: "What is React and why is it popular?",
-        answer:
-          "React is a JavaScript library for building user interfaces. It's popular because it uses a component-based architecture, virtual DOM for efficient updates, and has a strong ecosystem with excellent developer tools.",
-        difficulty: "Easy",
-      },
-      {
-        question: "Explain the useState hook and provide an example",
-        answer:
-          "useState is a React hook that lets you add state to functional components. Example: const [count, setCount] = useState(0); It returns an array with the current state value and a setter function.",
-        difficulty: "Medium",
-      },
-      {
-        question:
-          "What is the difference between useEffect and useLayoutEffect?",
-        answer:
-          "useEffect runs asynchronously after DOM mutations, while useLayoutEffect runs synchronously after all DOM mutations but before the browser paints. useLayoutEffect is useful for DOM measurements that affect layout.",
-        difficulty: "Hard",
-      },
-      {
-        question: "How does React's reconciliation algorithm work?",
-        answer:
-          "React's reconciliation compares the new virtual DOM tree with the previous one using a diffing algorithm. It identifies changes and updates only the necessary DOM nodes, making updates efficient through key-based matching and component type comparison.",
-        difficulty: "Hard",
-      },
-      {
-        question: "What are React props and how are they used?",
-        answer:
-          "Props (properties) are read-only data passed from parent to child components. They allow components to be dynamic and reusable. Example: <Button color='blue' onClick={handleClick}>Click me</Button>",
-        difficulty: "Easy",
-      },
-    ],
-  });
 
   const [currentIndex, setCurrentIndex] = useState(0);
   const [isFlipped, setIsFlipped] = useState(false);
@@ -66,31 +26,20 @@ const ShowFlashcards = () => {
   const fetchFlashcards = async () => {
     try {
       const token = localStorage.getItem("token");
-      console.log("tokne-->", token);
-
-      console.log("iddddddd=", id);
-
       const res = await axios.get(
         `${API_URL}/flashcards/get-flashcards/${id}`,
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        }
+        { headers: { Authorization: `Bearer ${token}` } }
       );
-
       if (res.status === 200) {
         setPdf(res.data.data);
         setFlashcards(res.data.data.flashcards);
-        toast.success("flashcards fetched successfully");
+        toast.success("Flashcards fetched successfully");
       }
-
-      console.log("flashcards from show compo-->", res.data.data);
     } catch (err) {
-      console.log("Error-->", err);
-      toast.error("flashcards fetched unsuccessful");
+      toast.error("Failed to fetch flashcards");
     }
   };
+
   useEffect(() => {
     fetchFlashcards();
   }, []);
@@ -119,23 +68,21 @@ const ShowFlashcards = () => {
 
   const nextCard = () => {
     setIsFlipped(false);
-    setTimeout(() => {
-      setCurrentIndex((prev) => (prev + 1) % flashcards.length);
-    }, 150);
+    setTimeout(
+      () => setCurrentIndex((prev) => (prev + 1) % flashcards.length),
+      150
+    );
   };
 
   const prevCard = () => {
     setIsFlipped(false);
-    setTimeout(() => {
-      setCurrentIndex(
-        (prev) => (prev - 1 + flashcards.length) % flashcards.length
-      );
-    }, 150);
+    setTimeout(
+      () => setCurrentIndex((prev) => (prev - 1 + flashcards.length) % flashcards.length),
+      150
+    );
   };
 
-  const flipCard = () => {
-    setIsFlipped(!isFlipped);
-  };
+  const flipCard = () => setIsFlipped(!isFlipped);
 
   const shuffleCards = () => {
     const shuffled = [...flashcards].sort(() => Math.random() - 0.5);
@@ -147,7 +94,7 @@ const ShowFlashcards = () => {
   };
 
   const resetCards = () => {
-    setFlashcards(flashcardsData.flashcards);
+    fetchFlashcards(); // ✅ reset to server data
     setCurrentIndex(0);
     setIsFlipped(false);
   };
@@ -155,17 +102,17 @@ const ShowFlashcards = () => {
   const currentCard = flashcards[currentIndex];
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-100 p-4">
-      <div className="max-w-4xl mx-auto">
-        {/* Header Section */}
-        <div className="mb-8 text-center">
-          <div className="bg-white/80 backdrop-blur-sm rounded-2xl p-6 shadow-lg border border-white/50">
-            <h1 className="text-3xl font-bold text-gray-800 mb-2 flex items-center justify-center gap-2">
-              <BookOpen className="text-indigo-600" />
+    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-100 p-2 sm:p-4 md:p-6">
+      <div className="max-w-5xl mx-auto">
+        {/* Header */}
+        <div className="mb-6 sm:mb-8 text-center">
+          <div className="bg-white/80 backdrop-blur-sm rounded-2xl p-4 sm:p-6 shadow-lg border border-white/50">
+            <h1 className="text-xl sm:text-2xl md:text-3xl font-bold text-gray-800 mb-3 flex items-center justify-center gap-2">
+              <BookOpen className="text-indigo-600 w-6 h-6 sm:w-7 sm:h-7" />
               {pdf.title}
             </h1>
 
-            <div className="flex flex-wrap items-center justify-center gap-4 text-sm text-gray-600 mb-4">
+            <div className="flex flex-wrap items-center justify-center gap-3 sm:gap-4 text-xs sm:text-sm text-gray-600 mb-4">
               <div className="flex items-center gap-1">
                 <Target className="w-4 h-4 text-purple-500" />
                 <span className="font-medium">{pdf.category}</span>
@@ -178,10 +125,10 @@ const ShowFlashcards = () => {
             </div>
 
             <div className="flex flex-wrap justify-center gap-2">
-              {pdf.tags?.map((tag, index) => (
+              {pdf.tags?.map((tag, i) => (
                 <span
-                  key={index}
-                  className="inline-flex items-center gap-1 px-3 py-1 bg-gradient-to-r from-indigo-100 to-purple-100 text-indigo-700 rounded-full text-xs font-medium border border-indigo-200"
+                  key={i}
+                  className="inline-flex items-center gap-1 px-2 sm:px-3 py-1 bg-gradient-to-r from-indigo-100 to-purple-100 text-indigo-700 rounded-full text-xs sm:text-sm font-medium border border-indigo-200"
                 >
                   <Tag className="w-3 h-3" />
                   {tag}
@@ -192,8 +139,8 @@ const ShowFlashcards = () => {
         </div>
 
         {/* Progress Bar */}
-        <div className="mb-6">
-          <div className="bg-white/50 rounded-full p-1 shadow-inner">
+        <div className="mb-4 sm:mb-6">
+          <div className="bg-white/50 rounded-full p-0.5 shadow-inner">
             <div
               className="h-2 bg-gradient-to-r from-indigo-500 to-purple-500 rounded-full transition-all duration-500 ease-out"
               style={{
@@ -201,79 +148,79 @@ const ShowFlashcards = () => {
               }}
             />
           </div>
-          <p className="text-center text-sm text-gray-600 mt-2 font-medium">
+          <p className="text-center text-xs sm:text-sm text-gray-600 mt-1 sm:mt-2 font-medium">
             Card {currentIndex + 1} of {flashcards.length}
           </p>
         </div>
 
         {/* Flashcard */}
-        <div className="perspective-1000 mb-8">
+        <div className="perspective-1000 mb-6 sm:mb-8">
           <div
-            className={`relative w-full h-80 transition-transform duration-700 preserve-3d cursor-pointer ${
+            className={`relative w-full h-64 sm:h-80 md:h-96 transition-transform duration-700 preserve-3d cursor-pointer ${
               isFlipped ? "rotate-y-180" : ""
             } ${isShuffled ? "animate-pulse" : ""}`}
             onClick={flipCard}
           >
-            {/* Front of card (Question) */}
+            {/* Front */}
             <div
-              className={`absolute inset-0 backface-hidden rounded-3xl shadow-2xl border-2 ${
+              className={`absolute inset-0 backface-hidden rounded-2xl sm:rounded-3xl shadow-2xl border-2 ${
                 difficultyBorders[currentCard?.difficulty]
               }`}
             >
-              <div className="h-full bg-white/90 backdrop-blur-sm rounded-3xl p-8 flex flex-col">
-                <div className="flex justify-between items-start mb-4">
+              <div className="h-full bg-white/90 backdrop-blur-sm rounded-2xl sm:rounded-3xl p-4 sm:p-6 flex flex-col">
+                <div className="flex justify-between items-start mb-2 sm:mb-4">
                   <span
-                    className={`px-3 py-1 rounded-full text-xs font-bold text-white bg-gradient-to-r ${
+                    className={`px-2 sm:px-3 py-1 rounded-full text-xs sm:text-sm font-bold text-white bg-gradient-to-r ${
                       difficultyColors[currentCard?.difficulty]
                     } shadow-lg`}
                   >
                     {currentCard?.difficulty}
                   </span>
-                  <span className="text-xs text-gray-500 font-medium">
+                  <span className="text-[10px] sm:text-xs text-gray-500 font-medium">
                     QUESTION
                   </span>
                 </div>
 
                 <div className="flex-1 flex items-center justify-center">
-                  <p className="text-xl font-medium text-gray-800 text-center leading-relaxed">
+                  <p className="text-base sm:text-lg md:text-xl font-medium text-gray-800 text-center leading-relaxed">
                     {currentCard?.question}
                   </p>
                 </div>
 
-                <div className="text-center text-sm text-gray-400 font-medium">
-                  Click to reveal answer
+                <div className="text-center text-xs sm:text-sm text-gray-400 font-medium">
+                  Tap to reveal answer
                 </div>
               </div>
             </div>
 
-            {/* Back of card (Answer) */}
+            {/* Back */}
             <div
-              className={`absolute inset-0 backface-hidden rotate-y-180 rounded-3xl shadow-2xl border-2 ${
+              className={`absolute inset-0 backface-hidden rotate-y-180 rounded-2xl sm:rounded-3xl shadow-2xl border-2 ${
                 difficultyBorders[currentCard?.difficulty]
               }`}
             >
-              <div className="h-full bg-gradient-to-br from-white to-gray-50/80 backdrop-blur-sm rounded-3xl p-8 flex flex-col">
-                <div className="flex justify-between items-start mb-4">
+              <div className="h-full bg-gradient-to-br from-white to-gray-50/80 backdrop-blur-sm rounded-2xl sm:rounded-3xl p-4 sm:p-6 flex flex-col">
+                <div className="flex justify-between items-start mb-2 sm:mb-4">
                   <span
-                    className={`px-3 py-1 rounded-full text-xs font-bold text-white bg-gradient-to-r ${
+                    className={`px-2 sm:px-3 py-1 rounded-full text-xs sm:text-sm font-bold text-white bg-gradient-to-r ${
                       difficultyColors[currentCard?.difficulty]
                     } shadow-lg`}
                   >
                     {currentCard?.difficulty}
                   </span>
-                  <span className="text-xs text-gray-500 font-medium">
+                  <span className="text-[10px] sm:text-xs text-gray-500 font-medium">
                     ANSWER
                   </span>
                 </div>
 
                 <div className="flex-1 flex items-center justify-center">
-                  <p className="text-lg text-gray-700 text-center leading-relaxed">
+                  <p className="text-sm sm:text-base md:text-lg text-gray-700 text-center leading-relaxed">
                     {currentCard?.answer}
                   </p>
                 </div>
 
-                <div className="text-center text-sm text-gray-400 font-medium">
-                  Click to see question
+                <div className="text-center text-xs sm:text-sm text-gray-400 font-medium">
+                  Tap to see question
                 </div>
               </div>
             </div>
@@ -281,29 +228,29 @@ const ShowFlashcards = () => {
         </div>
 
         {/* Controls */}
-        <div className="flex justify-center items-center gap-4">
+        <div className="flex justify-center items-center gap-3 sm:gap-4">
           <button
             onClick={prevCard}
             disabled={flashcards.length <= 1}
-            className="p-3 bg-white/80 backdrop-blur-sm rounded-full shadow-lg border border-white/50 text-gray-600 hover:text-indigo-600 hover:shadow-xl transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed group"
+            className="p-2 sm:p-3 bg-white/80 rounded-full shadow-lg border text-gray-600 hover:text-indigo-600 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
           >
-            <ChevronLeft className="w-6 h-6 group-hover:scale-110 transition-transform" />
+            <ChevronLeft className="w-5 h-5 sm:w-6 sm:h-6" />
           </button>
 
           <button
             onClick={resetCards}
-            className="p-3 bg-white/80 backdrop-blur-sm rounded-full shadow-lg border border-white/50 text-gray-600 hover:text-green-600 hover:shadow-xl transition-all duration-300 group"
+            className="p-2 sm:p-3 bg-white/80 rounded-full shadow-lg border text-gray-600 hover:text-green-600 transition-all"
           >
-            <RotateCcw className="w-5 h-5 group-hover:rotate-180 transition-transform duration-500" />
+            <RotateCcw className="w-4 h-4 sm:w-5 sm:h-5" />
           </button>
 
           <button
             onClick={shuffleCards}
             disabled={flashcards.length <= 1}
-            className="p-3 bg-white/80 backdrop-blur-sm rounded-full shadow-lg border border-white/50 text-gray-600 hover:text-purple-600 hover:shadow-xl transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed group"
+            className="p-2 sm:p-3 bg-white/80 rounded-full shadow-lg border text-gray-600 hover:text-purple-600 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
           >
             <Shuffle
-              className={`w-5 h-5 group-hover:scale-110 transition-transform ${
+              className={`w-4 h-4 sm:w-5 sm:h-5 ${
                 isShuffled ? "animate-spin" : ""
               }`}
             />
@@ -312,35 +259,36 @@ const ShowFlashcards = () => {
           <button
             onClick={nextCard}
             disabled={flashcards.length <= 1}
-            className="p-3 bg-white/80 backdrop-blur-sm rounded-full shadow-lg border border-white/50 text-gray-600 hover:text-indigo-600 hover:shadow-xl transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed group"
+            className="p-2 sm:p-3 bg-white/80 rounded-full shadow-lg border text-gray-600 hover:text-indigo-600 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
           >
-            <ChevronRight className="w-6 h-6 group-hover:scale-110 transition-transform" />
+            <ChevronRight className="w-5 h-5 sm:w-6 sm:h-6" />
           </button>
         </div>
 
         {/* Stats */}
-        <div className="mt-8 grid grid-cols-3 gap-4 text-center">
-          <div className="bg-white/50 backdrop-blur-sm rounded-xl p-4 border border-white/50">
-            <div className="text-2xl font-bold text-emerald-600">
-              {flashcards.filter((card) => card.difficulty === "Easy").length}
+        <div className="mt-6 sm:mt-8 grid grid-cols-3 gap-2 sm:gap-4 text-center">
+          <div className="bg-white/50 rounded-xl p-3 sm:p-4 border">
+            <div className="text-lg sm:text-xl md:text-2xl font-bold text-emerald-600">
+              {flashcards.filter((c) => c.difficulty === "Easy").length}
             </div>
-            <div className="text-sm text-gray-600">Easy</div>
+            <div className="text-xs sm:text-sm text-gray-600">Easy</div>
           </div>
-          <div className="bg-white/50 backdrop-blur-sm rounded-xl p-4 border border-white/50">
-            <div className="text-2xl font-bold text-amber-600">
-              {flashcards.filter((card) => card.difficulty === "Medium").length}
+          <div className="bg-white/50 rounded-xl p-3 sm:p-4 border">
+            <div className="text-lg sm:text-xl md:text-2xl font-bold text-amber-600">
+              {flashcards.filter((c) => c.difficulty === "Medium").length}
             </div>
-            <div className="text-sm text-gray-600">Medium</div>
+            <div className="text-xs sm:text-sm text-gray-600">Medium</div>
           </div>
-          <div className="bg-white/50 backdrop-blur-sm rounded-xl p-4 border border-white/50">
-            <div className="text-2xl font-bold text-red-600">
-              {flashcards.filter((card) => card.difficulty === "Hard").length}
+          <div className="bg-white/50 rounded-xl p-3 sm:p-4 border">
+            <div className="text-lg sm:text-xl md:text-2xl font-bold text-red-600">
+              {flashcards.filter((c) => c.difficulty === "Hard").length}
             </div>
-            <div className="text-sm text-gray-600">Hard</div>
+            <div className="text-xs sm:text-sm text-gray-600">Hard</div>
           </div>
         </div>
       </div>
 
+      {/* Card Flip CSS */}
       <style jsx>{`
         .perspective-1000 {
           perspective: 1000px;

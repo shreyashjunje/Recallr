@@ -378,51 +378,159 @@ export function Quiz({ quizInfo, questions, onExit }) {
 
   // Only render the quiz interface if NOT completed
   return (
+    // <div className="min-h-screen bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900 dark:from-slate-950 dark:via-purple-950 dark:to-slate-950">
+    //   {/* Header */}
+    //   <header className="border-b border-white/10 backdrop-blur-xl">
+    //     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
+    //       <div className="flex items-center justify-between">
+    //         <div className="flex items-center gap-4">
+    //           <button
+    //             onClick={onExit}
+    //             className="p-2 hover:bg-white/10 rounded-lg transition-colors duration-200"
+    //           >
+    //             <ArrowLeft className="w-5 h-5 text-white" />
+    //           </button>
+    //           <h1 className="text-xl font-semibold text-white">
+    //             {quizInfo.title}
+    //           </h1>
+    //         </div>
+    //         <div className="flex items-center gap-4">
+    //           <div className="text-sm text-purple-300">
+    //             Question {state.currentQuestionIndex + 1} of {questions.length}
+    //           </div>
+    //           <div className="w-32 bg-slate-700/50 rounded-full h-2">
+    //             <div
+    //               className="bg-gradient-to-r from-purple-600 to-pink-600 h-2 rounded-full transition-all duration-300"
+    //               style={{
+    //                 width: `${
+    //                   ((state.currentQuestionIndex + 1) / questions.length) *
+    //                   100
+    //                 }%`,
+    //               }}
+    //             />
+    //           </div>
+    //           <div className="text-sm text-slate-300">
+    //             {Math.round(
+    //               ((state.currentQuestionIndex + 1) / questions.length) * 100
+    //             )}
+    //             % Complete
+    //           </div>
+    //           <button
+    //             onClick={toggleTheme}
+    //             className="p-2 hover:bg-white/10 rounded-lg transition-colors duration-200"
+    //           >
+    //             {isDark ? (
+    //               <Sun className="w-5 h-5 text-white" />
+    //             ) : (
+    //               <Moon className="w-5 h-5 text-white" />
+    //             )}
+    //           </button>
+    //         </div>
+    //       </div>
+    //     </div>
+    //   </header>
+
+    //   {/* Main Content */}
+    //   <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+    //     <div className="grid lg:grid-cols-3 gap-8">
+    //       {/* Question Area */}
+    //       <div className="lg:col-span-2">
+    //         <div className="bg-white/10 dark:bg-slate-800/50 backdrop-blur-xl border border-white/20 dark:border-slate-700/50 rounded-3xl p-8 shadow-2xl">
+    //           <QuestionRenderer
+    //             question={currentQuestion}
+    //             userAnswer={currentAnswer}
+    //             onAnswerChange={handleAnswerChange}
+    //             questionTypes={quizInfo.settings?.questionTypes}
+    //           />
+
+    //           <div className="mt-8 pt-6 border-t border-white/10">
+    //             <QuizNavigation
+    //               currentQuestion={state.currentQuestionIndex}
+    //               totalQuestions={questions.length}
+    //               onPrevious={handlePrevious}
+    //               onNext={handleNext}
+    //               onSkip={handleSkip}
+    //               onQuestionSelect={handleQuestionSelect}
+    //               answeredQuestions={answeredQuestions}
+    //               showQuestionGrid={showQuestionGrid}
+    //               onToggleQuestionGrid={() =>
+    //                 setShowQuestionGrid(!showQuestionGrid)
+    //               }
+    //               onSubmitQuiz={handleSubmitQuiz} // Add this line
+    //             />
+    //           </div>
+    //         </div>
+    //       </div>
+
+    //       {/* Stats Sidebar */}
+    //       <div className="lg:col-span-1">
+    //         <div className="bg-white/10 dark:bg-slate-800/50 backdrop-blur-xl border border-white/20 dark:border-slate-700/50 rounded-3xl p-6 shadow-2xl">
+    //           <QuizStats
+    //             stats={quizStats}
+    //             currentQuestion={state.currentQuestionIndex}
+    //             totalQuestions={questions.length}
+    //             timeRemaining={formatTime}
+    //           />
+    //         </div>
+    //       </div>
+    //     </div>
+    //   </div>
+    // </div>
     <div className="min-h-screen bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900 dark:from-slate-950 dark:via-purple-950 dark:to-slate-950">
       {/* Header */}
       <header className="border-b border-white/10 backdrop-blur-xl">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-4">
+        <div className="max-w-7xl mx-auto px-3 sm:px-6 md:px-8 py-3 sm:py-4">
+          <div className="flex flex-col gap-3 sm:gap-4 md:flex-row md:items-center md:justify-between">
+            {/* Left Section */}
+            <div className="flex items-center gap-2 sm:gap-3 flex-shrink-0">
               <button
                 onClick={onExit}
                 className="p-2 hover:bg-white/10 rounded-lg transition-colors duration-200"
               >
-                <ArrowLeft className="w-5 h-5 text-white" />
+                <ArrowLeft className="w-5 h-5 sm:w-6 sm:h-6 text-white" />
               </button>
-              <h1 className="text-xl font-semibold text-white">
+              <h1 className="text-base sm:text-lg md:text-xl lg:text-2xl font-semibold text-white truncate max-w-[200px] sm:max-w-[400px] md:max-w-none">
                 {quizInfo.title}
               </h1>
             </div>
-            <div className="flex items-center gap-4">
-              <div className="text-sm text-purple-300">
+
+            {/* Right Section */}
+            <div className="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-4 flex-wrap">
+              {/* Question Count */}
+              <div className="text-xs sm:text-sm text-purple-300 text-center sm:text-left">
                 Question {state.currentQuestionIndex + 1} of {questions.length}
               </div>
-              <div className="w-32 bg-slate-700/50 rounded-full h-2">
-                <div
-                  className="bg-gradient-to-r from-purple-600 to-pink-600 h-2 rounded-full transition-all duration-300"
-                  style={{
-                    width: `${
-                      ((state.currentQuestionIndex + 1) / questions.length) *
-                      100
-                    }%`,
-                  }}
-                />
+
+              {/* Progress Bar */}
+              <div className="flex items-center gap-2 sm:gap-3 w-full sm:w-auto">
+                <div className="flex-1 sm:flex-none w-full sm:w-24 md:w-32 bg-slate-700/50 rounded-full h-2">
+                  <div
+                    className="bg-gradient-to-r from-purple-600 to-pink-600 h-2 rounded-full transition-all duration-300"
+                    style={{
+                      width: `${
+                        ((state.currentQuestionIndex + 1) / questions.length) *
+                        100
+                      }%`,
+                    }}
+                  />
+                </div>
+                <div className="text-xs sm:text-sm text-slate-300 whitespace-nowrap">
+                  {Math.round(
+                    ((state.currentQuestionIndex + 1) / questions.length) * 100
+                  )}
+                  % Complete
+                </div>
               </div>
-              <div className="text-sm text-slate-300">
-                {Math.round(
-                  ((state.currentQuestionIndex + 1) / questions.length) * 100
-                )}
-                % Complete
-              </div>
+
+              {/* Theme Toggle */}
               <button
                 onClick={toggleTheme}
-                className="p-2 hover:bg-white/10 rounded-lg transition-colors duration-200"
+                className="p-2 hover:bg-white/10 rounded-lg transition-colors duration-200 self-center"
               >
                 {isDark ? (
-                  <Sun className="w-5 h-5 text-white" />
+                  <Sun className="w-5 h-5 sm:w-6 sm:h-6 text-white" />
                 ) : (
-                  <Moon className="w-5 h-5 text-white" />
+                  <Moon className="w-5 h-5 sm:w-6 sm:h-6 text-white" />
                 )}
               </button>
             </div>
@@ -431,11 +539,11 @@ export function Quiz({ quizInfo, questions, onExit }) {
       </header>
 
       {/* Main Content */}
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        <div className="grid lg:grid-cols-3 gap-8">
+      <div className="max-w-7xl mx-auto px-3 sm:px-6 md:px-8 py-6 sm:py-8">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 lg:gap-8">
           {/* Question Area */}
-          <div className="lg:col-span-2">
-            <div className="bg-white/10 dark:bg-slate-800/50 backdrop-blur-xl border border-white/20 dark:border-slate-700/50 rounded-3xl p-8 shadow-2xl">
+          <div className="md:col-span-2">
+            <div className="bg-white/10 dark:bg-slate-800/50 backdrop-blur-xl border border-white/20 dark:border-slate-700/50 rounded-2xl sm:rounded-3xl p-4 sm:p-6 md:p-8 shadow-2xl">
               <QuestionRenderer
                 question={currentQuestion}
                 userAnswer={currentAnswer}
@@ -443,7 +551,7 @@ export function Quiz({ quizInfo, questions, onExit }) {
                 questionTypes={quizInfo.settings?.questionTypes}
               />
 
-              <div className="mt-8 pt-6 border-t border-white/10">
+              <div className="mt-6 sm:mt-8 pt-4 sm:pt-6 border-t border-white/10">
                 <QuizNavigation
                   currentQuestion={state.currentQuestionIndex}
                   totalQuestions={questions.length}
@@ -456,15 +564,15 @@ export function Quiz({ quizInfo, questions, onExit }) {
                   onToggleQuestionGrid={() =>
                     setShowQuestionGrid(!showQuestionGrid)
                   }
-                  onSubmitQuiz={handleSubmitQuiz} // Add this line
+                  onSubmitQuiz={handleSubmitQuiz}
                 />
               </div>
             </div>
           </div>
 
           {/* Stats Sidebar */}
-          <div className="lg:col-span-1">
-            <div className="bg-white/10 dark:bg-slate-800/50 backdrop-blur-xl border border-white/20 dark:border-slate-700/50 rounded-3xl p-6 shadow-2xl">
+          <div className="md:col-span-1">
+            <div className="bg-white/10 dark:bg-slate-800/50 backdrop-blur-xl border border-white/20 dark:border-slate-700/50 rounded-2xl sm:rounded-3xl p-4 sm:p-6 shadow-2xl">
               <QuizStats
                 stats={quizStats}
                 currentQuestion={state.currentQuestionIndex}
