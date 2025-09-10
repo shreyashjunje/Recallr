@@ -104,6 +104,54 @@ const PDFDetailsPage = () => {
     setPdfData((prev) => ({ ...prev, isFavorite: !prev.isFavorite }));
   };
 
+  // const handleGenerate = async (type) => {
+  //   try {
+  //     setIsGenerating(type);
+
+  //     let response;
+
+  //     if (type === "summary") {
+  //       response = await axios.post(`${API_URL}/pdf/summary-only`, {
+  //         pdfId: pdf._id,
+  //         fileUrl: pdf.cloudinaryUrl,
+  //         fileName: pdf.originalName,
+  //         customPrompt: "Summarize this for quick revision",
+  //       });
+  //     } else if (type === "flashcards") {
+  //       // response = await axios.post("/api/pdf/flashgenius-only", {
+  //       //   pdfId: pdfData._id,
+  //       //   fileUrl: pdfData.cloudinaryUrl,
+  //       // });
+  //     } else if (type === "quiz") {
+  //       response = await axios.post("/api/pdf/quiz-only", {
+  //         pdfId: pdfData._id,
+  //         fileUrl: pdfData.cloudinaryUrl,
+  //       });
+  //     }
+
+  //     // Update UI state after backend finishes
+  //     setPdfData((prev) => ({
+  //       ...prev,
+  //       [type === "summary"
+  //         ? "hasSummary"
+  //         : type === "flashcards"
+  //         ? "hasFlashcards"
+  //         : "hasQuiz"]: true,
+
+  //       ...(type === "flashcards" && {
+  //         flashcardsCount: response.data?.flashcards?.length || 0,
+  //       }),
+  //       ...(type === "quiz" && {
+  //         quizQuestionsCount: response.data.quiz?.length || 0,
+  //       }),
+  //     }));
+  //   } catch (err) {
+  //     console.error("❌ Error generating:", type, err);
+  //     // optionally toast error
+  //   } finally {
+  //     setIsGenerating(null);
+  //   }
+  // };
   const handleGenerate = async (type) => {
     try {
       setIsGenerating(type);
@@ -118,36 +166,36 @@ const PDFDetailsPage = () => {
           customPrompt: "Summarize this for quick revision",
         });
       } else if (type === "flashcards") {
-        // response = await axios.post("/api/pdf/flashgenius-only", {
-        //   pdfId: pdfData._id,
-        //   fileUrl: pdfData.cloudinaryUrl,
-        // });
+        response = await axios.post(`${API_URL}/pdf/flashgenius-only`, {
+          pdfId: pdf._id,
+          fileUrl: pdf.cloudinaryUrl,
+        });
       } else if (type === "quiz") {
-        response = await axios.post("/api/pdf/quiz-only", {
-          pdfId: pdfData._id,
-          fileUrl: pdfData.cloudinaryUrl,
+        response = await axios.post(`${API_URL}/pdf/quiz-only`, {
+          pdfId: pdf._id,
+          fileUrl: pdf.cloudinaryUrl,
         });
       }
 
-      // Update UI state after backend finishes
-      setPdfData((prev) => ({
+      // ✅ Update single pdf state
+      setPdf((prev) => ({
         ...prev,
-        [type === "summary"
-          ? "hasSummary"
-          : type === "flashcards"
-          ? "hasFlashcards"
-          : "hasQuiz"]: true,
-
+        ...(type === "summary" && {
+          isSummarized: true,
+          summary: response.data.summary,
+        }),
         ...(type === "flashcards" && {
-          flashcardsCount: response.data.flashcards?.length || 0,
+          isFlashcardGenerated: true,
+          flashcards: response.data.flashcards || [],
         }),
         ...(type === "quiz" && {
-          quizQuestionsCount: response.data.quiz?.length || 0,
+          isQuizGenerated: true,
+          quizzes: response.data.quiz || [],
         }),
       }));
     } catch (err) {
       console.error("❌ Error generating:", type, err);
-      // optionally toast error
+      toast.error("Failed to generate " + type);
     } finally {
       setIsGenerating(null);
     }
@@ -316,7 +364,9 @@ const PDFDetailsPage = () => {
                 {/* Progress Bar */}
                 <div>
                   <div className="flex justify-between items-center mb-2">
-                    <span className="text-gray-600 text-sm sm:text-base">Overall Progress</span>
+                    <span className="text-gray-600 text-sm sm:text-base">
+                      Overall Progress
+                    </span>
                     <span className="font-bold text-emerald-600 text-sm sm:text-base">
                       {pdf.progress}%
                     </span>
@@ -390,7 +440,9 @@ const PDFDetailsPage = () => {
                 <div className="space-y-3 sm:space-y-4">
                   <div className="flex items-center gap-2 text-emerald-600 mb-3 sm:mb-4">
                     <CheckCircle size={16} />
-                    <span className="font-medium text-sm sm:text-base">Summary Available</span>
+                    <span className="font-medium text-sm sm:text-base">
+                      Summary Available
+                    </span>
                   </div>
 
                   <div className="bg-gradient-to-br from-purple-50 to-blue-50 rounded-lg sm:rounded-xl p-3 sm:p-4 border border-purple-100">
@@ -411,8 +463,13 @@ const PDFDetailsPage = () => {
                 </div>
               ) : (
                 <div className="text-center py-6 sm:py-8">
-                  <XCircle size={40} className="text-gray-400 mx-auto mb-3 sm:mb-4" />
-                  <p className="text-gray-500 mb-3 sm:mb-4 text-sm sm:text-base">No summary generated yet</p>
+                  <XCircle
+                    size={40}
+                    className="text-gray-400 mx-auto mb-3 sm:mb-4"
+                  />
+                  <p className="text-gray-500 mb-3 sm:mb-4 text-sm sm:text-base">
+                    No summary generated yet
+                  </p>
                   <button
                     onClick={() => handleGenerate("summary")}
                     disabled={isGenerating === "summary"}
@@ -447,7 +504,9 @@ const PDFDetailsPage = () => {
                   <div className="space-y-3 sm:space-y-4">
                     <div className="flex items-center gap-2 text-emerald-600 mb-3 sm:mb-4">
                       <CheckCircle size={16} />
-                      <span className="font-medium text-sm sm:text-base">Ready to Study</span>
+                      <span className="font-medium text-sm sm:text-base">
+                        Ready to Study
+                      </span>
                     </div>
 
                     <div className="bg-gradient-to-br from-orange-50 to-yellow-50 rounded-lg sm:rounded-xl p-3 sm:p-4 border border-orange-100">
@@ -470,8 +529,13 @@ const PDFDetailsPage = () => {
                   </div>
                 ) : (
                   <div className="text-center py-4 sm:py-6">
-                    <XCircle size={36} className="text-gray-400 mx-auto mb-2 sm:mb-3" />
-                    <p className="text-gray-500 mb-3 sm:mb-4 text-sm sm:text-base">No flashcards created</p>
+                    <XCircle
+                      size={36}
+                      className="text-gray-400 mx-auto mb-2 sm:mb-3"
+                    />
+                    <p className="text-gray-500 mb-3 sm:mb-4 text-sm sm:text-base">
+                      No flashcards created
+                    </p>
                     <button
                       onClick={() => handleGenerate("flashcards")}
                       disabled={isGenerating === "flashcards"}
@@ -504,7 +568,9 @@ const PDFDetailsPage = () => {
                   <div className="space-y-3 sm:space-y-4">
                     <div className="flex items-center gap-2 text-emerald-600 mb-3 sm:mb-4">
                       <CheckCircle size={16} />
-                      <span className="font-medium text-sm sm:text-base">Quiz Ready</span>
+                      <span className="font-medium text-sm sm:text-base">
+                        Quiz Ready
+                      </span>
                     </div>
 
                     <div className="bg-gradient-to-br from-indigo-50 to-purple-50 rounded-lg sm:rounded-xl p-3 sm:p-4 border border-indigo-100">
@@ -524,8 +590,13 @@ const PDFDetailsPage = () => {
                   </div>
                 ) : (
                   <div className="text-center py-4 sm:py-6">
-                    <XCircle size={36} className="text-gray-400 mx-auto mb-2 sm:mb-3" />
-                    <p className="text-gray-500 mb-3 sm:mb-4 text-sm sm:text-base">No quiz available</p>
+                    <XCircle
+                      size={36}
+                      className="text-gray-400 mx-auto mb-2 sm:mb-3"
+                    />
+                    <p className="text-gray-500 mb-3 sm:mb-4 text-sm sm:text-base">
+                      No quiz available
+                    </p>
                     <button
                       onClick={() => handleGenerate("quiz")}
                       disabled={isGenerating === "quiz"}
@@ -561,7 +632,9 @@ const PDFDetailsPage = () => {
                 <div className="text-xl sm:text-2xl font-bold text-blue-600 mb-1">
                   {pdf.isSummarized ? "✓" : "—"}
                 </div>
-                <div className="text-blue-700 text-xs sm:text-sm font-medium">Summary</div>
+                <div className="text-blue-700 text-xs sm:text-sm font-medium">
+                  Summary
+                </div>
               </div>
 
               <div className="text-center p-3 sm:p-4 bg-orange-50 rounded-lg sm:rounded-xl">
@@ -584,7 +657,7 @@ const PDFDetailsPage = () => {
 
               <div className="text-center p-3 sm:p-4 bg-emerald-50 rounded-lg sm:rounded-xl">
                 <div className="text-xl sm:text-2xl font-bold text-emerald-600 mb-1">
-                  {pdfData.progress?.timeSpent || "0h 0m"}
+                  {pdf.progress?.timeSpent || "0h 0m"}
                 </div>
                 <div className="text-emerald-700 text-xs sm:text-sm font-medium">
                   Time Spent
@@ -619,7 +692,9 @@ const PDFDetailsPage = () => {
                       )}
                       <span
                         className={`font-medium text-sm sm:text-base ${
-                          pdf.isSummarized ? "text-emerald-700" : "text-gray-500"
+                          pdf.isSummarized
+                            ? "text-emerald-700"
+                            : "text-gray-500"
                         }`}
                       >
                         Summary

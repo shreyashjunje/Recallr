@@ -9,7 +9,8 @@ const Navbar = () => {
   const { user, logout } = useAuth();
   const [isLoggedIn, setIsLoggedIn] = useState(!!user);
 
-  console.log("isLOGGEDIN-->", isLoggedIn);
+  // console.log("isLOGGEDIN-->", isLoggedIn);
+  // console.log("Profile picture URL:", user?.profilePicture);
 
   const navigate = useNavigate();
   const location = useLocation();
@@ -166,9 +167,9 @@ const Navbar = () => {
                         <div className="flex items-center space-x-3">
                           <div className="relative">
                             <div className="w-12 h-12 rounded-2xl flex items-center justify-center shadow-lg overflow-hidden">
-                              {user?.profilePicture ? (
+                              {user.profilePicture ? (
                                 <img
-                                  src={user.profilePicture}
+                                  src={user?.profilePicture}
                                   alt="Profile"
                                   className="w-full h-full object-cover"
                                 />

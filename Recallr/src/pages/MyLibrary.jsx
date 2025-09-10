@@ -800,12 +800,12 @@ const MyLibrary = () => {
                         {pdf.category || "Uncategorized"}
                       </span>
                       {/* Favorite badge for mobile view */}
-                      {pdf.isFavorite && (
+                      {/* {pdf.isFavorite && (
                         <div className="md:hidden flex items-center text-yellow-500">
                           <Star className="w-4 h-4 fill-yellow-400 mr-1" />
                           <span className="text-xs">Favorite</span>
                         </div>
-                      )}
+                      )} */}
                     </div>
                     <div className="flex items-center gap-2 text-sm text-gray-400">
                       <Clock className="w-4 h-4" />
@@ -900,215 +900,220 @@ const MyLibrary = () => {
             ))}
           </div>
         ) : (
-        <div className="space-y-5">
-  {filteredPdfs.map((pdf) => (
-    <div
-      key={pdf._id}
-      className="group relative bg-white rounded-2xl transition-all duration-300 p-5 flex flex-col md:flex-row md:items-center gap-5 hover:shadow-lg hover:border-transparent cursor-pointer border border-gray-100"
-      onClick={(e) => {
-        if (!e.target.closest("button, a, [role='button']")) {
-          handlePdfDetails(pdf._id);
-        }
-      }}
-    >
-      {/* PDF Icon */}
-      <div
-        className={`w-14 h-14 md:w-16 md:h-16 rounded-xl bg-gradient-to-br ${pdf.color} flex items-center justify-center flex-shrink-0 shadow-md`}
-      >
-        <FileText className="w-6 h-6 md:w-7 md:h-7 text-white" />
-      </div>
-
-      {/* Content Section */}
-      <div className="flex-1 min-w-0">
-        <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-3">
-          <div className="min-w-0">
-            <div className="flex items-center gap-2 mb-1">
-              <h3 className="text-lg md:text-xl font-bold text-gray-900 group-hover:text-blue-600 transition-colors truncate">
-                {pdf.title}
-              </h3>
-              {pdf.isFavorite && (
-                <Star className="w-4 h-4 fill-yellow-400 text-yellow-500" />
-              )}
-            </div>
-
-            {/* Category + Size + Date */}
-            <div className="flex flex-wrap items-center gap-3 mt-1 text-sm text-gray-500">
-              <span className="px-2 py-0.5 bg-blue-50 text-blue-700 rounded-full text-xs font-medium">
-                {pdf.category || "Uncategorized"}
-              </span>
-              <span>{pdf.formattedSize}</span>
-              <div className="flex items-center gap-1 text-xs">
-                <Clock className="w-3 h-3" />
-                <span>{pdf.formattedDate}</span>
-              </div>
-            </div>
-
-            {/* Tags */}
-            <div className="flex flex-wrap gap-2 mt-3">
-              {pdf.tags.slice(0, 3).map((tag) => (
-                <span
-                  key={tag}
-                  className="inline-flex items-center px-2.5 py-1 text-xs font-medium bg-gray-100 text-gray-700 rounded-full"
-                >
-                  {tag}
-                </span>
-              ))}
-              {pdf.tags.length > 3 && (
-                <span className="inline-flex items-center px-2 py-1 text-xs font-medium bg-gray-100 text-gray-500 rounded-full">
-                  +{pdf.tags.length - 3}
-                </span>
-              )}
-            </div>
-          </div>
-
-          {/* Progress bar (stacked on mobile) */}
-          <div className="text-left sm:text-right min-w-[120px]">
-            <div className="text-xs md:text-sm font-medium text-gray-900 mb-1">
-              {pdf.progress}% Complete
-            </div>
-            <div className="w-full bg-gray-200 rounded-full h-2">
+          <div className="space-y-5">
+            {filteredPdfs.map((pdf) => (
               <div
-                className={`h-2 rounded-full ${getProgressColor(pdf.progress)}`}
-                style={{ width: `${pdf.progress}%` }}
-              />
-            </div>
-          </div>
-        </div>
-
-        {/* Feature Chips */}
-        <div className="flex flex-wrap gap-2 mt-3">
-          {pdf?.isQuizGenerated && (
-            <div className="inline-flex items-center px-2.5 py-1 bg-gray-50 text-gray-700 rounded-lg text-xs font-medium border border-gray-100">
-              {getFeatureIcon("Quiz")}
-              <span className="ml-1">Quiz</span>
-            </div>
-          )}
-          {pdf?.isFlashcardGenerated && (
-            <div className="inline-flex items-center px-2.5 py-1 bg-gray-50 text-gray-700 rounded-lg text-xs font-medium border border-gray-100">
-              {getFeatureIcon("Flashcards")}
-              <span className="ml-1">Flashcards</span>
-            </div>
-          )}
-          {pdf.isSummarized && (
-            <div className="inline-flex items-center px-2.5 py-1 bg-gray-50 text-gray-700 rounded-lg text-xs font-medium border border-gray-100">
-              {getFeatureIcon("Summary")}
-              <span className="ml-1">Summary</span>
-            </div>
-          )}
-        </div>
-      </div>
-
-      {/* Action Buttons */}
-      <div className="flex flex-wrap sm:flex-nowrap items-center gap-3 sm:gap-4 mt-4 md:mt-0">
-        {/* Favorite */}
-        <button
-          className="p-2 text-gray-400 hover:text-yellow-500 hover:bg-yellow-50 rounded-lg transition-colors"
-          onClick={(e) => {
-            e.stopPropagation();
-            handleToggleFavorite(pdf);
-          }}
-          title={pdf.isFavorite ? "Remove from favorites" : "Add to favorites"}
-        >
-          {pdf.isFavorite ? (
-            <Star className="w-5 h-5 fill-yellow-400 text-yellow-400" />
-          ) : (
-            <Star className="w-5 h-5" />
-          )}
-        </button>
-
-        {/* Read */}
-        <button
-          className="flex items-center space-x-2 px-3 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg text-sm font-medium transition-colors shadow-md"
-          onClick={(e) => {
-            e.stopPropagation();
-            handleRead(pdf);
-          }}
-        >
-          <Eye className="w-4 h-4" />
-          <span>Read</span>
-        </button>
-
-        {/* Download */}
-        <button
-          className="p-2 bg-gray-100 hover:bg-gray-200 text-gray-600 rounded-lg transition-colors shadow-sm"
-          onClick={(e) => {
-            e.stopPropagation();
-            handledownload(pdf);
-          }}
-        >
-          <Download className="w-4 h-4" />
-        </button>
-
-        {/* More menu */}
-        <div className="relative">
-          <button
-            className="p-2 text-gray-500 hover:text-gray-700 hover:bg-gray-100 rounded-lg transition-colors"
-            onClick={(e) => {
-              e.stopPropagation();
-              setSelectedPdf(pdf);
-            }}
-          >
-            <MoreVertical className="w-4 h-4" />
-          </button>
-
-          {selectedPdf?._id === pdf._id && (
-            <div
-              ref={dropdownRef}
-              className="absolute right-0 mt-2 w-44 bg-white rounded-xl shadow-lg z-10 border border-gray-200 overflow-hidden"
-            >
-              {/* Close */}
-              <button
-                className="absolute top-2 right-2 text-gray-600 hover:text-gray-900"
+                key={pdf._id}
+                className="group relative bg-white rounded-2xl transition-all duration-300 p-5 flex flex-col md:flex-row md:items-center gap-5 hover:shadow-lg hover:border-transparent cursor-pointer border border-gray-100"
                 onClick={(e) => {
-                  e.stopPropagation();
-                  setSelectedPdf(null);
+                  if (!e.target.closest("button, a, [role='button']")) {
+                    handlePdfDetails(pdf._id);
+                  }
                 }}
               >
-                <X className="w-5 h-5" />
-              </button>
+                {/* PDF Icon */}
+                <div
+                  className={`w-14 h-14 md:w-16 md:h-16 rounded-xl bg-gradient-to-br ${pdf.color} flex items-center justify-center flex-shrink-0 shadow-md`}
+                >
+                  <FileText className="w-6 h-6 md:w-7 md:h-7 text-white" />
+                </div>
 
-              <div className="py-2">
-                <button
-                  className="flex items-center px-4 py-3 text-sm text-gray-700 hover:bg-blue-50 w-full text-left"
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    handlePdfAction("edit", pdf);
-                  }}
-                >
-                  <Edit className="w-4 h-4 mr-3 text-blue-500" />
-                  Edit Details
-                </button>
-                <button
-                  className="flex items-center px-4 py-3 text-sm text-gray-700 hover:bg-blue-50 w-full text-left"
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    handlePdfAction("download", pdf);
-                  }}
-                >
-                  <Download className="w-4 h-4 mr-3 text-blue-500" />
-                  Download
-                </button>
-                <button
-                  className="flex items-center px-4 py-3 text-sm text-red-600 hover:bg-red-50 w-full text-left"
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    setPdfToDelete(pdf);
-                    setShowDeleteConfirm(true);
-                    setSelectedPdf(null);
-                  }}
-                >
-                  <Trash2 className="w-4 h-4 mr-3" />
-                  Delete
-                </button>
+                {/* Content Section */}
+                <div className="flex-1 min-w-0">
+                  <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-3">
+                    <div className="min-w-0">
+                      <div className="flex items-center gap-2 mb-1">
+                        <h3 className="text-lg md:text-xl font-bold text-gray-900 group-hover:text-blue-600 transition-colors truncate">
+                          {pdf.title}
+                        </h3>
+                        {pdf.isFavorite && (
+                          <Star className="w-4 h-4 fill-yellow-400 text-yellow-500" />
+                        )}
+                      </div>
+
+                      {/* Category + Size + Date */}
+                      <div className="flex flex-wrap items-center gap-3 mt-1 text-sm text-gray-500">
+                        <span className="px-2 py-0.5 bg-blue-50 text-blue-700 rounded-full text-xs font-medium">
+                          {pdf.category || "Uncategorized"}
+                        </span>
+                        <span>{pdf.formattedSize}</span>
+                        <div className="flex items-center gap-1 text-xs">
+                          <Clock className="w-3 h-3" />
+                          <span>{pdf.formattedDate}</span>
+                        </div>
+                      </div>
+
+                      {/* Tags */}
+                      <div className="flex flex-wrap gap-2 mt-3">
+                        {pdf.tags.slice(0, 3).map((tag) => (
+                          <span
+                            key={tag}
+                            className="inline-flex items-center px-2.5 py-1 text-xs font-medium bg-gray-100 text-gray-700 rounded-full"
+                          >
+                            {tag}
+                          </span>
+                        ))}
+                        {pdf.tags.length > 3 && (
+                          <span className="inline-flex items-center px-2 py-1 text-xs font-medium bg-gray-100 text-gray-500 rounded-full">
+                            +{pdf.tags.length - 3}
+                          </span>
+                        )}
+                      </div>
+                    </div>
+
+                    {/* Progress bar (stacked on mobile) */}
+                    <div className="text-left sm:text-right min-w-[120px]">
+                      <div className="text-xs md:text-sm font-medium text-gray-900 mb-1">
+                        {pdf.progress}% Complete
+                      </div>
+                      <div className="w-full bg-gray-200 rounded-full h-2">
+                        <div
+                          className={`h-2 rounded-full ${getProgressColor(
+                            pdf.progress
+                          )}`}
+                          style={{ width: `${pdf.progress}%` }}
+                        />
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Feature Chips */}
+                  <div className="flex flex-wrap gap-2 mt-3">
+                    {pdf?.isQuizGenerated && (
+                      <div className="inline-flex items-center px-2.5 py-1 bg-gray-50 text-gray-700 rounded-lg text-xs font-medium border border-gray-100">
+                        {getFeatureIcon("Quiz")}
+                        <span className="ml-1">Quiz</span>
+                      </div>
+                    )}
+                    {pdf?.isFlashcardGenerated && (
+                      <div className="inline-flex items-center px-2.5 py-1 bg-gray-50 text-gray-700 rounded-lg text-xs font-medium border border-gray-100">
+                        {getFeatureIcon("Flashcards")}
+                        <span className="ml-1">Flashcards</span>
+                      </div>
+                    )}
+                    {pdf.isSummarized && (
+                      <div className="inline-flex items-center px-2.5 py-1 bg-gray-50 text-gray-700 rounded-lg text-xs font-medium border border-gray-100">
+                        {getFeatureIcon("Summary")}
+                        <span className="ml-1">Summary</span>
+                      </div>
+                    )}
+                  </div>
+                </div>
+
+                {/* Action Buttons */}
+                <div className="flex flex-wrap sm:flex-nowrap items-center gap-3 sm:gap-4 mt-4 md:mt-0">
+                  {/* Favorite */}
+                  <button
+                    className="p-2 text-gray-400 hover:text-yellow-500 hover:bg-yellow-50 rounded-lg transition-colors"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      handleToggleFavorite(pdf);
+                    }}
+                    title={
+                      pdf.isFavorite
+                        ? "Remove from favorites"
+                        : "Add to favorites"
+                    }
+                  >
+                    {pdf.isFavorite ? (
+                      <Star className="w-5 h-5 fill-yellow-400 text-yellow-400" />
+                    ) : (
+                      <Star className="w-5 h-5" />
+                    )}
+                  </button>
+
+                  {/* Read */}
+                  <button
+                    className="flex items-center space-x-2 px-3 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg text-sm font-medium transition-colors shadow-md"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      handleRead(pdf);
+                    }}
+                  >
+                    <Eye className="w-4 h-4" />
+                    <span>Read</span>
+                  </button>
+
+                  {/* Download */}
+                  <button
+                    className="p-2 bg-gray-100 hover:bg-gray-200 text-gray-600 rounded-lg transition-colors shadow-sm"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      handledownload(pdf);
+                    }}
+                  >
+                    <Download className="w-4 h-4" />
+                  </button>
+
+                  {/* More menu */}
+                  <div className="relative">
+                    <button
+                      className="p-2 text-gray-500 hover:text-gray-700 hover:bg-gray-100 rounded-lg transition-colors"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        setSelectedPdf(pdf);
+                      }}
+                    >
+                      <MoreVertical className="w-4 h-4" />
+                    </button>
+
+                    {selectedPdf?._id === pdf._id && (
+                      <div
+                        ref={dropdownRef}
+                        className="absolute right-0 mt-2 w-44 bg-white rounded-xl shadow-lg z-10 border border-gray-200 overflow-hidden"
+                      >
+                        {/* Close */}
+                        <button
+                          className="absolute top-2 right-2 text-gray-600 hover:text-gray-900"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            setSelectedPdf(null);
+                          }}
+                        >
+                          <X className="w-5 h-5" />
+                        </button>
+
+                        <div className="py-2">
+                          <button
+                            className="flex items-center px-4 py-3 text-sm text-gray-700 hover:bg-blue-50 w-full text-left"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              handlePdfAction("edit", pdf);
+                            }}
+                          >
+                            <Edit className="w-4 h-4 mr-3 text-blue-500" />
+                            Edit Details
+                          </button>
+                          <button
+                            className="flex items-center px-4 py-3 text-sm text-gray-700 hover:bg-blue-50 w-full text-left"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              handlePdfAction("download", pdf);
+                            }}
+                          >
+                            <Download className="w-4 h-4 mr-3 text-blue-500" />
+                            Download
+                          </button>
+                          <button
+                            className="flex items-center px-4 py-3 text-sm text-red-600 hover:bg-red-50 w-full text-left"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              setPdfToDelete(pdf);
+                              setShowDeleteConfirm(true);
+                              setSelectedPdf(null);
+                            }}
+                          >
+                            <Trash2 className="w-4 h-4 mr-3" />
+                            Delete
+                          </button>
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                </div>
               </div>
-            </div>
-          )}
-        </div>
-      </div>
-    </div>
-  ))}
-</div>
-
+            ))}
+          </div>
         )}
       </div>
 

@@ -1,7 +1,8 @@
 const TelegramBot = require("node-telegram-bot-api");
 const { linkTelegramAccount } = require("./controllers/telegramController");
 
-const bot = new TelegramBot(process.env.TELEGRAM_BOT_TOKEN, { polling: true });
+// const bot = new TelegramBot(process.env.TELEGRAM_BOT_TOKEN, { polling: true });
+const bot = require("../bot");
 
 bot.onText(/^\/start(?:\s+(\S+))?/, async (msg, match) => {
   const chatId = msg.chat.id;

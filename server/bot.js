@@ -13,7 +13,7 @@ console.log("controller exports:", controller);
 
 const { TELEGRAM_BOT_TOKEN, API_BASE_URL, BOT_SHARED_SECRET } = process.env;
 
-const bot = new TelegramBot(TELEGRAM_BOT_TOKEN, { polling: true });
+const bot = new TelegramBot(TELEGRAM_BOT_TOKEN, { polling: false });
 
 console.log("Telegram Bot started...");
 

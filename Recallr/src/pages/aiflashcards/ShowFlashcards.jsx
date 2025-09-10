@@ -33,6 +33,7 @@ const ShowFlashcards = () => {
       if (res.status === 200) {
         setPdf(res.data.data);
         setFlashcards(res.data.data.flashcards);
+        console.log("Fetched Flashcards:", res.data.data.flashcards);
         toast.success("Flashcards fetched successfully");
       }
     } catch (err) {
@@ -269,13 +270,13 @@ const ShowFlashcards = () => {
         <div className="mt-6 sm:mt-8 grid grid-cols-3 gap-2 sm:gap-4 text-center">
           <div className="bg-white/50 rounded-xl p-3 sm:p-4 border">
             <div className="text-lg sm:text-xl md:text-2xl font-bold text-emerald-600">
-              {flashcards.filter((c) => c.difficulty === "Easy").length}
+              {flashcards?.filter((c) => c.difficulty === "Easy").length}
             </div>
             <div className="text-xs sm:text-sm text-gray-600">Easy</div>
           </div>
           <div className="bg-white/50 rounded-xl p-3 sm:p-4 border">
             <div className="text-lg sm:text-xl md:text-2xl font-bold text-amber-600">
-              {flashcards.filter((c) => c.difficulty === "Medium").length}
+              {flashcards?.filter((c) => c.difficulty === "Medium").length}
             </div>
             <div className="text-xs sm:text-sm text-gray-600">Medium</div>
           </div>

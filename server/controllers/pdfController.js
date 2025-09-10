@@ -4,6 +4,7 @@ const axios = require("axios");
 const User = require("../models/User");
 const {
   processSummaryWithGeminiFromUrl,
+  processFlashcardsWithGeminiFromUrl,
 } = require("../services/geminiService");
 const Pdf = require("../models/Pdf");
 const cloudinary = require("cloudinary").v2;
@@ -400,7 +401,50 @@ const generateSummaryOnly = async (req, res) => {
   }
 };
 
-const generateFlashCardsOnly = async (req, res) => {};
+const generateFlashCardsOnly = async (req, res) => {
+  const { fileUrl, fileName, customPrompt } = req.body;
+
+  try {
+    if (!fileUrl) {
+      return res.status(400).json({ message: "No file URL provided" });
+    }
+
+    console.log("Fetching file from Cloudinary for flashcards:", fileUrl);
+
+    // 1. Call Gemini for flashcards (not summary)
+    const airesponse = await processFlashcardsWithGeminiFromUrl(
+      fileUrl,
+      customPrompt
+    );
+
+    const { flashcards } = airesponse;
+
+    // 2. Find PDF doc by Cloudinary URL and update flashcards
+    const updatedPdf = await Pdf.findOneAndUpdate(
+      { cloudinaryUrl: fileUrl }, // match document
+      {
+        $set: {
+          flashcards, // store flashcards array
+          isFlashcardGenerated: true, // flag
+          flashcardsGeneratedAt: new Date(), // timestamp
+        },
+      },
+      { new: true } // return updated document
+    );
+
+    if (!updatedPdf) {
+      return res.status(404).json({ message: "PDF not found in database" });
+    }
+
+    res.status(200).json({
+      message: "Flashcards generated & saved successfully",
+      pdf: updatedPdf,
+    });
+  } catch (err) {
+    console.error("❌ Error generating flashcards:", err);
+    res.status(500).json({ message: "Failed to generate flashcards" });
+  }
+};
 
 const updatePdfProgress = async (req, res) => {
   try {
@@ -424,41 +468,40 @@ const updatePdfProgress = async (req, res) => {
   }
 };
 
-const getCategories =async (req,res)=>{
-  try{
+const getCategories = async (req, res) => {
+  try {
+    const userId = req.user.id;
 
-    const userId=req.user.id;
-
-    if(!userId){
-      return res.status(400).json({message:"user id not found"})
+    if (!userId) {
+      return res.status(400).json({ message: "user id not found" });
     }
 
-    const user=await User.findById(userId)
+    const user = await User.findById(userId);
 
-    if(!user){
-      return res.status(400).json({message:"user not found"})
+    if (!user) {
+      return res.status(400).json({ message: "user not found" });
     }
 
-    const categories=await Pdf.distinct("category", { user:userId })
+    const categories = await Pdf.distinct("category", { user: userId });
 
     // if(!categories){
     //   return res.status(400).json({message:"No categories found"})
     // }
 
     return res.status(200).json({
-      success:true,
-      data:categories,
-      message:"categories fetched successfully"
-    })
-
-  }catch(err){
-    console.log("errorL",err)
-    res,status(500).jaon({
-      success:false,
-      message:"server error while fetching catgories"
-    })
+      success: true,
+      data: categories,
+      message: "categories fetched successfully",
+    });
+  } catch (err) {
+    console.log("errorL", err);
+    res,
+      status(500).jaon({
+        success: false,
+        message: "server error while fetching catgories",
+      });
   }
-}
+};
 
 module.exports = {
   uploadPdf,
@@ -470,5 +513,5 @@ module.exports = {
   generateSummaryOnly,
   generateFlashCardsOnly,
   updatePdfProgress,
-  getCategories
+  getCategories,
 };

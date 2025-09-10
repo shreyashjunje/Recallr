@@ -340,7 +340,7 @@ The structure must be:
     {
       "question": "Write a ${settings.questionType} type question",
       "answer": "Provide the correct answer here",
-      "difficulty": "${settings.difficulty}"
+      "difficulty": "Easy | Medium | Hard"
     }
   ]
 }
@@ -352,7 +352,8 @@ Rules:
 - Category must be a single word or short phrase.
 - Questions must be clear, concise, and based only on the document.
 - Answers must be accurate and unambiguous.
-- Difficulty for all flashcards should match: "${settings.difficulty}".
+- If settings.difficulty = "Mixed", assign different difficulty levels (Easy, Medium, Hard) individually to each flashcard instead of using "mixed".
+- Otherwise, use the exact difficulty from settings.difficulty for all flashcards.
 - Output valid JSON only, no explanations or extra text.
     `;
 
@@ -550,24 +551,29 @@ Generate output in **strict JSON format only** (no extra text).
 The structure must be:
 
 {
-
+  "title": "Short and clear title of the document",
+  "tags": ["keyword1", "keyword2", "keyword3"],
+  "category": "Choose one category (e.g., Programming, AI, Cloud)",
   "flashcards": [
     {
       "question": "Write a ${settings.questionType} type question",
       "answer": "Provide the correct answer here",
-      "difficulty": "${settings.difficulty}"
+      "difficulty": "Easy | Medium | Hard"
     }
   ]
 }
 
 Rules:
 - Generate exactly **${settings.numCards} flashcards**.
+- Title should be 3–6 words max.
+- Tags must be 3–5 short keywords (no long sentences).
+- Category must be a single word or short phrase.
 - Questions must be clear, concise, and based only on the document.
 - Answers must be accurate and unambiguous.
-- Difficulty for all flashcards should match: "${settings.difficulty}".
+- If settings.difficulty = "Mixed", assign different difficulty levels (Easy, Medium, Hard) individually to each flashcard instead of using "mixed".
+- Otherwise, use the exact difficulty from settings.difficulty for all flashcards.
 - Output valid JSON only, no explanations or extra text.
     `;
-
     // 3. Get Gemini model
     const model = genAI.getGenerativeModel({
       model: "gemini-2.5-pro",
