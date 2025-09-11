@@ -21,7 +21,7 @@ let cors = require("cors");
 connectDb();
 const allowedOrigins = [
   "http://localhost:5173",
-  "https://recallr-two.vercel.app",
+  "https://recallr-app.vercel.app",
   "https://recallr-git-main-yashs-projects-14d0553e.vercel.app",
   "https://recallr-dfwmf5e3l-yashs-projects-14d0553e.vercel.app"
 ];
