@@ -506,7 +506,7 @@ const generateQuizOnly = async (req, res) => {
       pdfId,
       fileUrl,
       fileName,
-      userId,
+      // userId,
       numQuestions,
       difficulty,
       questionTypes,
@@ -517,6 +517,10 @@ const generateQuizOnly = async (req, res) => {
       shuffleQuestions,
       shuffleOptions,
     } = req.body;
+
+    const userId = req.user?.id;
+
+
 
     if (!fileUrl || !userId) {
       return res.status(400).json({ message: "Missing required fields" });
