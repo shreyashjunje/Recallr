@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import {
   Heart,
   Share2,
@@ -15,11 +15,15 @@ import {
 import { useLocation, useParams } from "react-router-dom";
 import { toast } from "react-toastify";
 import axios from "axios";
+import html2pdf from "html2pdf.js";
+import jsPDF from "jspdf";
 
 const API_URL = import.meta.env.VITE_API_URL;
 
 const AiSummaryDisplay = () => {
   const { id } = useParams();
+  const pdfRef = useRef();
+
   const location = useLocation();
   const summary = location.state?.summary;
 
@@ -68,12 +72,58 @@ const AiSummaryDisplay = () => {
     }
   };
 
+  // const handlePDFDownload = () => {
+  //   const element = pdfRef.current;
+  //   const options = {
+  //     margin: 0.3,
+  //     filename: "summary.pdf",
+  //     image: { type: "jpeg", quality: 0.98 },
+  //     html2canvas: { scale: 2 },
+  //     jsPDF: { unit: "in", format: "a4", orientation: "portrait" },
+  //   };
+
+  //   html2pdf().set(options).from(element).save();
+  // };
+  // const handlePDFDownload = () => {
+  //   const doc = new jsPDF();
+
+  //   // Title
+  //   doc.setFontSize(18);
+  //   doc.text(`${summaryinfo.title}`, 10, 15);
+
+  //   // Section: Summary
+  //   doc.setFontSize(14);
+  //   doc.text("Summary:", 10, 30);
+  //   doc.setFontSize(12);
+  //   doc.text(summaryinfo.summary, 10, 40, { maxWidth: 180 });
+
+  //   // Section: Key Points
+  //   doc.setFontSize(14);
+  //   doc.text("Key Points:", 10, 80);
+
+  //   doc.setFontSize(12);
+  //   summaryinfo.keyPoints.forEach((point, index) => {
+  //     doc.text(`• ${point}`, 12, 90 + index * 10, { maxWidth: 180 });
+  //   });
+
+  //   // Save PDF
+  //   doc.save("summary.pdf");
+  // };
   const handlePDFDownload = () => {
-    alert("PDF download feature coming soon!");
+    const element = pdfRef.current;
+    const options = {
+      margin: 0.3,
+      filename: "mern-roadmap.pdf",
+      image: { type: "jpeg", quality: 0.98 },
+      html2canvas: { scale: 2 },
+      jsPDF: { unit: "in", format: "a4", orientation: "portrait" },
+    };
+
+    html2pdf().set(options).from(element).save();
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 to-blue-50">
+    <div className="min-h-screen bg-gradient-to-br from-slate-50 to-blue-50 ">
       {/* Header */}
       <header className="bg-white/80 backdrop-blur-sm border-b border-slate-200 sticky top-0 z-10">
         <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
@@ -116,92 +166,94 @@ const AiSummaryDisplay = () => {
 
       {/* Main Content */}
       <main className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-10">
-        {/* Title Section */}
-        <div className="bg-white rounded-2xl shadow-sm border border-slate-200 p-4 sm:p-6 lg:p-8 mb-6">
-          <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-slate-900 leading-tight mb-4">
-            {summaryinfo.title}
-          </h1>
-          <div className="flex lg:flex-col lg:items-start flex-wrap items-center gap-4 text-xs sm:text-sm text-slate-600">
-            <div className="flex items-center gap-1">
-              <Calendar size={14} />
-              <span>
-                {summaryinfo.uploadedAt &&
-                  new Date(summaryinfo.uploadedAt).toLocaleDateString()}
-              </span>
-            </div>
-            <div className="flex items-center gap-2">
-              <Bookmark className="text-blue-600" size={14} />
-              <span className="px-2 sm:px-3 py-1 bg-blue-100 text-blue-800 rounded-full text-xs sm:text-sm font-medium">
-                {summaryinfo.category}
-              </span>
-            </div>
-            {summaryinfo?.tags?.length > 0 && (
+        <div ref={pdfRef}>
+          {/* Title Section */}
+          <div className="bg-white rounded-2xl shadow-sm border border-slate-200 p-4 sm:p-6 lg:p-8 mb-6">
+            <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-slate-900 leading-tight mb-4">
+              {summaryinfo.title}
+            </h1>
+            <div className="flex lg:flex-col lg:items-start flex-wrap items-center gap-4 text-xs sm:text-sm text-slate-600">
+              <div className="flex items-center gap-1">
+                <Calendar size={14} />
+                <span>
+                  {summaryinfo.uploadedAt &&
+                    new Date(summaryinfo.uploadedAt).toLocaleDateString()}
+                </span>
+              </div>
               <div className="flex items-center gap-2">
-                <Tag className="text-slate-500" size={14} />
-                <div className="flex flex-wrap gap-2">
-                  {summaryinfo.tags.map((tag, i) => (
-                    <span
-                      key={i}
-                      className="px-2 py-1 bg-slate-100 text-slate-700 rounded-full text-xs sm:text-sm font-medium"
-                    >
-                      {tag}
-                    </span>
-                  ))}
+                <Bookmark className="text-blue-600" size={14} />
+                <span className="px-2 sm:px-3 py-1 bg-blue-100 text-blue-800 rounded-full text-xs sm:text-sm font-medium">
+                  {summaryinfo.category}
+                </span>
+              </div>
+              {summaryinfo?.tags?.length > 0 && (
+                <div className="flex items-center gap-2">
+                  <Tag className="text-slate-500" size={14} />
+                  <div className="flex flex-wrap gap-2">
+                    {summaryinfo.tags.map((tag, i) => (
+                      <span
+                        key={i}
+                        className="px-2 py-1 bg-slate-100 text-slate-700 rounded-full text-xs sm:text-sm font-medium"
+                      >
+                        {tag}
+                      </span>
+                    ))}
+                  </div>
                 </div>
-              </div>
-            )}
+              )}
+            </div>
           </div>
-        </div>
 
-        {/* Summary */}
-        <div className="bg-white rounded-2xl shadow-sm border border-slate-200 p-4 sm:p-6 lg:p-8 mb-6">
-          <h2 className="text-lg sm:text-xl font-semibold text-slate-900 mb-4 flex items-center gap-2">
-            <BookOpen className="text-blue-600" size={18} />
-            Summary
-          </h2>
-          <div className="space-y-3 sm:space-y-4">
-            {summaryinfo.summary?.map((para, i) => (
-              <p
-                key={i}
-                className="text-slate-700 leading-relaxed text-sm sm:text-base lg:text-lg"
-              >
-                {para}
-              </p>
-            ))}
-          </div>
-        </div>
-
-        {/* Key Points */}
-        <div className="bg-white rounded-2xl shadow-sm border border-slate-200 p-4 sm:p-6 lg:p-8">
-          <h2 className="text-lg sm:text-xl font-semibold text-slate-900 mb-4 flex items-center gap-2">
-            <Star className="text-amber-500" size={18} />
-            Key Points
-          </h2>
-          <div className="space-y-3">
-            {summaryinfo?.keyPoints?.map((kp, i) => (
-              <div
-                key={i}
-                className={`flex items-start gap-3 sm:gap-4 p-3 sm:p-4 rounded-xl ${
-                  kp.important
-                    ? "bg-amber-50 border-l-4 border-amber-400"
-                    : "bg-slate-50 hover:bg-slate-100"
-                }`}
-              >
-                <div
-                  className={`w-2 h-2 rounded-full mt-2 ${
-                    kp.important ? "bg-amber-500" : "bg-slate-400"
-                  }`}
-                />
-                <p className="text-slate-700 text-sm sm:text-base lg:text-lg flex-1">
-                  {kp.point}
+          {/* Summary */}
+          <div className="bg-white rounded-2xl shadow-sm border border-slate-200 p-4 sm:p-6 lg:p-8 mb-6">
+            <h2 className="text-lg sm:text-xl font-semibold text-slate-900 mb-4 flex items-center gap-2">
+              <BookOpen className="text-blue-600" size={18} />
+              Summary
+            </h2>
+            <div className="space-y-3 sm:space-y-4">
+              {summaryinfo.summary?.map((para, i) => (
+                <p
+                  key={i}
+                  className="text-slate-700 leading-relaxed text-sm sm:text-base lg:text-lg"
+                >
+                  {para}
                 </p>
-                {kp.important && (
-                  <span className="hidden sm:inline px-2 py-1 rounded-full text-xs font-medium bg-amber-100 text-amber-800">
-                    Important
-                  </span>
-                )}
-              </div>
-            ))}
+              ))}
+            </div>
+          </div>
+
+          {/* Key Points */}
+          <div className="bg-white rounded-2xl shadow-sm border border-slate-200 p-4 sm:p-6 lg:p-8">
+            <h2 className="text-lg sm:text-xl font-semibold text-slate-900 mb-4 flex items-center gap-2">
+              <Star className="text-amber-500" size={18} />
+              Key Points
+            </h2>
+            <div className="space-y-3">
+              {summaryinfo?.keyPoints?.map((kp, i) => (
+                <div
+                  key={i}
+                  className={`flex items-start gap-3 sm:gap-4 p-3 sm:p-4 rounded-xl ${
+                    kp.important
+                      ? "bg-amber-50 border-l-4 border-amber-400"
+                      : "bg-slate-50 hover:bg-slate-100"
+                  }`}
+                >
+                  <div
+                    className={`w-2 h-2 rounded-full mt-2 ${
+                      kp.important ? "bg-amber-500" : "bg-slate-400"
+                    }`}
+                  />
+                  <p className="text-slate-700 text-sm sm:text-base lg:text-lg flex-1">
+                    {kp.point}
+                  </p>
+                  {kp.important && (
+                    <span className="hidden sm:inline px-2 py-1 rounded-full text-xs font-medium bg-amber-100 text-amber-800">
+                      Important
+                    </span>
+                  )}
+                </div>
+              ))}
+            </div>
           </div>
         </div>
 

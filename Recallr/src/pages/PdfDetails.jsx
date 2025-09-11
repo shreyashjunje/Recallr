@@ -23,12 +23,15 @@ import {
   Tag,
   Folder,
   Info,
+  Star,
 } from "lucide-react";
 import { useParams } from "react-router-dom";
 import { useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
 import axios from "axios";
 import useAuth from "@/hooks/useAuth";
+import { jwtDecode } from "jwt-decode";
+
 const API_URL = import.meta.env.VITE_API_URL;
 
 const mockPDFData = {
@@ -73,6 +76,12 @@ const PDFDetailsPage = () => {
   const [expandedSummary, setExpandedSummary] = useState(false);
   const [pdf, setPdf] = useState({});
   const navigate = useNavigate();
+  const [isFav, setIsFav] = useState(pdf.isFavourite);
+
+  const [pdfToDelete, setPdfToDelete] = useState(null);
+  const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
+  const [selectedPdf, setSelectedPdf] = useState(null);
+  const [isRefreshing, setIsRefreshing] = useState(false);
 
   const fetchPdfDetails = async () => {
     try {
@@ -102,9 +111,9 @@ const PDFDetailsPage = () => {
     });
   };
 
-  const toggleFavorite = () => {
-    setPdfData((prev) => ({ ...prev, isFavorite: !prev.isFavorite }));
-  };
+  // const toggleFavorite = () => {
+  //   setPdfData((prev) => ({ ...prev, isFavorite: !prev.isFavorite }));
+  // };
 
   // const handleGenerate = async (type) => {
   //   try {
@@ -237,6 +246,18 @@ const PDFDetailsPage = () => {
       setIsGenerating(null);
     }
   };
+  const handleRefresh = async () => {
+    setIsRefreshing(true);
+    try {
+      await fetchPdfDetails();
+      toast.success("PDF details refreshed");
+    } catch (error) {
+      console.error("Error refreshing PDF:", error);
+      toast.error("Failed to refresh PDF details");
+    } finally {
+      setIsRefreshing(false);
+    }
+  };
 
   const copyToClipboard = (text) => {
     navigator.clipboard.writeText(text);
@@ -255,6 +276,95 @@ const PDFDetailsPage = () => {
     navigate(`/summify/${summaryId}`);
   };
 
+  const handledownload = async (pdf) => {
+    const pdfName =
+      pdf.originalName && pdf.originalName.trim() !== ""
+        ? pdf.originalName
+        : "myfile.pdf";
+
+    try {
+      const response = await fetch(pdf.cloudinaryUrl, { mode: "cors" });
+      const blob = await response.blob();
+      const url = window.URL.createObjectURL(blob);
+
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = pdfName; // force your filename
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+
+      window.URL.revokeObjectURL(url);
+    } catch (err) {
+      console.error("Download failed:", err);
+    }
+  };
+
+  const handleToggleFavorite = async () => {
+    const token = localStorage.getItem("token");
+    if (!token) return;
+
+    // Optimistic update
+    setIsFav((prev) => !prev);
+
+    try {
+      const endpoint = isFav
+        ? `${API_URL}/helper/remove-from-favourite`
+        : `${API_URL}/helper/add-to-favourite`;
+
+      const config = { headers: { Authorization: `Bearer ${token}` } };
+
+      if (isFav) {
+        await axios.delete(endpoint, { ...config, data: { pdfId: pdf._id } });
+      } else {
+        await axios.post(endpoint, { pdfId: pdf._id }, config);
+      }
+    } catch (error) {
+      console.error(error);
+      // rollback if API fails
+      setIsFav((prev) => !prev);
+    }
+  };
+
+  // Confirm delete
+  const confirmDelete = async () => {
+    if (!pdfToDelete) return;
+
+    const token = localStorage.getItem("token");
+    if (!token) {
+      toast.error("You are not logged in");
+      return;
+    }
+
+    const decodedToken = jwtDecode(token);
+    const userID = decodedToken.id;
+
+    // Optimistic update
+    // const oldPDFs = [...PDFS];
+    // setPDFS((prev) => prev.filter((p) => p._id !== pdfToDelete._id));
+    setShowDeleteConfirm(false);
+    setPdfToDelete(null);
+
+    try {
+      const res = await axios.delete(`${API_URL}/pdf/delete-pdf`, {
+        headers: { Authorization: `Bearer ${token}` },
+        data: { userId: userID, pdfId: pdfToDelete._id },
+      });
+
+      if (res.status === 200) {
+        navigate("/my-library");
+      }
+    } catch (error) {
+      console.error("Error deleting PDF:", error);
+      // setPDFS(oldPDFs); // rollback if deletion failed
+      toast.error("Failed to delete PDF");
+    }
+  };
+
+  useEffect(() => {
+    setIsFav(pdf.isFavourite);
+  }, [pdf.isFavourite]);
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 to-blue-50 p-4 sm:p-6">
       <div className="max-w-7xl mx-auto">
@@ -263,9 +373,9 @@ const PDFDetailsPage = () => {
           <div className="flex flex-col lg:flex-row gap-4 sm:gap-6 md:gap-8">
             {/* PDF Preview */}
             <div className="flex-shrink-0 mx-auto lg:mx-0">
-              <div className="w-32 h-44 sm:w-40 sm:h-56 md:w-48 md:h-64 bg-gradient-to-br from-blue-100 to-indigo-100 rounded-lg sm:rounded-xl border-2 border-dashed border-blue-200 flex items-center justify-center group hover:from-blue-200 hover:to-indigo-200 transition-all duration-300">
+              <div className="w-24 h-32 sm:w-28 sm:h-40 md:w-32 md:h-44 bg-gradient-to-br from-blue-100 to-indigo-100 rounded-lg sm:rounded-xl border-2 border-dashed border-blue-200 flex items-center justify-center group hover:from-blue-200 hover:to-indigo-200 transition-all duration-300">
                 <FileText
-                  size={48}
+                  size={36}
                   className="text-blue-500 group-hover:text-blue-600 transition-colors"
                 />
               </div>
@@ -291,28 +401,59 @@ const PDFDetailsPage = () => {
                 {/* Quick Actions */}
                 <div className="flex flex-wrap gap-2 self-center sm:self-auto">
                   <button
-                    onClick={toggleFavorite}
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      handleToggleFavorite(pdf);
+                    }}
                     className={`p-2 sm:p-3 rounded-lg sm:rounded-xl transition-all duration-200 ${
-                      pdf.isFavorite
+                      isFav
                         ? "bg-red-500 text-white shadow-lg hover:bg-red-600"
                         : "bg-gray-100 text-gray-600 hover:bg-gray-200"
                     }`}
                   >
-                    <Heart
-                      size={16}
-                      className={pdf.isFavorite ? "fill-current" : ""}
-                    />
+                    {isFav ? (
+                      <Heart className="w-5 h-5 text-yellow-400 fill-yellow-400" />
+                    ) : (
+                      <Heart className="w-5 h-5" />
+                    )}
                   </button>
-                  <button className="p-2 sm:p-3 bg-gray-100 text-gray-600 rounded-lg sm:rounded-xl hover:bg-gray-200 transition-all duration-200">
+
+                  <button
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      handledownload(pdf);
+                    }}
+                    className="p-2 sm:p-3 bg-gray-100 text-gray-600 rounded-lg sm:rounded-xl hover:bg-gray-200 transition-all duration-200"
+                  >
                     <Download size={16} />
                   </button>
-                  <button className="p-2 sm:p-3 bg-gray-100 text-gray-600 rounded-lg sm:rounded-xl hover:bg-gray-200 transition-all duration-200">
+                  {/* <button className="p-2 sm:p-3 bg-gray-100 text-gray-600 rounded-lg sm:rounded-xl hover:bg-gray-200 transition-all duration-200">
                     <Share2 size={16} />
+                  </button> */}
+                  <button
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      handleRefresh();
+                    }}
+                    className="p-2 sm:p-3 bg-emerald-500 text-white rounded-lg sm:rounded-xl hover:bg-emerald-600 transition-all duration-200 shadow-lg disabled:opacity-50 disabled:cursor-not-allowed"
+                    disabled={isRefreshing}
+                  >
+                    {isRefreshing ? (
+                      <RefreshCw size={16} className="animate-spin" />
+                    ) : (
+                      <RefreshCw size={16} />
+                    )}
                   </button>
-                  <button className="p-2 sm:p-3 bg-emerald-500 text-white rounded-lg sm:rounded-xl hover:bg-emerald-600 transition-all duration-200 shadow-lg">
-                    <RefreshCw size={16} />
-                  </button>
-                  <button className="p-2 sm:p-3 bg-red-500 text-white rounded-lg sm:rounded-xl hover:bg-red-600 transition-all duration-200 shadow-lg">
+
+                  <button
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      setPdfToDelete(pdf);
+                      setShowDeleteConfirm(true);
+                      setSelectedPdf(null);
+                    }}
+                    className="p-2 sm:p-3 bg-red-500 text-white rounded-lg sm:rounded-xl hover:bg-red-600 transition-all duration-200 shadow-lg"
+                  >
                     <Trash2 size={16} />
                   </button>
                 </div>
@@ -857,6 +998,47 @@ const PDFDetailsPage = () => {
           </div>
         </div>
       </div>
+
+      {/* Delete Confirmation Modal */}
+      {showDeleteConfirm && (
+        <div
+          className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4"
+          onClick={() => setShowDeleteConfirm(false)}
+        >
+          <div
+            className="bg-white rounded-2xl shadow-xl w-full max-w-md"
+            onClick={(e) => e.stopPropagation()} // Prevent click from bubbling to parent
+          >
+            <div className="p-6">
+              <div className="flex items-center justify-center w-16 h-16 bg-red-100 rounded-full mx-auto mb-4">
+                <Trash2 className="w-8 h-8 text-red-600" />
+              </div>
+              <h3 className="text-xl font-semibold text-gray-900 text-center mb-2">
+                Delete PDF?
+              </h3>
+              <p className="text-gray-500 text-center mb-6">
+                Are you sure you want to delete "{pdfToDelete?.title}"? This
+                action cannot be undone.
+              </p>
+
+              <div className="flex justify-center space-x-4">
+                <button
+                  onClick={() => setShowDeleteConfirm(false)}
+                  className="px-6 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50"
+                >
+                  Cancel
+                </button>
+                <button
+                  onClick={confirmDelete}
+                  className="px-6 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700"
+                >
+                  Delete
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

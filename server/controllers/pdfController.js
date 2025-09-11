@@ -266,9 +266,12 @@ const getPdfDetail = async (req, res) => {
     const pdf = await PDF.findById(id)
       .populate("user", "userName email") // get user info
       .populate({
-        path: "quizzes",
-        populate: { path: "userId", select: "userName email" }, // get quiz creator
-      });
+        path: "quizzes",                    // quizzes of this PDF
+        select: "title description settings questions", // pick only needed fields
+        populate: {
+          path: "userId",                   // also populate quiz creator
+          select: "userName email",
+        }})
 
     // const pdf = await PDF.findById(id).populate("quizzes");
     // console.log(pdf);

@@ -800,12 +800,12 @@ const MyLibrary = () => {
                         {pdf.category || "Uncategorized"}
                       </span>
                       {/* Favorite badge for mobile view */}
-                      {/* {pdf.isFavorite && (
+                      {pdf.isFavorite && (
                         <div className="md:hidden flex items-center text-yellow-500">
                           <Star className="w-4 h-4 fill-yellow-400 mr-1" />
                           <span className="text-xs">Favorite</span>
                         </div>
-                      )} */}
+                      )}
                     </div>
                     <div className="flex items-center gap-2 text-sm text-gray-400">
                       <Clock className="w-4 h-4" />
@@ -1134,7 +1134,7 @@ const MyLibrary = () => {
             {/* Average Progress */}
             <div className="text-center p-4 sm:p-5 lg:p-6 bg-gradient-to-br from-green-50 to-green-100 rounded-lg lg:rounded-xl shadow-sm">
               <div className="text-xl sm:text-2xl lg:text-3xl font-bold text-green-900 mb-1">
-                {averageProgress}%
+                {Math.floor(averageProgress)}%
               </div>
               <div className="text-xs sm:text-sm lg:text-base text-green-700 font-medium">
                 Average Progress
