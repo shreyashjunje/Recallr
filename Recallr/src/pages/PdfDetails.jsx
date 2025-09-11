@@ -158,7 +158,7 @@ const PDFDetailsPage = () => {
     try {
       setIsGenerating(type);
       const token = localStorage.getItem("token");
-      if(!token) return;
+      if (!token) return;
 
       let response;
 
@@ -187,10 +187,31 @@ const PDFDetailsPage = () => {
           }
         );
       } else if (type === "quiz") {
-        response = await axios.post(`${API_URL}/pdf/quiz-only`, {
-          pdfId: pdf._id,
-          fileUrl: pdf.cloudinaryUrl,
-        });
+        response = await axios.post(
+          `${API_URL}/pdf/quiz-only`,
+          {
+            pdfId: pdf._id,
+            fileUrl: pdf.cloudinaryUrl,
+            fileName: pdf.title || "document.pdf",
+            userId: user._id, // decoded from JWT or stored in state
+
+            // Quiz settings
+            numQuestions: 5,
+            difficulty: "Mixed",
+            questionTypes: ["MCQ"],
+            timeLimit: 30,
+            timeLimitType: "overall",
+            mode: "Practice",
+            markingScheme: "normal",
+            shuffleQuestions: true,
+            shuffleOptions: true,
+          },
+          {
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          }
+        );
       }
 
       // ✅ Update single pdf state

@@ -5,6 +5,7 @@ const User = require("../models/User");
 const {
   processSummaryWithGeminiFromUrl,
   processFlashcardsWithGeminiFromUrl,
+  processQuizWithGeminiFromUrl,
 } = require("../services/geminiService");
 const Pdf = require("../models/Pdf");
 const cloudinary = require("cloudinary").v2;
@@ -499,6 +500,93 @@ const generateFlashCardsOnly = async (req, res) => {
     res.status(500).json({ message: "Failed to generate flashcards" });
   }
 };
+const generateQuizOnly = async (req, res) => {
+  try {
+    const {
+      pdfId,
+      fileUrl,
+      fileName,
+      userId,
+      numQuestions,
+      difficulty,
+      questionTypes,
+      timeLimit,
+      timeLimitType,
+      mode,
+      markingScheme,
+      shuffleQuestions,
+      shuffleOptions,
+    } = req.body;
+
+    if (!fileUrl || !userId) {
+      return res.status(400).json({ message: "Missing required fields" });
+    }
+
+    console.log("🎯 Generating quiz for:", fileUrl);
+
+    // 1️⃣ Build settings object
+    const settings = {
+      numQuestions: parseInt(numQuestions) || 10,
+      difficulty: difficulty || "Medium",
+      questionTypes: Array.isArray(questionTypes)
+        ? questionTypes
+        : [questionTypes],
+      timeLimit: parseInt(timeLimit) || 30,
+      timeLimitType: timeLimitType || "overall",
+      mode: mode || "Practice",
+      markingScheme: markingScheme || "normal",
+      shuffleQuestions:
+        shuffleQuestions === "true" || shuffleQuestions === true,
+      shuffleOptions: shuffleOptions === "true" || shuffleOptions === true,
+    };
+
+    // 2️⃣ Call Gemini
+    const pdfData = await processQuizWithGeminiFromUrl(
+      fileUrl,
+      fileName,
+      settings
+    );
+
+    if (!pdfData || !pdfData.questions) {
+      return res.status(500).json({ message: "Failed to generate quiz" });
+    }
+
+    // 3️⃣ Create Quiz record
+    const newQuiz = await Quiz.create({
+      userId: userId,
+      pdfId: pdfId || null,
+      title: pdfData.title || "Generated Quiz",
+      description: pdfData.description || "",
+      category: pdfData.category || "General",
+      tags: pdfData.tags || [],
+      questions: pdfData.questions || [],
+      settings,
+      createdAt: Date.now(),
+    });
+
+    // 4️⃣ Update PDF (if linked)
+    if (pdfId) {
+      await Pdf.findByIdAndUpdate(pdfId, {
+        $set: {
+          isQuizGenerated: true,
+          quizId: newQuiz._id,
+          quizGeneratedAt: new Date(),
+        },
+      });
+    }
+
+    // 5️⃣ Send response
+    res.status(200).json({
+      message: "✅ Quiz generated successfully",
+      quiz: newQuiz,
+    });
+  } catch (err) {
+    console.error("❌ Error in generateQuizOnly:", err);
+    res
+      .status(500)
+      .json({ message: "Failed to generate quiz", error: err.message });
+  }
+};
 
 const updatePdfProgress = async (req, res) => {
   try {
@@ -568,4 +656,5 @@ module.exports = {
   generateFlashCardsOnly,
   updatePdfProgress,
   getCategories,
+  generateQuizOnly,
 };
