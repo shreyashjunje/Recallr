@@ -1,8 +1,14 @@
 import React from "react";
-import { Trophy, Heart, TrendingUp, Award } from "lucide-react";
+import { Trophy, Heart, TrendingUp, Award, SkipForward } from "lucide-react";
 
-export function QuizStats({ stats, currentQuestion, totalQuestions, timeRemaining }) {
+export function QuizStats({
+  stats,
+  currentQuestion,
+  totalQuestions,
+  timeRemaining,
+}) {
   const progressPercentage = ((currentQuestion + 1) / totalQuestions) * 100;
+  
 
   return (
     <div className="space-y-4 sm:space-y-6">
@@ -39,7 +45,9 @@ export function QuizStats({ stats, currentQuestion, totalQuestions, timeRemainin
             </div>
             <div className="flex-1">
               <p className="text-slate-300 text-xs sm:text-sm">Score</p>
-              <p className="text-white text-lg sm:text-xl font-semibold">{stats.score}</p>
+              <p className="text-white text-lg sm:text-xl font-semibold">
+                {stats.score}
+              </p>
             </div>
           </div>
         </div>
@@ -102,6 +110,21 @@ export function QuizStats({ stats, currentQuestion, totalQuestions, timeRemainin
               <p className="text-slate-300 text-xs sm:text-sm">Position</p>
               <p className="text-white text-lg sm:text-xl font-semibold">
                 {stats.position}
+              </p>
+            </div>
+          </div>
+        </div>
+
+        {/* Skipped Questions */}
+        <div className="bg-slate-800/50 rounded-xl p-3 sm:p-4 border border-slate-700/50">
+          <div className="flex items-center gap-2 sm:gap-3">
+            <div className="p-2 bg-orange-500/20 rounded-lg">
+              <SkipForward className="w-4 h-4 sm:w-5 sm:h-5 text-orange-400" />
+            </div>
+            <div className="flex-1">
+              <p className="text-slate-300 text-xs sm:text-sm">Skipped</p>
+              <p className="text-white text-lg sm:text-xl font-semibold">
+                {stats?.skipped}
               </p>
             </div>
           </div>

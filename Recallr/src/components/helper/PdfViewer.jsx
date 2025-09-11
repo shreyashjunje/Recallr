@@ -20,11 +20,12 @@ import {
   X,
 } from "lucide-react";
 import axios from "axios";
-const API_URL = import.meta.env.VITE_API_URL;
+const API_URL=import.meta.env.VITE_API_URL
 
 // PDF.js worker setup
 // pdfjs.GlobalWorkerOptions.workerSrc = `//cdnjs.cloudflare.com/ajax/libs/pdf.js/${pdfjs.version}/pdf.worker.min.js`;
-pdfjs.GlobalWorkerOptions.workerSrc = `https://cdnjs.cloudflare.com/ajax/libs/pdf.js/${pdfjs.version}/pdf.worker.min.js`;
+pdfjs.GlobalWorkerOptions.workerSrc =
+  `https://cdnjs.cloudflare.com/ajax/libs/pdf.js/${pdfjs.version}/pdf.worker.min.js`;
 
 const ToolbarButton = ({ title, onClick, disabled, children, active }) => (
   <button
@@ -43,7 +44,7 @@ const ToolbarButton = ({ title, onClick, disabled, children, active }) => (
 export default function PdfViewer() {
   const location = useLocation();
   const navigate = useNavigate();
-  const { url, fileName, pdfId } = location.state || {};
+  const { url, fileName ,pdfId} = location.state || {};
 
   const viewerRef = useRef(null);
   const pdfRef = useRef(null);
@@ -79,23 +80,23 @@ export default function PdfViewer() {
   }, [viewerRef.current?.clientWidth, viewMode]);
 
   useEffect(() => {
-    if (!numPages || !visiblePage) return;
-    console.log("pdfiD:", pdfId);
+  if (!numPages || !visiblePage) return;
+  console.log("pdfiD:",pdfId)
 
-    const updateProgress = async () => {
-      try {
-        await axios.put(`${API_URL}/pdf/${pdfId}/progress`, {
-          currentPage: visiblePage,
-          totalPages: numPages,
-        });
-        console.log(`Progress updated: ${pdfId}/${numPages}`);
-      } catch (err) {
-        console.error("Failed to update progress", err);
-      }
-    };
+  const updateProgress = async () => {
+    try {
+      await axios.put(`${API_URL}/pdf/${pdfId}/progress`, {
+        currentPage: visiblePage,
+        totalPages: numPages,
+      });
+      console.log(`Progress updated: ${pdfId}/${numPages}`);
+    } catch (err) {
+      console.error("Failed to update progress", err);
+    }
+  };
 
-    updateProgress();
-  }, [visiblePage, numPages, fileName]);
+  updateProgress();
+}, [visiblePage, numPages, fileName]);
 
   // Handle document load
   const onDocumentLoadSuccess = useCallback(async (pdf) => {
@@ -172,7 +173,7 @@ export default function PdfViewer() {
       const pageNum = Math.max(1, Math.min(n || 1, numPages || 1));
       const element = document.getElementById(`page-${pageNum}`);
       if (element) {
-        element.scrollIntoView({ behavior: "smooth" });
+        element.scrollIntoView({ behavior: 'smooth' });
       }
     },
     [numPages]
@@ -569,7 +570,7 @@ export default function PdfViewer() {
         )}
 
         {/* PDF Viewer */}
-        <div
+        <div 
           ref={containerRef}
           className="flex-1 overflow-auto p-4 flex flex-col items-center"
         >
@@ -641,8 +642,8 @@ export default function PdfViewer() {
                 // Scroll view - render all pages in a vertical column
                 <div className="flex flex-col items-center">
                   {Array.from({ length: numPages || 0 }, (_, i) => (
-                    <div
-                      key={`page_${i + 1}`}
+                    <div 
+                      key={`page_${i + 1}`} 
                       id={`page-${i + 1}`}
                       className="mb-4"
                     >

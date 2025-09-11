@@ -24,7 +24,7 @@ router.post(
   uploadTelegram.single("file"),
   uploadPdf
 );
-router.delete("/delete-pdf", deletePdf);
+router.delete("/delete-pdf",authMiddleware, deletePdf);
 router.patch("/edit-pdf", editPdf);
 router.get("/pdfs", authMiddleware, getAllPdfs);
 router.get("/pdfs/:id", getPdfDetail);

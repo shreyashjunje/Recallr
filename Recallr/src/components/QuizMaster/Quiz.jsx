@@ -24,6 +24,7 @@ export function Quiz({ quizInfo, questions, onExit }) {
   );
   const [currentView, setCurrentView] = useState("quiz");
   const [reviewData, setReviewData] = useState(null);
+  const skippedCount = state.answers.filter((a) => a.skipped).length;
 
   const handleReview = (quizState, quizInfo) => {
     setCurrentView("review");
@@ -168,14 +169,38 @@ export function Quiz({ quizInfo, questions, onExit }) {
   //   }
   // };
   // Update handleNext to remove the completion logic
+
+  // const handleNext = () => {
+  //   if (state.currentQuestionIndex < questions.length - 1) {
+  //     dispatch({
+  //       type: "SET_CURRENT_QUESTION",
+  //       payload: state.currentQuestionIndex + 1,
+  //     });
+  //   }
+  //   // Don't complete quiz here anymore - let the Submit button handle it
+  // };
   const handleNext = () => {
-    if (state.currentQuestionIndex < questions.length - 1) {
+    const currentQId = getQId(currentQuestion);
+
+    // Check if this question already has an answer in state
+    const existingAnswer = state.answers.find(
+      (a) => a.questionId === currentQId
+    );
+
+    if (!existingAnswer) {
+      // No answer selected => mark as skipped
       dispatch({
-        type: "SET_CURRENT_QUESTION",
-        payload: state.currentQuestionIndex + 1,
+        type: "SET_ANSWER",
+        payload: {
+          questionId: currentQId,
+          answer: null,
+          skipped: true,
+        },
       });
     }
-    // Don't complete quiz here anymore - let the Submit button handle it
+
+    // then move to next question
+    dispatch({ type: "NEXT_QUESTION" });
   };
 
   // Then in your handleAnswerChange function, check if this was the last question
@@ -218,7 +243,18 @@ export function Quiz({ quizInfo, questions, onExit }) {
     }
   };
 
+  // const handleSkip = () => {
+  //   handleNext();
+  // };
   const handleSkip = () => {
+    dispatch({
+      type: "SET_ANSWER",
+      payload: {
+        questionId: getQId(currentQuestion),
+        answer: null, // or "SKIPPED"
+        skipped: true,
+      },
+    });
     handleNext();
   };
 
@@ -303,6 +339,7 @@ export function Quiz({ quizInfo, questions, onExit }) {
     lives: 3, // Mock lives system
     progress: `${state.currentQuestionIndex + 1}/${questions.length}`,
     position: "2nd", // Mock position
+    skipped: skippedCount, // ✅ pass here
   };
 
   // Add this useEffect to log state changes for debugging

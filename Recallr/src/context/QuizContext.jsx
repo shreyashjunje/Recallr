@@ -70,6 +70,12 @@ function quizReducer(state, action) {
       return { ...state, score: action.payload };
     case "RESET_QUIZ":
       return { ...initialState, ...action.payload };
+    case "NEXT_QUESTION":
+      return {
+        ...state,
+        currentQuestionIndex: state.currentQuestionIndex + 1,
+      };
+
     default:
       return state;
   }

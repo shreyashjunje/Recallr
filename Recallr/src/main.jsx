@@ -7,7 +7,8 @@ import "react-toastify/dist/ReactToastify.css";
 import { ToastContainer } from "react-toastify";
 import { AuthProvider } from "./context/AuthContext";
 import { QuizProvider } from "./context/QuizContext";
-import { ThemeProvider } from "./context/ThemeContext";
+// import { ThemeProvider } from "./context/ThemeContext";
+
 
 createRoot(document.getElementById("root")).render(
   <BrowserRouter>

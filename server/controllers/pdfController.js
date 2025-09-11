@@ -154,7 +154,8 @@ const uploadPdf = async (req, res) => {
 //   }
 // };
 const deletePdf = async (req, res) => {
-  const { userId, pdfId } = req.body;
+  const { pdfId } = req.body;
+  const userId = req.user?.id; // 🔹 grab from body
 
   if (!userId || !pdfId) {
     return res.status(400).json({ message: "userId and pdfId are required" });
@@ -178,12 +179,12 @@ const deletePdf = async (req, res) => {
     );
     console.log("Requested PDF ID:", pdfId);
 
-    // check ownership
-    if (!user.pdfs.some((id) => id.equals(pdfId))) {
-      return res
-        .status(403)
-        .json({ message: "You do not have permission to delete this PDF" });
-    }
+    // // check ownership
+    // if (!user.pdfs.some((id) => id.equals(pdfId))) {
+    //   return res
+    //     .status(403)
+    //     .json({ message: "You do not have permission to delete this PDF" });
+    // }
 
     // delete from cloudinary first
     if (pdf.cloudinaryPublicId) {

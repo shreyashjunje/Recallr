@@ -73,6 +73,7 @@ const QuizMasterHome = () => {
       if (res.status === 200) {
         setQuizzes(res.data.data);
         const all = res.data.data;
+        console.log("all:", all);
         setTotalQuizzes(all.length);
 
         const uniqueCategories = new Set(all.map((quiz) => quiz.category));
@@ -471,7 +472,7 @@ const QuizMasterHome = () => {
                         </span>
                       </div>
                       <p className="text-base sm:text-lg font-bold text-gray-900">
-                        {Math.floor((quiz.settings?.timeLimit || 600) / 60)}m
+                        {quiz.settings?.timeLimit}m
                       </p>
                     </div>
                   </div>

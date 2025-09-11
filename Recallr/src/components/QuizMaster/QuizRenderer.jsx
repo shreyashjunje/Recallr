@@ -159,10 +159,10 @@ export function QuestionRenderer({
         <div className="inline-flex items-center gap-2 px-3 sm:px-4 py-1.5 sm:py-2 
                         bg-purple-500/20 rounded-full text-purple-300 
                         text-xs sm:text-sm font-medium mb-3 sm:mb-4">
-          <span>{question.points} points</span>
+          <span>{question?.points} points</span>
         </div>
         <h2 className="text-lg sm:text-xl md:text-2xl font-semibold text-white leading-relaxed">
-          {question.questionText}
+          {question?.questionText}
         </h2>
       </div>
 

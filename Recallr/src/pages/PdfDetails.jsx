@@ -332,7 +332,7 @@ const PDFDetailsPage = () => {
               </div>
 
               {/* Description */}
-              <div className="bg-gray-50 rounded-lg sm:rounded-xl p-3 sm:p-4">
+              {/* <div className="bg-gray-50 rounded-lg sm:rounded-xl p-3 sm:p-4">
                 <div className="flex items-start gap-2 sm:gap-3">
                   <Info
                     size={16}
@@ -342,7 +342,7 @@ const PDFDetailsPage = () => {
                     {pdf.description}
                   </p>
                 </div>
-              </div>
+              </div> */}
             </div>
           </div>
         </div>
