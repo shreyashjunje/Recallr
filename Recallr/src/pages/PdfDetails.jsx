@@ -28,6 +28,7 @@ import { useParams } from "react-router-dom";
 import { useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
 import axios from "axios";
+import useAuth from "@/hooks/useAuth";
 const API_URL = import.meta.env.VITE_API_URL;
 
 const mockPDFData = {
@@ -66,6 +67,7 @@ const mockPDFData = {
 
 const PDFDetailsPage = () => {
   const { id } = useParams();
+  const { user } = useAuth();
   const [pdfData, setPdfData] = useState(mockPDFData);
   const [isGenerating, setIsGenerating] = useState(null);
   const [expandedSummary, setExpandedSummary] = useState(false);
@@ -155,6 +157,8 @@ const PDFDetailsPage = () => {
   const handleGenerate = async (type) => {
     try {
       setIsGenerating(type);
+      const token = localStorage.getItem("token");
+      if(!token) return;
 
       let response;
 
@@ -166,10 +170,22 @@ const PDFDetailsPage = () => {
           customPrompt: "Summarize this for quick revision",
         });
       } else if (type === "flashcards") {
-        response = await axios.post(`${API_URL}/pdf/flashgenius-only`, {
-          pdfId: pdf._id,
-          fileUrl: pdf.cloudinaryUrl,
-        });
+        response = await axios.post(
+          `${API_URL}/pdf/flashgenius-only`,
+          {
+            pdfId: pdf._id,
+            fileUrl: pdf.cloudinaryUrl,
+            userId: user._id,
+            numCards: 5,
+            questionType: "Q/A",
+            difficulty: "Mixed",
+          },
+          {
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          }
+        );
       } else if (type === "quiz") {
         response = await axios.post(`${API_URL}/pdf/quiz-only`, {
           pdfId: pdf._id,

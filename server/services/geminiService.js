@@ -520,8 +520,110 @@ ${customPrompt}
   }
 }
 
-async function processFlashcardsWithGeminiFromUrl(fileUrl, settings) {
+// async function processFlashcardsWithGeminiFromUrl(fileUrl, settings) {
+//   try {
+//     const cloudinaryResponse = await axios.get(fileUrl, {
+//       responseType: "arraybuffer",
+//       auth: {
+//         username: process.env.CLOUDINARY_API_KEY,
+//         password: process.env.CLOUDINARY_API_SECRET,
+//       },
+//     });
+
+//     const pdfBuffer = Buffer.from(cloudinaryResponse.data);
+
+//     const pdfPath = path.join(__dirname, "temp.pdf");
+//     fs.writeFileSync(pdfPath, pdfBuffer);
+
+//     console.log("Uploading PDF to Gemini...");
+
+//     const uploadResult = await fileManager.uploadFile(pdfBuffer, {
+//       mimeType: "application/pdf",
+//       displayName: "document.pdf",
+//     });
+//     console.log("✅ Uploaded to Gemini:", uploadResult);
+
+//     // 2. Base instructions for flashcards
+//     const basePrompt = `
+// You are an AI that creates **educational flashcards** from documents.
+
+// Generate output in **strict JSON format only** (no extra text).
+// The structure must be:
+
+// {
+//   "title": "Short and clear title of the document",
+//   "tags": ["keyword1", "keyword2", "keyword3"],
+//   "category": "Choose one category (e.g., Programming, AI, Cloud)",
+//   "flashcards": [
+//     {
+//       "question": "Write a ${settings.questionType} type question",
+//       "answer": "Provide the correct answer here",
+//       "difficulty": "Easy | Medium | Hard"
+//     }
+//   ]
+// }
+
+// Rules:
+// - Generate exactly **${settings.numCards} flashcards**.
+// - Title should be 3–6 words max.
+// - Tags must be 3–5 short keywords (no long sentences).
+// - Category must be a single word or short phrase.
+// - Questions must be clear, concise, and based only on the document.
+// - Answers must be accurate and unambiguous.
+// - If settings.difficulty = "Mixed", assign different difficulty levels (Easy, Medium, Hard) individually to each flashcard instead of using "mixed".
+// - Otherwise, use the exact difficulty from settings.difficulty for all flashcards.
+// - Output valid JSON only, no explanations or extra text.
+//     `;
+//     // 3. Get Gemini model
+//     const model = genAI.getGenerativeModel({
+//       model: "gemini-2.5-pro",
+//     });
+
+//     console.log("📤 Sending request to Gemini");
+
+//     // 4. Generate flashcards
+//     const result = await model.generateContent([
+//       {
+//         fileData: {
+//           mimeType: uploadResult.file.mimeType,
+//           fileUri: uploadResult.file.uri,
+//         },
+//       },
+//       { text: basePrompt },
+//     ]);
+
+//     console.log("📥 Got response from Gemini");
+//     console.log("direct form gemini-->", result);
+
+//     const responseText = await result.response.text();
+//     console.log("Raw Gemini Response:", responseText);
+
+//     // Defensive check
+//     if (!responseText) {
+//       throw new Error("Empty response from Gemini");
+//     }
+
+//     // Try to extract JSON safely
+//     let parsedJSON;
+//     try {
+//       const jsonStart = responseText.indexOf("{");
+//       const jsonEnd = responseText.lastIndexOf("}") + 1;
+//       const jsonString = responseText.slice(jsonStart, jsonEnd);
+//       parsedJSON = JSON.parse(jsonString);
+//     } catch (parseErr) {
+//       console.error("❌ Failed to parse JSON:", parseErr);
+//       throw new Error("Gemini response was not valid JSON");
+//     }
+
+//     return parsedJSON;
+//   } catch (err) {
+//     console.error("❌ Error in processSummaryWithGeminiFromUrl:", err);
+//     throw new Error(`AI processing failed: ${err.message}`);
+//   }
+// }
+async function processFlashcardsWithGeminiFromUrl(fileUrl, settings = {}) {
   try {
+    // 1. Download from Cloudinary
     const cloudinaryResponse = await axios.get(fileUrl, {
       responseType: "arraybuffer",
       auth: {
@@ -532,20 +634,30 @@ async function processFlashcardsWithGeminiFromUrl(fileUrl, settings) {
 
     const pdfBuffer = Buffer.from(cloudinaryResponse.data);
 
+    // Write to temp file (optional – you might not even need this)
     const pdfPath = path.join(__dirname, "temp.pdf");
     fs.writeFileSync(pdfPath, pdfBuffer);
 
     console.log("Uploading PDF to Gemini...");
 
+    // 2. Upload to Gemini
     const uploadResult = await fileManager.uploadFile(pdfBuffer, {
       mimeType: "application/pdf",
       displayName: "document.pdf",
     });
     console.log("✅ Uploaded to Gemini:", uploadResult);
 
-    // 2. Base instructions for flashcards
+    // Ensure defaults
+    const {
+      numCards = 5,
+      questionType = "Q/A",
+      difficulty = "Mixed",
+      customPrompt = "",
+    } = settings;
+
+    // 3. Base instructions
     const basePrompt = `
-You are an AI that creates **educational flashcards** from documents.  
+You are an AI that creates **educational flashcards** from documents.
 
 Generate output in **strict JSON format only** (no extra text).  
 The structure must be:
@@ -556,7 +668,7 @@ The structure must be:
   "category": "Choose one category (e.g., Programming, AI, Cloud)",
   "flashcards": [
     {
-      "question": "Write a ${settings.questionType} type question",
+      "question": "Write a ${questionType} type question",
       "answer": "Provide the correct answer here",
       "difficulty": "Easy | Medium | Hard"
     }
@@ -564,24 +676,25 @@ The structure must be:
 }
 
 Rules:
-- Generate exactly **${settings.numCards} flashcards**.
+- Generate exactly **${numCards} flashcards**.
 - Title should be 3–6 words max.
-- Tags must be 3–5 short keywords (no long sentences).
+- Tags must be 3–5 short keywords.
 - Category must be a single word or short phrase.
-- Questions must be clear, concise, and based only on the document.
-- Answers must be accurate and unambiguous.
-- If settings.difficulty = "Mixed", assign different difficulty levels (Easy, Medium, Hard) individually to each flashcard instead of using "mixed".
-- Otherwise, use the exact difficulty from settings.difficulty for all flashcards.
-- Output valid JSON only, no explanations or extra text.
-    `;
-    // 3. Get Gemini model
+- Questions must be based only on the document.
+- If difficulty = "Mixed", assign Easy, Medium, Hard individually.
+- Otherwise, use "${difficulty}" for all flashcards.
+
+${customPrompt ? `Extra instructions: ${customPrompt}` : ""}
+`;
+
+    // 4. Get Gemini model
     const model = genAI.getGenerativeModel({
       model: "gemini-2.5-pro",
     });
 
     console.log("📤 Sending request to Gemini");
 
-    // 4. Generate flashcards
+    // 5. Generate flashcards
     const result = await model.generateContent([
       {
         fileData: {
@@ -593,17 +706,15 @@ Rules:
     ]);
 
     console.log("📥 Got response from Gemini");
-    console.log("direct form gemini-->", result);
 
     const responseText = await result.response.text();
     console.log("Raw Gemini Response:", responseText);
 
-    // Defensive check
     if (!responseText) {
       throw new Error("Empty response from Gemini");
     }
 
-    // Try to extract JSON safely
+    // Extract clean JSON
     let parsedJSON;
     try {
       const jsonStart = responseText.indexOf("{");
@@ -617,7 +728,7 @@ Rules:
 
     return parsedJSON;
   } catch (err) {
-    console.error("❌ Error in processSummaryWithGeminiFromUrl:", err);
+    console.error("❌ Error in processFlashcardsWithGeminiFromUrl:", err);
     throw new Error(`AI processing failed: ${err.message}`);
   }
 }

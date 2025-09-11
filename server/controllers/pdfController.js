@@ -401,8 +401,60 @@ const generateSummaryOnly = async (req, res) => {
   }
 };
 
+// const generateFlashCardsOnly = async (req, res) => {
+//   const { fileUrl, fileName, customPrompt } = req.body;
+
+//   try {
+//     if (!fileUrl) {
+//       return res.status(400).json({ message: "No file URL provided" });
+//     }
+
+//     console.log("Fetching file from Cloudinary for flashcards:", fileUrl);
+
+//     // 1. Call Gemini for flashcards (not summary)
+//     const airesponse = await processFlashcardsWithGeminiFromUrl(
+//       fileUrl,
+//       customPrompt
+//     );
+
+//     const { flashcards } = airesponse;
+
+//     // 2. Find PDF doc by Cloudinary URL and update flashcards
+//     const updatedPdf = await Pdf.findOneAndUpdate(
+//       { cloudinaryUrl: fileUrl }, // match document
+//       {
+//         $set: {
+//           flashcards, // store flashcards array
+//           isFlashcardGenerated: true, // flag
+//           flashcardsGeneratedAt: new Date(), // timestamp
+//         },
+//       },
+//       { new: true } // return updated document
+//     );
+
+//     if (!updatedPdf) {
+//       return res.status(404).json({ message: "PDF not found in database" });
+//     }
+
+//     res.status(200).json({
+//       message: "Flashcards generated & saved successfully",
+//       pdf: updatedPdf,
+//     });
+//   } catch (err) {
+//     console.error("❌ Error generating flashcards:", err);
+//     res.status(500).json({ message: "Failed to generate flashcards" });
+//   }
+// };
 const generateFlashCardsOnly = async (req, res) => {
-  const { fileUrl, fileName, customPrompt } = req.body;
+  console.log("in the generte flashcards controller");
+  const {
+    fileUrl,
+    fileName,
+    customPrompt,
+    numCards,
+    questionType,
+    difficulty,
+  } = req.body;
 
   try {
     if (!fileUrl) {
@@ -411,25 +463,27 @@ const generateFlashCardsOnly = async (req, res) => {
 
     console.log("Fetching file from Cloudinary for flashcards:", fileUrl);
 
-    // 1. Call Gemini for flashcards (not summary)
-    const airesponse = await processFlashcardsWithGeminiFromUrl(
-      fileUrl,
-      customPrompt
-    );
+    // 1. Call Gemini with settings object
+    const airesponse = await processFlashcardsWithGeminiFromUrl(fileUrl, {
+      numCards,
+      questionType,
+      difficulty,
+      customPrompt,
+    });
 
     const { flashcards } = airesponse;
 
     // 2. Find PDF doc by Cloudinary URL and update flashcards
     const updatedPdf = await Pdf.findOneAndUpdate(
-      { cloudinaryUrl: fileUrl }, // match document
+      { cloudinaryUrl: fileUrl },
       {
         $set: {
-          flashcards, // store flashcards array
-          isFlashcardGenerated: true, // flag
-          flashcardsGeneratedAt: new Date(), // timestamp
+          flashcards,
+          isFlashcardGenerated: true,
+          flashcardsGeneratedAt: new Date(),
         },
       },
-      { new: true } // return updated document
+      { new: true }
     );
 
     if (!updatedPdf) {

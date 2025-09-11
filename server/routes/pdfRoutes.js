@@ -30,7 +30,7 @@ router.get("/pdfs/:id", getPdfDetail);
 router.put("/:id/progress", updatePdfProgress);
 router.post("/download-pdf", downloadPdf); // for fetching pdf by id
 router.post("/summary-only", generateSummaryOnly);
-router.post("/flashgenius-only", generateFlashCardsOnly);
+router.post("/flashgenius-only",authMiddleware, generateFlashCardsOnly);
 router.get("/get-categories", authMiddleware, getCategories);
 
 module.exports = router;
