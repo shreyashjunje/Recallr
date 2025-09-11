@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import {
   BookOpen,
   Clock,
@@ -34,125 +34,7 @@ const API_URL = import.meta.env.VITE_API_URL;
 import logo from "../../assets/logoR.png";
 import { jwtDecode } from "jwt-decode";
 
-// // Mock data for demonstration
-// const mockQuizzes = [
-//   {
-//     id: 1,
-//     title: "Advanced JavaScript Concepts",
-//     category: "Programming",
-//     tags: [
-//       "JavaScript",
-//       "ES6",
-//       "Async/Await",
-//       "Promises",
-//       "Closures",
-//       "Prototypes",
-//       "DOM",
-//     ],
-//     difficulty: "Hard",
-//     numQuestions: 25,
-//     timeLimit: 1800,
-//     mode: "Exam",
-//     questionTypes: ["MCQ", "TrueFalse"],
-//     createdAt: "2024-01-15",
-//     studentsCompleted: 342,
-//     averageScore: 78,
-//   },
-//   {
-//     id: 2,
-//     title: "Data Structures & Algorithms",
-//     category: "Computer Science",
-//     tags: ["Arrays", "Trees", "Graphs", "Sorting", "Searching", "Complexity"],
-//     difficulty: "Medium",
-//     numQuestions: 20,
-//     timeLimit: 1200,
-//     mode: "Practice",
-//     questionTypes: ["MCQ", "ShortAnswer"],
-//     createdAt: "2024-01-10",
-//     studentsCompleted: 156,
-//     averageScore: 85,
-//   },
-//   {
-//     id: 3,
-//     title: "Machine Learning Fundamentals",
-//     category: "AI/ML",
-//     tags: [
-//       "Linear Regression",
-//       "Classification",
-//       "Neural Networks",
-//       "Deep Learning",
-//     ],
-//     difficulty: "Hard",
-//     numQuestions: 30,
-//     timeLimit: 2400,
-//     mode: "Exam",
-//     questionTypes: ["MCQ", "TrueFalse", "ShortAnswer"],
-//     createdAt: "2024-01-20",
-//     studentsCompleted: 89,
-//     averageScore: 72,
-//   },
-//   {
-//     id: 4,
-//     title: "React Hooks Deep Dive",
-//     category: "Programming",
-//     tags: ["React", "Hooks", "useState", "useEffect", "Custom Hooks"],
-//     difficulty: "Medium",
-//     numQuestions: 15,
-//     timeLimit: 900,
-//     mode: "Practice",
-//     questionTypes: ["MCQ", "FillBlank"],
-//     createdAt: "2024-01-25",
-//     studentsCompleted: 234,
-//     averageScore: 88,
-//   },
-//   {
-//     id: 5,
-//     title: "Database Design Patterns",
-//     category: "Database",
-//     tags: ["SQL", "NoSQL", "Normalization", "Indexes", "Transactions"],
-//     difficulty: "Easy",
-//     numQuestions: 12,
-//     timeLimit: 600,
-//     mode: "Practice",
-//     questionTypes: ["MCQ", "TrueFalse"],
-//     createdAt: "2024-01-18",
-//     studentsCompleted: 445,
-//     averageScore: 91,
-//   },
-//   {
-//     id: 6,
-//     title: "Cloud Computing Essentials",
-//     category: "Cloud",
-//     tags: [
-//       "AWS",
-//       "Azure",
-//       "Docker",
-//       "Kubernetes",
-//       "Microservices",
-//       "Serverless",
-//     ],
-//     difficulty: "Medium",
-//     numQuestions: 18,
-//     timeLimit: 1080,
-//     mode: "Exam",
-//     questionTypes: ["MCQ", "ShortAnswer"],
-//     createdAt: "2024-01-12",
-//     studentsCompleted: 167,
-//     averageScore: 79,
-//   },
-// ];
-
-// const categories = [
-//   "All",
-//   "Programming",
-//   "Computer Science",
-//   "AI/ML",
-//   "Database",
-//   "Cloud",
-// ];
-// const difficulties = ["All", "Easy", "Medium", "Hard", "Mixed"];
-// const modes = ["All", "Practice", "Exam"];
-
+// import React, { useEffect, useState, useMemo } from "react";
 const SummaryHome = () => {
   const navigate = useNavigate();
   const [showAllQuizzes, setShowAllQuizzes] = useState(false);
@@ -293,6 +175,66 @@ const SummaryHome = () => {
     const options = { year: "numeric", month: "short", day: "numeric" };
     return new Date(dateString).toLocaleDateString(undefined, options);
   };
+
+  // Filter summaries using the search query (safe for different shapes)
+  // const filteredSummaries = useMemo(() => {
+  //   const q = (filters.search || "").trim().toLowerCase();
+  //   if (!q) return summaries;
+
+  //   return summaries.filter((s) => {
+  //     const title = (s.title || s.name || s.fileName || "")
+  //       .toString()
+  //       .toLowerCase();
+  //     const category = (s.category || "").toString().toLowerCase();
+
+  //     const tagsArr = Array.isArray(s.tags) ? s.tags : [];
+  //     const tagsString = tagsArr
+  //       .map((t) => {
+  //         if (typeof t === "string") return t;
+  //         if (t && typeof t === "object")
+  //           return t.name || t.label || t.value || "";
+  //         return "";
+  //       })
+  //       .join(" ")
+  //       .toLowerCase();
+
+  //     return (
+  //       title.includes(q) || category.includes(q) || tagsString.includes(q)
+  //     );
+  //   });
+  // }, [summaries, filters.search]);
+  const filteredSummaries = useMemo(() => {
+    const q = (filters.search || "").trim().toLowerCase();
+    if (!q) return summaries;
+
+    return summaries.filter((s) => {
+      const title = (s.title || s.name || s.fileName || "")
+        .toString()
+        .toLowerCase();
+      const category = (s.category || "").toString().toLowerCase();
+
+      const tagsArr = Array.isArray(s.tags) ? s.tags : [];
+      const tagsString = tagsArr
+        .map((t) => {
+          if (typeof t === "string") return t;
+          if (t && typeof t === "object")
+            return t.name || t.label || t.value || "";
+          return "";
+        })
+        .join(" ")
+        .toLowerCase();
+
+      return (
+        title.includes(q) || category.includes(q) || tagsString.includes(q)
+      );
+    });
+  }, [summaries, filters.search]);
+
+  // Show only 3 items unless user clicks "Show All"
+  const displayedSummaries = useMemo(() => {
+    if (showAllQuizzes) return filteredSummaries;
+    return filteredSummaries.slice(0, 3);
+  }, [filteredSummaries, showAllQuizzes]);
 
   //   const filteredQuizzes = mockQuizzes.filter((quiz) => {
   //     const matchesCategory =
@@ -448,7 +390,7 @@ const SummaryHome = () => {
             </div>
           </div>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-            {summaries.map((summary, idx) => (
+            {displayedSummaries?.map((summary, idx) => (
               <div
                 key={summary._id}
                 className={`relative rounded-3xl shadow-md transition-all duration-500 ease-out p-4 lg:p-6 flex flex-col justify-between transform hover:-translate-y-2 hover:scale-[1.02] hover:shadow-2xl`}
@@ -525,7 +467,7 @@ const SummaryHome = () => {
           </div>
 
           {/* Show More Button */}
-          {summaries.length < 3 && (
+          {filteredSummaries.length > 3 && (
             <div className="text-center mt-12">
               <button
                 onClick={() => setShowAllQuizzes(!showAllQuizzes)}
@@ -539,7 +481,7 @@ const SummaryHome = () => {
                 ) : (
                   <>
                     <ChevronDown className="w-5 h-5" />
-                    Show All ({summaries.length - 3} more)
+                    Show All ({Math.max(0, filteredSummaries.length - 3)} more)
                   </>
                 )}
               </button>
