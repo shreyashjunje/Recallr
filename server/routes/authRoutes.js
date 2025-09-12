@@ -2,6 +2,8 @@ const express = require("express");
 const router = express.Router();
 const passport = require("passport");
 const jwt = require("jsonwebtoken");
+const { authMiddleware } = require("../middlewares/auth");
+
 
 const {
   registerUser,
@@ -10,6 +12,7 @@ const {
   forgotpassword,
   validateResetToken,
   resetpassword,
+  changePassword,
 } = require("../controllers/authController");
 
 router.post("/register", registerUser);
@@ -17,6 +20,7 @@ router.post("/login", loginUser);
 router.post("/logout", logoutUser);
 router.post("/forgot-password",forgotpassword)
 router.post("/reset-password",resetpassword)
+router.post("/change-password",authMiddleware,changePassword)
 router.post("/validate-reset-token",validateResetToken)
 
 // 1️⃣ Redirect to Google for login

@@ -205,7 +205,7 @@ export default function QuizStatistics() {
         </header>
 
         {/* Tab Navigation */}
-        <div className="flex border-b border-gray-200 mb-6">
+        {/* <div className="flex border-b border-gray-200 mb-6">
           <button
             className={`py-3 px-6 font-medium border-b-2 transition-colors ${activeTab === 'overview' ? 'border-indigo-600 text-indigo-600' : 'border-transparent text-gray-500 hover:text-gray-700'}`}
             onClick={() => setActiveTab('overview')}
@@ -224,7 +224,7 @@ export default function QuizStatistics() {
           >
             History
           </button>
-        </div>
+        </div> */}
 
         {/* Stats Cards Grid */}
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5 mb-8">
@@ -300,12 +300,12 @@ export default function QuizStatistics() {
               <div>
                 <div className="flex justify-between items-center mb-2">
                   <span className="text-gray-600">Average Score</span>
-                  <span className="font-medium text-gray-900">{stats.avgScore}%</span>
+                  <span className="font-medium text-gray-900 overflow-hidden">{stats.avgScore}%</span>
                 </div>
                 <div className="w-full bg-gray-200 rounded-full h-2.5">
                   <div 
                     className="bg-green-500 h-2.5 rounded-full" 
-                    style={{ width: `${stats.avgScore}%` }}
+                    style={{ width: `${(500-stats.avgScore)-stats.avgScore}%` }}
                   ></div>
                 </div>
                 <p className="text-xs text-gray-500 mt-1">Target: 80% or higher</p>

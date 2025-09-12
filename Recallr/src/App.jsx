@@ -34,6 +34,7 @@ import HelpSupportPage from "./pages/usernav/HelpSupport";
 import ProfilePage from "./pages/usernav/Profile";
 import SettingsPage from "./pages/usernav/Settings";
 import QuizStatistics from "./components/QuizMaster/QuizStatistics";
+import ChangePassword from "./pages/auth/ChangePassword";
 
 function App() {
   // const [quizStarted, setQuizStarted] = useState(false);
@@ -45,6 +46,7 @@ function App() {
       <Route path="/register" element={<SignUpPage />} />
       <Route path="/forgot-password" element={<ForgotPassword />} />
       <Route path="/reset-password" element={<ResetPassword />} />
+      <Route path="/change-password" element={<ChangePassword />} />
       <Route path="/view" element={<PDFViewer />} />
       <Route path="/terms" element={<TermsOfService />} />
       <Route path="/privacy" element={<PrivacyPolicy />} />

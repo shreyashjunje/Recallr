@@ -416,6 +416,7 @@ async function processSummaryWithGeminiFromUrl(
   customPrompt
 ) {
   try {
+    console.log("in the summary url function to generate summary");
     // 1️⃣ Download PDF from Cloudinary
     const cloudinaryResponse = await axios.get(fileUrl, {
       responseType: "arraybuffer",
@@ -424,6 +425,14 @@ async function processSummaryWithGeminiFromUrl(
         password: process.env.CLOUDINARY_API_SECRET,
       },
     });
+    // const cloudinaryResponse = await axios.get(
+    //   fileUrl.replace("http://", "https://"),
+    //   {
+    //     responseType: "arraybuffer",
+    //   }
+    // );
+
+    console.log("PDF downloaded from Cloudinary");
 
     // Convert ArrayBuffer → Node Buffer
     const pdfBuffer = Buffer.from(cloudinaryResponse.data);
@@ -735,7 +744,12 @@ ${customPrompt ? `Extra instructions: ${customPrompt}` : ""}
 
 async function processQuizWithGeminiFromUrl(fileUrl, fileName, settings) {
   try {
+    console.log("Processing quiz with Gemini...");
+    console.log("fileurl:", fileUrl);
+    console.log("settings:", settings);
+
     // Download PDF
+    console.log("Downloading PDF from Cloudinary... in the quiz function");
     const cloudinaryResponse = await axios.get(fileUrl, {
       responseType: "arraybuffer",
       auth: {
@@ -749,11 +763,13 @@ async function processQuizWithGeminiFromUrl(fileUrl, fileName, settings) {
     const pdfPath = path.join(__dirname, "temp.pdf");
     fs.writeFileSync(pdfPath, pdfBuffer);
 
+    console.log("Uploading PDF to Gemini...");
     // Upload PDF
     const uploadResult = await fileManager.uploadFile(pdfBuffer, {
       mimeType: "application/pdf",
       displayName: fileName || "document.pdf",
     });
+    console.log("✅ Uploaded to Gemini:", uploadResult);
 
     // Question type safety
     const questionTypes = Array.isArray(settings.questionTypes)
@@ -765,10 +781,75 @@ async function processQuizWithGeminiFromUrl(fileUrl, fileName, settings) {
     const questionTypesString = questionTypes.join(", ");
 
     // Prompt
-    const customPrompt = `...`;
+    const customPrompt = `
+You are an AI that generates QUIZZES in STRICT JSON format only.
 
+Generate a quiz based on the uploaded PDF using the following settings:
+- Number of questions: ${settings.numQuestions}
+- Difficulty: ${settings.difficulty}
+- Question types: ${settings.questionTypes.join(", ")}
+
+Return ONLY a JSON object with this schema - NO additional text, NO markdown, NO code blocks, NO explanations:
+
+{
+  "title": "string (max 5 words)",
+  "description": "string (short summary of quiz)",
+  "category": "string",
+  "tags": ["string"],
+  "questions": [
+    {
+      "type": "MCQ | TrueFalse | FillBlank | ShortAnswer",
+      "questionText": "string",
+      "options": ["string"],   // only for MCQ
+      "correctAnswer": "string",
+      "explanation": "string"
+    }
+  ]
+}
+
+IMPORTANT: Return PURE JSON only, without any surrounding text or markdown formatting.
+`;
     // Call Gemini
-    const model = genAI.getGenerativeModel({ model: "gemini-2.5-pro" });
+    // const model = genAI.getGenerativeModel({ model: "gemini-2.5-pro" });
+    // 🔹 Call Gemini model with configuration
+    const model = genAI.getGenerativeModel({
+      model: "gemini-2.5-pro",
+      generationConfig: {
+        responseMimeType: "application/json",
+        responseSchema: {
+          type: "object",
+          properties: {
+            title: { type: "string" },
+            description: { type: "string" },
+            category: { type: "string" },
+            tags: { type: "array", items: { type: "string" } },
+            questions: {
+              type: "array",
+              items: {
+                type: "object",
+                properties: {
+                  type: { type: "string" },
+                  questionText: { type: "string" },
+                  options: { type: "array", items: { type: "string" } },
+                  correctAnswer: { type: "string" },
+                  explanation: { type: "string" },
+                },
+                required: [
+                  "type",
+                  "questionText",
+                  "correctAnswer",
+                  "explanation",
+                ],
+              },
+            },
+          },
+          required: ["title", "description", "category", "tags", "questions"],
+        },
+      },
+    });
+
+    console.log("Sending request to Gemini...");
+
     const result = await model.generateContent([
       {
         fileData: {
@@ -784,6 +865,9 @@ async function processQuizWithGeminiFromUrl(fileUrl, fileName, settings) {
     if (!responseText) {
       throw new Error("Empty response from Gemini");
     }
+
+    console.log("Received response from Gemini");
+    console.log("Response text:", result);
 
     let parsedJSON;
     try {
@@ -802,7 +886,6 @@ async function processQuizWithGeminiFromUrl(fileUrl, fileName, settings) {
     throw new Error(`AI processing failed: ${err.message}`);
   }
 }
-
 
 module.exports = {
   processWithGemini,

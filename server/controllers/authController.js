@@ -220,6 +220,37 @@ const resetpassword = async (req, res) => {
   res.json({ message: "Password reset successfully" });
 };
 
+// Change password (for logged-in users)
+const changePassword = async (req, res) => {
+  try {
+    const userId = req.user.id; // user id from JWT middleware
+    const { oldPassword, newPassword } = req.body;
+
+    // Find user
+    const user = await User.findById(userId);
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
+    }
+
+    // Verify old password
+    const isMatch = await bcrypt.compare(oldPassword, user.password);
+    if (!isMatch) {
+      return res.status(400).json({ message: "Old password is incorrect" });
+    }
+
+    // Hash new password
+    const hashedPassword = await bcrypt.hash(newPassword, 10);
+    user.password = hashedPassword;
+
+    await user.save();
+
+    res.json({ message: "Password updated successfully" });
+  } catch (error) {
+    console.error("Error changing password:", error);
+    res.status(500).json({ message: "Server error" });
+  }
+};
+
 module.exports = {
   registerUser,
   loginUser,
@@ -227,4 +258,5 @@ module.exports = {
   forgotpassword,
   resetpassword,
   validateResetToken,
+  changePassword
 };

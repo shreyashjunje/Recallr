@@ -18,7 +18,7 @@ const {
 
 router.get("/full-profile", authMiddleware, getFullProfile);
 router.delete("/delete-user", deleteUser);
-router.patch("/edit-profile", editUser);
+router.put("/edit-profile",authMiddleware, editUser);
 router.get("/average-progress", authMiddleware, getAverageProgress);
 router.put("/update-profile-picture", authMiddleware,upload.single("profilePicture"), updateProfilePicture);
 

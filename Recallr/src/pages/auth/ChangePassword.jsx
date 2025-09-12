@@ -4,22 +4,25 @@ import logo from "../../assets/logoR.png";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import axios from "axios";
 import { toast } from "react-toastify";
-const API_URL=import.meta.env.VITE_API_URL
-export default function ResetPassword() {
+const API_URL = import.meta.env.VITE_API_URL;
+export default function ChangePassword() {
   const [searchParams] = useSearchParams();
   const token = searchParams.get("token");
   const navigate = useNavigate();
   const [valid, setValid] = useState(null); // null=loading, true=valid, false=invalid
-  const [password, setPassword] = useState("");
+  const [newPassword, setNewPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
-  const [loading,setLoading]=useState(false)
+  const [oldPassword, setOldPassword] = useState("");
+  const [loading, setLoading] = useState(false);
 
   // Step 1: validate token when page loads
   useEffect(() => {
     const validateToken = async () => {
       try {
-        const res=await axios.post(`${API_URL}/auth/validate-reset-token`, { token });
-        console.log("ressss->",res)
+        const res = await axios.post(`${API_URL}/auth/validate-reset-token`, {
+          token,
+        });
+        console.log("ressss->", res);
         setValid(true);
       } catch (err) {
         setValid(false);
@@ -28,30 +31,58 @@ export default function ResetPassword() {
     if (token) validateToken();
   }, [token]);
 
-
-
   // const [createPassword, setCreatePassword] = useState("");
   // const [reenterPassword, setReenterPassword] = useState("");
   const [showCreatePassword, setShowCreatePassword] = useState(false);
   const [showReenterPassword, setShowReenterPassword] = useState(false);
 
+  const [showOldPassword, setShowOldPassword] = useState(false);
 
-   const handleReset = async (e) => {
-    setLoading(true)
+  const handleReset = async (e) => {
+    setLoading(true);
     e.preventDefault();
-    if (password !== confirmPassword) {
+    if (newPassword !== confirmPassword) {
       toast.error("Passwords do not match!");
       return;
     }
-    console.log("password-->",password)
+    console.log("newPassword-->", newPassword);
     try {
-      await axios.post(`${API_URL}/auth/reset-password`, { token, password });
+      await axios.post(`${API_URL}/auth/reset-newPassword`, {
+        token,
+        newPassword,
+      });
       toast.success("Password reset successful. Please log in.");
       navigate("/login");
     } catch (err) {
       toast.error(err.response?.data?.message || "Something went wrong");
     }
-    setLoading(false)
+    setLoading(false);
+  };
+
+  const handleChangePassword = async (e) => {
+    console.log("in handle change password");
+    e.preventDefault();
+    if (newPassword !== confirmPassword) {
+      toast.error("Passwords do not match!");
+      return;
+    }
+
+    try {
+      const token = localStorage.getItem("token"); // or however you store it
+      const response = await axios.post(
+        `${API_URL}/auth/change-Password`,
+        { oldPassword, newPassword },
+        { headers: { Authorization: `Bearer ${token}` } }
+      );
+      // console.log("response->", response);
+      if (response.status === 200) {
+        localStorage.removeItem("token");
+        navigate("/login");
+        toast.success("Password updated successfully");
+      }
+    } catch (err) {
+      toast.error(err.response?.data?.message || "Something went wrong");
+    }
   };
 
   return (
@@ -76,13 +107,40 @@ export default function ResetPassword() {
               {/* Main Content */}
               <div className="max-w-sm">
                 <h1 className="text-3xl font-bold text-gray-900 mb-4">
-                  Set a password
+                  Change Password
                 </h1>
 
                 <p className="text-gray-600 mb-8 leading-relaxed">
-                  Your previous password has been reseted. Please set a new
-                  password for your account.
+                  Please enter your old password and set a new one to update
+                  your account security.
                 </p>
+
+                {/* old Password Input */}
+                <div className="mb-6">
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    Old Password
+                  </label>
+                  <div className="relative">
+                    <input
+                      type={showCreatePassword ? "text" : "oldPassword"}
+                      value={oldPassword}
+                      placeholder="Enter your old password"
+                      onChange={(e) => setOldPassword(e.target.value)}
+                      className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-colors pr-12"
+                    />
+                    <button
+                      type="button"
+                      onClick={() => setShowOldPassword(!showOldPassword)}
+                      className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-500 hover:text-gray-700"
+                    >
+                      {showOldPassword ? (
+                        <EyeOff size={20} />
+                      ) : (
+                        <Eye size={20} />
+                      )}
+                    </button>
+                  </div>
+                </div>
 
                 {/* Create Password Input */}
                 <div className="mb-6">
@@ -91,9 +149,10 @@ export default function ResetPassword() {
                   </label>
                   <div className="relative">
                     <input
-                      type={showCreatePassword ? "text" : "password"}
-                      value={password}
-                      onChange={(e) => setPassword(e.target.value)}
+                      type={showCreatePassword ? "text" : "newPassword"}
+                      value={newPassword}
+                      placeholder="Enter new password"
+                      onChange={(e) => setNewPassword(e.target.value)}
                       className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-colors pr-12"
                     />
                     <button
@@ -117,8 +176,9 @@ export default function ResetPassword() {
                   </label>
                   <div className="relative">
                     <input
-                      type={showReenterPassword ? "text" : "password"}
+                      type={showReenterPassword ? "text" : "newPassword"}
                       value={confirmPassword}
+                      placeholder="Re-enter new password"
                       onChange={(e) => setConfirmPassword(e.target.value)}
                       className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-colors pr-12"
                     />
@@ -140,15 +200,16 @@ export default function ResetPassword() {
 
                 {/* Set Password Button */}
                 <button
-                onClick={handleReset}
-                 className="w-full bg-blue-600 hover:bg-blue-700 text-white font-medium py-3 px-6 rounded-lg transition-colors">
-                  {
-                    loading ? (
-                      <div className="flex justify-center items-center">
+                  onClick={handleChangePassword}
+                  className="w-full bg-blue-600 hover:bg-blue-700 text-white font-medium py-3 px-6 rounded-lg transition-colors"
+                >
+                  {loading ? (
+                    <div className="flex justify-center items-center">
                       <div className="w-6 h-6 sm:w-8 sm:h-8 border-4 border-blue-500 border-t-transparent rounded-full animate-spin"></div>
                     </div>
-                    ) : ("Set password")
-                  }
+                  ) : (
+                    "Set newPassword"
+                  )}
                 </button>
               </div>
             </div>
@@ -241,4 +302,3 @@ export default function ResetPassword() {
     </div>
   );
 }
-

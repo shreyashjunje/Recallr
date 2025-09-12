@@ -138,7 +138,7 @@ export function QuestionRenderer({
 
   // Decide what to render
   const renderQuestionContent = () => {
-    switch (question.type) {
+    switch (question?.type) {
       case "MCQ":
         return renderMCQ();
       case "TrueFalse":

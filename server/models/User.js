@@ -12,6 +12,8 @@ const userSchema = new mongoose.Schema(
       required: true,
       unique: true,
     },
+    role: { type: String, enum: ["user", "admin"], default: "user" },
+
     phoneNumber: {
       type: String,
       required: true,
@@ -66,6 +68,17 @@ const userSchema = new mongoose.Schema(
     // telegramChatId: { type: String, default: null },
     // telegramLinkToken: { type: String, default: null },
     // telegramLinkedAt: { type: Date, default: null },
+
+    name: {
+      type: String,
+    },
+    dateOfBirth: { type: Date },
+    bio: { type: String, default: "" },
+    social: {
+      linkedIn: { type: String, default: "" },
+      github: { type: String, default: "" },
+      twitter: { type: String, default: "" },
+    },
   },
 
   { timestamps: true }

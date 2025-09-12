@@ -72,7 +72,7 @@ const deleteUser = async (req, res) => {
 
 const editUser = async (req, res) => {
   //   const userId = req.params.id;
-  const userId = "6891d415c8cd6309b50acd01";
+  const userId = req.user?.id;
 
   try {
     const user = await User.findById(userId);

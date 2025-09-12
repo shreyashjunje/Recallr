@@ -12,6 +12,11 @@ const summaryRoutes = require("./routes/summaryRoutes");
 const flashcardsRoutes = require("./routes/flashcardsRoutes");
 const helperRoutes = require("./routes/helperRoutes");
 const taskRoutes = require("./routes/taskRoutes");
+const faqRoutes = require("./routes/faqRoutes");
+const ticketRoutes = require("./routes/ticketRoutes");
+// const chatMessageRoutes = require("./routes/chatMessageRoutes");
+
+
 const bot = require("./bot");
 require("dotenv").config();
 require("./config/passport");
@@ -59,6 +64,12 @@ app.use("/api/summary", summaryRoutes);
 app.use("/api/flashcards", flashcardsRoutes);
 app.use("/api/helper", helperRoutes);
 app.use("/api/task", taskRoutes);
+
+app.use("/api/faqs", faqRoutes);
+app.use("/api/ticket", ticketRoutes);
+// app.use("/api/chat", chatMessageRoutes);
+
+
 
 app.get("/", (req, res) => {
   res.send("Hello, World!");

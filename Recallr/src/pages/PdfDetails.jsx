@@ -352,7 +352,7 @@ const PDFDetailsPage = () => {
       });
 
       if (res.status === 200) {
-        navigate("/my-library");
+        navigate("/library");
       }
     } catch (error) {
       console.error("Error deleting PDF:", error);

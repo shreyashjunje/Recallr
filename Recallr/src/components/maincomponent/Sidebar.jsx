@@ -257,14 +257,14 @@ export default function Sidebar() {
             <div className="w-1 h-1 bg-gradient-to-r from-pink-400 to-rose-500 rounded-full animate-pulse delay-100"></div>
             <div className="w-1 h-1 bg-gradient-to-r from-blue-400 to-cyan-500 rounded-full animate-pulse delay-200"></div>
           </div>
-          {/* <SidebarUserNav
+          <SidebarUserNav
             user={user}
             trigger={
               <div className="w-10 h-10 bg-gradient-to-r from-indigo-500 to-purple-600 rounded-xl flex items-center justify-center shadow-lg cursor-pointer">
                 <User className="w-5 h-5 text-white" />
               </div>
             }
-          /> */}
+          />
           
         </div>
       </div>

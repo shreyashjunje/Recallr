@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import {
   X,
@@ -10,39 +10,78 @@ import {
   MapPin,
   Globe,
   Calendar,
-  Briefcase, // Added missing imports
+  Briefcase,
 } from "lucide-react";
-
-// interface EditProfileModalProps {
-//   isOpen: boolean;
-//   onClose: () => void;
-// }
+const API_URL = import.meta.env.VITE_API_URL;
+import axios from "axios";
+import { toast } from "react-toastify";
 
 const EditProfileModal = ({ isOpen, onClose }) => {
   const [formData, setFormData] = useState({
-    name: "Sarah Johnson",
-    username: "sarah_dev",
-    email: "sarah.johnson@example.com",
-    phone: "+1 (555) 123-4567",
-    bio: "Passionate full-stack developer with a love for creating beautiful, functional web experiences. Always learning and exploring new technologies to build innovative solutions.",
-    location: "San Francisco, CA",
-    website: "www.sarahdev.com",
-    company: "Tech Innovations Inc.",
-    jobTitle: "Senior Full Stack Developer",
+    userName: "",
+    email: "",
+    phoneNumber: "",
+    bio: "",
+    location: "",
+    website: "",
+    company: "",
+    jobTitle: "",
+    dateOfBirth: "",
+    emergencyContact: "",
+    linkedIn: "",
+    github: "",
+    twitter: "",
     timezone: "Pacific Standard Time (PST)",
-    dateOfBirth: "1992-08-15",
-    gender: "female",
-    emergencyContact: "John Johnson - +1 (555) 987-6543",
-    skills: "React, TypeScript, Node.js, Python, AWS",
-    education: "BS Computer Science, Stanford University",
-    experience: "5+ Years",
-    languages: "English (Native), Spanish (Fluent), French (Intermediate)",
-    linkedIn: "linkedin.com/in/sarahjohnson",
-    github: "github.com/sarah-dev",
-    twitter: "@sarah_codes",
   });
 
+  const [user, setUser] = useState(null);
   const [isLoading, setIsLoading] = useState(false);
+
+  const fetchUserProfile = async () => {
+    setIsLoading(true);
+    try {
+      const token = localStorage.getItem("token");
+      const response = await axios.get(`${API_URL}/user/full-profile`, {
+        headers: {
+          Authorization: `Bearer ${token}`
+        }
+      });
+
+      console.log("User profile data:", response.data.data);
+      if (response.status === 200) {
+        setUser(response.data.data);
+        // Populate form data with user data
+        setFormData(prev => ({
+          ...prev,
+          userName: response.data.data.userName || "",
+          email: response.data.data.email || "",
+          phoneNumber: response.data.data.phoneNumber || "",
+          bio: response.data.data.bio || "",
+          location: response.data.data.location || "",
+          website: response.data.data.website || "",
+          company: response.data.data.company || "",
+          jobTitle: response.data.data.jobTitle || "",
+          dateOfBirth: response.data.data.dateOfBirth || "",
+          emergencyContact: response.data.data.emergencyContact || "",
+          linkedIn: response.data.data.linkedIn || "",
+          github: response.data.data.github || "",
+          twitter: response.data.data.twitter || "",
+          timezone: response.data.data.timezone || "Pacific Standard Time (PST)",
+        }));
+      }
+    } catch (error) {
+      console.error("Error fetching user profile:", error);
+      toast.error("Failed to fetch user profile");
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    if (isOpen) {
+      fetchUserProfile();
+    }
+  }, [isOpen]);
 
   const handleInputChange = (field, value) => {
     setFormData((prev) => ({ ...prev, [field]: value }));
@@ -50,28 +89,53 @@ const EditProfileModal = ({ isOpen, onClose }) => {
 
   const handleSave = async () => {
     setIsLoading(true);
-    // Simulate API call
-    await new Promise((resolve) => setTimeout(resolve, 1500));
-    setIsLoading(false);
+    
+    try {
+      const token = localStorage.getItem("token");
+      const response = await axios.put(
+        `${API_URL}/user/edit-profile`,
+        {
+          userName: formData.userName,
+          email: formData.email,
+          phoneNumber: formData.phoneNumber,
+          bio: formData.bio,
+          location: formData.location,
+          website: formData.website,
+          company: formData.company,
+          jobTitle: formData.jobTitle,
+          dateOfBirth: formData.dateOfBirth,
+          emergencyContact: formData.emergencyContact,
+          linkedIn: formData.linkedIn,
+          github: formData.github,
+          twitter: formData.twitter,
+          timezone: formData.timezone,
+        },
+        {
+          headers: {
+            Authorization: `Bearer ${token}`
+          }
+        }
+      );
 
-    // Show success toast
-    if (window.showToast) {
-      window.showToast("Profile updated successfully!", "success");
+      if (response.status === 200) {
+        toast.success("Profile updated successfully!");
+        onClose();
+      }
+    } catch (error) {
+      console.error("Error updating profile:", error);
+      if (error.response?.status === 409) {
+        toast.error(error.response.data.message || "This value is already in use");
+      } else {
+        toast.error("Failed to update profile");
+      }
+    } finally {
+      setIsLoading(false);
     }
-
-    onClose();
   };
 
   const formFields = [
     {
-      key: "name",
-      label: "Full Name",
-      icon: User,
-      type: "text",
-      required: true,
-    },
-    {
-      key: "username",
+      key: "userName",
       label: "Username",
       icon: User,
       type: "text",
@@ -85,7 +149,7 @@ const EditProfileModal = ({ isOpen, onClose }) => {
       required: true,
     },
     {
-      key: "phone",
+      key: "phoneNumber",
       label: "Phone Number",
       icon: Phone,
       type: "tel",
@@ -189,7 +253,7 @@ const EditProfileModal = ({ isOpen, onClose }) => {
                 <div className="flex items-center space-x-6">
                   <div className="relative">
                     <img
-                      src="https://images.pexels.com/photos/1222271/pexels-photo-1222271.jpeg?auto=compress&cs=tinysrgb&w=400"
+                      src={user?.profilePicture || "https://images.pexels.com/photos/1222271/pexels-photo-1222271.jpeg?auto=compress&cs=tinysrgb&w=400"}
                       alt="Profile"
                       className="w-24 h-24 rounded-2xl object-cover"
                     />

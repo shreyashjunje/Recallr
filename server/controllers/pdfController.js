@@ -266,12 +266,14 @@ const getPdfDetail = async (req, res) => {
     const pdf = await PDF.findById(id)
       .populate("user", "userName email") // get user info
       .populate({
-        path: "quizzes",                    // quizzes of this PDF
-        select: "title description settings questions", // pick only needed fields
+        path: "quizzes",
+        match: { pdf: id }, // only quizzes linked to this pdf
+        select: "settings",
         populate: {
-          path: "userId",                   // also populate quiz creator
+          path: "userId",
           select: "userName email",
-        }})
+        },
+      });
 
     // const pdf = await PDF.findById(id).populate("quizzes");
     // console.log(pdf);
@@ -523,8 +525,6 @@ const generateQuizOnly = async (req, res) => {
     } = req.body;
 
     const userId = req.user?.id;
-
-
 
     if (!fileUrl || !userId) {
       return res.status(400).json({ message: "Missing required fields" });
