@@ -8,8 +8,8 @@ import {
   CheckCircle,
   AlertCircle,
 } from "lucide-react";
-import Modal from "../../components/Common/Modal";
-import Button from "../../components/Common/Button";
+import Modal from "../../components/common/Modal";
+import Button from "../../components/common/Button";
 import axios from "axios";
 import { toast } from "react-toastify";
 

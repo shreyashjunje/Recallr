@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import { Plus, Search, Edit, Trash2, Menu, X, ChevronDown, ChevronUp } from "lucide-react";
-import Modal from "../../components/Common/Modal";
+import Modal from "../../components/common/Modal";
 import Button from "../../components/common/Button";
 import axios from "axios";
 import { toast } from "react-toastify";
