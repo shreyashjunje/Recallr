@@ -107,7 +107,7 @@ const loginUser = async (req, res) => {
         phoneNumber: user.phoneNumber, // Include phone number in the token
         profilePicture: user.profilePicture,
         role: user.role,
-      }, // Payload: minimal info
+      }, 
       process.env.JWT_SECRET, // Secret key (you'll store in .env)
       { expiresIn: "1d" } // Token expiry
     );
