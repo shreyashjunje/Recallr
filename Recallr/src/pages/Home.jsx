@@ -31,16 +31,7 @@ const Home = () => {
   const [currentFrame, setCurrentFrame] = useState(0);
   const navigate = useNavigate();
 
-  // useEffect(() => {
-  //   let token = localStorage.getItem("token");
-
-  //   if (token) {
-  //     navigate("/dashboard");
-  //     toast.success("User logged in successfully..!");
-  //   }
-  // }, []);
-
-  // Animation frames cycle
+  
   useEffect(() => {
     const interval = setInterval(() => {
       setCurrentFrame((prev) => (prev + 1) % 8);
