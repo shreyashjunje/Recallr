@@ -29,6 +29,8 @@ export const AuthProvider = ({ children }) => {
     }
   }, []);
 
+
+
   // 🔹 Login function
   const login = (token) => {
     localStorage.setItem("token", token);

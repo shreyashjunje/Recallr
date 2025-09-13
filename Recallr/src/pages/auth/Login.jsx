@@ -6,6 +6,7 @@ import { useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
 import logo from "../../assets/logoR.png";
 import useAuth from "@/hooks/useAuth";
+import { jwtDecode } from "jwt-decode";
 
 export default function LoginPage() {
   const { login, user, authChecked } = useAuth();
@@ -68,13 +69,22 @@ export default function LoginPage() {
         toast.success("User login successfully..!");
 
         const token = res.data.token;
+
+        const decoded = jwtDecode(res.data.token);
+        localStorage.setItem("role", decoded.role); // 👈 save role
+
         if (rememberMe) {
           localStorage.setItem("token", token); // persists until manually cleared
         } else {
           sessionStorage.setItem("token", token); // clears when browser is closed
         }
 
-        navigate("/dashboard");
+        // 🚀 redirect based on role
+        if (decoded.role === "admin") {
+          navigate("/admin/dashboard");
+        } else {
+          navigate("/dashboard");
+        }
       }
 
       if (res.status == 400) {

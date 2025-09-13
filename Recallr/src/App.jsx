@@ -35,6 +35,11 @@ import ProfilePage from "./pages/usernav/Profile";
 import SettingsPage from "./pages/usernav/Settings";
 import QuizStatistics from "./components/QuizMaster/QuizStatistics";
 import ChangePassword from "./pages/auth/ChangePassword";
+import AdminRoute from "./components/layouts/AdminRoute";
+import AdminDashboard from "./pages/admin/AdminDashboard";
+import FAQs from "./pages/admin/FAQ";
+import Tickets from "./pages/admin/Tickets";
+import AdminSettings from "./pages/admin/Settings";
 
 function App() {
   // const [quizStarted, setQuizStarted] = useState(false);
@@ -108,6 +113,42 @@ function App() {
               estimatedDate="OCT 2025"
               progress={0}
             />
+          }
+        />
+
+        <Route
+          path="/admin/dashboard"
+          element={
+            <AdminRoute>
+              <AdminDashboard />
+            </AdminRoute>
+          }
+        />
+
+         <Route
+          path="/admin/faqs"
+          element={
+            <AdminRoute>
+              <FAQs />
+            </AdminRoute>
+          }
+        />
+
+         <Route
+          path="/admin/tickets"
+          element={
+            <AdminRoute>
+              <Tickets />
+            </AdminRoute>
+          }
+        />
+
+         <Route
+          path="/admin/settings"
+          element={
+            <AdminRoute>
+              <AdminSettings />
+            </AdminRoute>
           }
         />
       </Route>

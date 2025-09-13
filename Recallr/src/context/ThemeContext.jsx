@@ -6,10 +6,7 @@ import React, {
   useEffect,
 } from "react";
 
-// interface ThemeContextType {
-//   isDark: boolean;
-//   toggleTheme: () => void;
-// }
+
 
 const ThemeContext = createContext(undefined);
 

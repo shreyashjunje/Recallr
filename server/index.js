@@ -14,6 +14,7 @@ const helperRoutes = require("./routes/helperRoutes");
 const taskRoutes = require("./routes/taskRoutes");
 const faqRoutes = require("./routes/faqRoutes");
 const ticketRoutes = require("./routes/ticketRoutes");
+const activityRoutes = require("./routes/activityRoutes");
 // const chatMessageRoutes = require("./routes/chatMessageRoutes");
 
 
@@ -67,6 +68,7 @@ app.use("/api/task", taskRoutes);
 
 app.use("/api/faqs", faqRoutes);
 app.use("/api/ticket", ticketRoutes);
+app.use("/api/activity", activityRoutes);
 // app.use("/api/chat", chatMessageRoutes);
 
 

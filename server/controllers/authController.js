@@ -49,6 +49,7 @@ const registerUser = async (req, res) => {
         userName: newUser.userName,
         email: newUser.email,
         phoneNumber: newUser.phoneNumber,
+        role: newUser.role,
       },
       process.env.JWT_SECRET,
       {
@@ -104,7 +105,8 @@ const loginUser = async (req, res) => {
         userName: user.userName,
         email: user.email,
         phoneNumber: user.phoneNumber, // Include phone number in the token
-        profilePicture:user.profilePicture
+        profilePicture: user.profilePicture,
+        role: user.role,
       }, // Payload: minimal info
       process.env.JWT_SECRET, // Secret key (you'll store in .env)
       { expiresIn: "1d" } // Token expiry
@@ -195,13 +197,13 @@ const validateResetToken = async (req, res) => {
 };
 
 const resetpassword = async (req, res) => {
-  console.log("in the reset password controller")
+  console.log("in the reset password controller");
   const { token, password } = req.body;
-  console.log("token->",token)
-  console.log("newpass->",password)
+  console.log("token->", token);
+  console.log("newpass->", password);
 
   const user = await User.findOne({ resetPasswordToken: token });
-  console.log("user->",user)
+  console.log("user->", user);
 
   if (!user || user.resetPasswordExpires < Date.now()) {
     return res.status(400).json({ message: "Invalid or expired token" });
@@ -258,5 +260,5 @@ module.exports = {
   forgotpassword,
   resetpassword,
   validateResetToken,
-  changePassword
+  changePassword,
 };

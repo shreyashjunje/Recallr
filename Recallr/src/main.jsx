@@ -7,25 +7,26 @@ import "react-toastify/dist/ReactToastify.css";
 import { ToastContainer } from "react-toastify";
 import { AuthProvider } from "./context/AuthContext";
 import { QuizProvider } from "./context/QuizContext";
-// import { ThemeProvider } from "./context/ThemeContext";
-
+import { ThemeProvider } from "./context/AdminThemeContext";
 
 createRoot(document.getElementById("root")).render(
   <BrowserRouter>
-    <AuthProvider>
-      <QuizProvider>
-        <App />
-        <ToastContainer
-          position="top-right"
-          toastClassName="custom-toast"
-          newestOnTop
-          autoClose={3000}
-          hideProgressBar={false}
-          closeOnClick
-          pauseOnHover
-          draggable
-        />{" "}
-      </QuizProvider>
-    </AuthProvider>
+    <ThemeProvider>
+      <AuthProvider>
+        <QuizProvider>
+          <App />
+          <ToastContainer
+            position="top-right"
+            toastClassName="custom-toast"
+            newestOnTop
+            autoClose={3000}
+            hideProgressBar={false}
+            closeOnClick
+            pauseOnHover
+            draggable
+          />{" "}
+        </QuizProvider>
+      </AuthProvider>
+    </ThemeProvider>
   </BrowserRouter>
 );
