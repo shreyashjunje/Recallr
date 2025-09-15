@@ -5,7 +5,7 @@ import { useState, useEffect } from "react";
 import useAuth from "../hooks/useAuth";
 import SidebarUserNav from "./dashboard/helper/SidebarUserNav";
 
-const Navbar = () => {
+const Navbar = ({isDark}) => {
   const { user, logout } = useAuth();
   const [isLoggedIn, setIsLoggedIn] = useState(!!user);
 
@@ -105,7 +105,7 @@ const Navbar = () => {
 
   return (
     <nav
-      className={`sticky top-0 z-50 py-2 bg-white transition-all duration-300 ${
+      className={`sticky top-0 z-50 py-2 ${isDark ? "bg-gray-600" : "bg-white"} transition-all duration-300 ${
         isScrolled ? "shadow-md" : "shadow-sm"
       }`}
     >
@@ -120,7 +120,7 @@ const Navbar = () => {
               className="h-10 w-auto md:h-12 cursor-pointer"
               onClick={() => navigate("/")}
             />
-            <h1 className="text-2xl sm:text-3xl font-bold text-gray-900">
+            <h1 className={`text-2xl sm:text-3xl font-bold ${isDark ? "text-gray-300" : "text-gray-900"}`}>
               Recallr
             </h1>
           </div>
@@ -129,19 +129,19 @@ const Navbar = () => {
           <div className="hidden md:flex items-center space-x-8">
             <a
               href="#features"
-              className="text-gray-600 hover:text-gray-900 transition-colors text-sm lg:text-base font-medium"
+              className={`text-gray-600 hover:text-gray-900 transition-colors text-sm lg:text-base font-medium ${isDark ? "text-white" : "text-gray-600"}`}
             >
               Features
             </a>
             <a
               href="#how-it-works"
-              className="text-gray-600 hover:text-gray-900 transition-colors text-sm lg:text-base font-medium"
+              className={`text-gray-600 hover:text-gray-900 transition-colors text-sm lg:text-base font-medium ${isDark ? "text-white" : "text-gray-600"}`}
             >
               How it works
             </a>
             <a
               href="#demo"
-              className="text-gray-600 hover:text-gray-900 transition-colors text-sm lg:text-base font-medium"
+              className={`text-gray-600 hover:text-gray-900 transition-colors text-sm lg:text-base font-medium ${isDark ? "text-white" : "text-gray-600"}`}
             >
               Demo
             </a>

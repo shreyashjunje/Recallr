@@ -11,15 +11,15 @@ const {
 } = require("../controllers/ticketController");
 const router = express.Router();
 
-const { protect, authMiddleware } = require("../middlewares/auth");
+const { optionalAuth, authMiddleware } = require("../middlewares/auth");
 
 
-router.get("/get-all-tickets",authMiddleware, getAllTickets);
-router.post("/create-ticket", protect, createTicket);
-router.get("/get-ticket/:id", getTicketById);
-router.delete("/delete-ticket/:id", deleteTicket);
-router.put("/update-ticket/:id", updateTicket);
-router.get("/my-tickets", authMiddleware, getMyAllTickets);
+router.get("/get-all-tickets",authMiddleware, getAllTickets);//checked
+router.post("/create-ticket", optionalAuth, createTicket);//checked
+router.get("/get-ticket/:id", getTicketById); //notused 
+router.delete("/delete-ticket/:id", deleteTicket); //checked
+router.put("/update-ticket/:id", updateTicket); //checked
+router.get("/my-tickets", authMiddleware, getMyAllTickets); //checked
 router.post("/track-ticket", trackTicket);
 router.get("/tickets-weekly", getWeeklyTicketVolume);
 

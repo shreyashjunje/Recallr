@@ -7,6 +7,7 @@ import {
   Clock,
   CheckCircle,
   AlertCircle,
+  Trash2,
 } from "lucide-react";
 import Modal from "../../components/common/Modal";
 import Button from "../../components/common/Button";
@@ -23,6 +24,13 @@ const Tickets = () => {
   const [selectedTicket, setSelectedTicket] = useState(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [newNote, setNewNote] = useState("");
+  // const [confirmationModalOpen, setConfirmationModalOpen] = useState(false);
+  const [ticketToDelete, setTicketToDelete] = useState(null);
+
+  const [confirmModal, setConfirmModal] = useState({
+    open: false,
+    faqId: null,
+  });
 
   useEffect(() => {
     fetchTickets();
@@ -72,7 +80,9 @@ const Tickets = () => {
       const res = await axios.put(
         `${API_URL}/ticket/update-ticket/${selectedTicket._id}`,
         payload,
-        { headers: { Authorization: `Bearer ${localStorage.getItem("token")}` } }
+        {
+          headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
+        }
       );
 
       setSelectedTicket(res.data.ticket);
@@ -108,7 +118,9 @@ const Tickets = () => {
           message: "New note added",
           note,
         },
-        { headers: { Authorization: `Bearer ${localStorage.getItem("token")}` } }
+        {
+          headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
+        }
       );
 
       setSelectedTicket(res.data.ticket);
@@ -145,6 +157,24 @@ const Tickets = () => {
       statusFilter === "all" || ticket.status === statusFilter;
     return matchesSearch && matchesStatus;
   });
+
+  const handleDeleteTicket = async (ticketId) => {
+    if (!window.confirm("Are you sure you want to delete this ticket?")) return;
+
+    try {
+      const res=await axios.delete(`${API_URL}/ticket/delete-ticket/${ticketId}`, {
+        headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
+      });
+      if(res.status===200){
+        setTickets((prev) => prev.filter((t) => t._id !== ticketId));
+        setConfirmModal({ open: false, faqId: null });
+        toast.success("Ticket deleted successfully!");
+      }
+    } catch (err) {
+      console.error("Failed to delete ticket:", err);
+      toast.error("Failed to delete ticket. Try again.");
+    }
+  };
 
   return (
     <div className="space-y-6">
@@ -224,7 +254,15 @@ const Tickets = () => {
             <table className="w-full text-sm">
               <thead className="bg-gray-50 dark:bg-gray-700">
                 <tr>
-                  {["Ticket ID", "Subject", "Status", "Email", "User", "Created", "Actions"].map((h) => (
+                  {[
+                    "Ticket ID",
+                    "Subject",
+                    "Status",
+                    "Email",
+                    "User",
+                    "Created",
+                    "Actions",
+                  ].map((h) => (
                     <th
                       key={h}
                       className="px-6 py-3 text-left font-medium text-gray-500 dark:text-gray-300 uppercase text-xs"
@@ -254,7 +292,15 @@ const Tickets = () => {
                     <td className="px-6 py-3">
                       {new Date(ticket.createdAt).toLocaleDateString()}
                     </td>
-                    <td className="px-6 py-3 text-right">
+                    <td className="px-6 py-3 text-center flex items-center gap-3">
+                      <button>
+                        <Trash2
+                          size={16}
+                          onClick={() =>
+                            setConfirmModal({ open: true, faqId: ticket._id })
+                          }
+                        />
+                      </button>
                       <button
                         onClick={() => handleViewTicket(ticket)}
                         className="p-1 text-blue-600 hover:bg-blue-100 rounded"
@@ -409,6 +455,36 @@ const Tickets = () => {
           </Modal>
         )}
       </AnimatePresence>
+
+      {/* Delete Confirmation Modal */}
+      {confirmModal.open && (
+        <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50 p-4">
+          <div className="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-6 w-full max-w-md">
+            <h2 className="text-lg font-semibold text-gray-800 dark:text-gray-200">
+              Confirm Delete
+            </h2>
+            <p className="text-sm text-gray-600 dark:text-gray-400 mt-2">
+              This action is permanent. Are you sure you want to delete this
+              FAQ?
+            </p>
+
+            <div className="mt-4 flex flex-col sm:flex-row justify-end gap-3">
+              <button
+                onClick={() => setConfirmModal({ open: false, faqId: null })}
+                className="px-4 py-2 bg-gray-300 dark:bg-gray-600 rounded-lg text-gray-800 dark:text-gray-200 order-2 sm:order-1"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={() => handleDeleteTicket(confirmModal.faqId)}
+                className="px-4 py-2 bg-red-600 hover:bg-red-700 text-white rounded-lg order-1 sm:order-2"
+              >
+                Delete
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

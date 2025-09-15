@@ -45,6 +45,8 @@ const activitySchema = new mongoose.Schema(
       type: Object,
       default: {}, // flexible extra data (e.g. { oldStatus: "open", newStatus: "resolved" })
     },
+    ticket: { type: mongoose.Schema.Types.ObjectId, ref: "Ticket" }, // for relation
+    ticketCode: { type: String }, // store "TKT-2025-32834"
   },
   { timestamps: true } // adds createdAt & updatedAt automatically
 );

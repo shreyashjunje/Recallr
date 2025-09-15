@@ -17,18 +17,6 @@ import {
   Edit,
   Trash2,
   Star,
-  FilePlus,
-  Bookmark,
-  FileEdit,
-  FileMinus,
-  FileOutput,
-  FileSearch,
-  FileBarChart2,
-  FileInput,
-  FileClock,
-  FileCheck,
-  FileX,
-  FileUp,
   X,
 } from "lucide-react";
 import { AuthContext } from "@/context/AuthContext";
@@ -38,8 +26,8 @@ import { useNavigate } from "react-router-dom";
 import PDFUploadModal from "../components/modals/PdfUploadModal";
 import { toast } from "react-toastify";
 // import PdfReaderModal from "../components/helper/PdfReaderModal";
-import PdfReader from "../components/helper/PdfViewer";
-import PdfViewer from "../components/helper/PdfViewer";
+
+import { useTheme } from "@/context/AdminThemeContext";
 // import PDFViewer from "./ViewPdf";
 const API_URL = import.meta.env.VITE_API_URL;
 
@@ -60,43 +48,10 @@ const MyLibrary = () => {
   const [showViewer, setShowViewer] = useState(null);
   const [averageProgress, setAverageProgress] = useState(0);
   const [favorites, setFavorites] = useState([]);
-  // const handleToggleFavorite = async (pdf) => {
-  //   try {
-  //     const token = localStorage.getItem("token");
-  //     if (!token) return;
-
-  //     const endpoint = pdf.isFavorite
-  //       ? `${API_URL}/helper/remove-from-favourite`
-  //       : `${API_URL}/helper/add-to-favourite`;
-
-  //     const response = await axios.post(
-  //       endpoint,
-  //       { pdfId: pdf._id },
-  //       { headers: { Authorization: `Bearer ${token}` } }
-  //     );
-
-  //     if (response.status === 200) {
-  //       setPDFS((prevPDFs) =>
-  //         prevPDFs.map((p) =>
-  //           p._id === pdf._id ? { ...p, isFavorite: !p.isFavorite } : p
-  //         )
-  //       );
-
-  //       toast.success(
-  //         pdf.isFavorite ? "Removed from favorites" : "Added to favorites"
-  //       );
-  //     }
-  //   } catch (error) {
-  //     console.error("Error toggling favorite:", error);
-  //     toast.error("Failed to update favorites");
-  //   }
-  // };
+  const { isDark, toggleTheme } = useTheme(); // Get theme state and toggle function
 
   const dropdownRef = useRef(null);
 
-  // const [title, setTitle] = useState("");
-  // const [category, setCategory] = useState("");
-  // const [tags, setTags] = useState("");
   const [formData, setFormData] = useState({
     title: "",
     category: "",
@@ -533,17 +488,35 @@ const MyLibrary = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100">
+    <div
+      className={`min-h-screen ${
+        isDark ? "bg-gray-900 text-gray-100" : "bg-gray-50 text-gray-900"
+      }`}
+    >
       {/* Header */}
-      <div className="sticky top-0 z-10 bg-white/95 backdrop-blur-sm border-b border-gray-200 shadow-sm">
+      <div
+        className={`sticky top-0 z-10 ${
+          isDark ? "bg-gray-900/95" : "bg-white/95"
+        } backdrop-blur-sm border-b border-gray-200 shadow-sm`}
+      >
         <div className="max-w-7xl mx-auto px-4 sm:px-6 py-4 sm:py-6">
           {/* Header */}
           <div className="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-3 sm:gap-4 mb-4 sm:mb-6">
             <div>
-              <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold bg-gradient-to-r from-gray-800 to-gray-600 bg-clip-text text-transparent">
+              <h1
+                className={`text-2xl sm:text-3xl lg:text-4xl font-bold ${
+                  isDark
+                    ? "bg-gradient-to-r from-gray-100 to-gray-600 bg-clip-text text-transparent"
+                    : ""
+                }`}
+              >
                 My Library
               </h1>
-              <p className="text-sm sm:text-base text-gray-600 mt-1">
+              <p
+                className={`text-sm sm:text-base ${
+                  isDark ? "text-gray-400" : "text-gray-600"
+                } mt-1`}
+              >
                 {filteredPdfs.length}{" "}
                 {filteredPdfs.length === 1 ? "document" : "documents"} in your
                 collection
@@ -574,10 +547,14 @@ const MyLibrary = () => {
                 placeholder="Search PDFs, tags, or content..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                className="w-full pl-10 sm:pl-12 pr-3 sm:pr-4 py-2.5 sm:py-3 bg-white border border-gray-300 rounded-lg sm:rounded-xl
+                className={`w-full pl-10 sm:pl-12 pr-3 sm:pr-4 py-2.5 sm:py-3  ${
+                  isDark
+                    ? "bg-gray-700 text-gray-700"
+                    : "bg-white text-gray-700"
+                } rounded-lg sm:rounded-xl
                      text-sm sm:text-base text-gray-900 placeholder-gray-500
                      focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20
-                     transition-all duration-200 shadow-sm"
+                     transition-all duration-200 shadow-sm`}
               />
             </div>
 
@@ -588,10 +565,14 @@ const MyLibrary = () => {
                 <select
                   value={selectedCategory}
                   onChange={(e) => setSelectedCategory(e.target.value)}
-                  className="appearance-none bg-white border border-gray-300 rounded-lg sm:rounded-xl px-3 sm:px-4 py-2.5 sm:py-3 pr-8 sm:pr-10
+                  className={`appearance-none ${
+                    isDark
+                      ? "bg-gray-700 text-gray-100"
+                      : "bg-white text-gray-700"
+                  } rounded-lg sm:rounded-xl px-3 sm:px-4 py-2.5 sm:py-3 pr-8 sm:pr-10
                        text-sm sm:text-base text-gray-700
                        focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20
-                       transition-all duration-200 shadow-sm w-full"
+                       transition-all duration-200 shadow-sm w-full`}
                 >
                   {categories.map((category) => (
                     <option key={category} value={category}>
@@ -607,10 +588,14 @@ const MyLibrary = () => {
                 <select
                   value={sortBy}
                   onChange={(e) => setSortBy(e.target.value)}
-                  className="appearance-none bg-white border border-gray-300 rounded-lg sm:rounded-xl px-3 sm:px-4 py-2.5 sm:py-3 pr-8 sm:pr-10
+                  className={`appearance-none ${
+                    isDark
+                      ? "bg-gray-700 text-gray-100"
+                      : "bg-white text-gray-700"
+                  } rounded-lg sm:rounded-xl px-3 sm:px-4 py-2.5 sm:py-3 pr-8 sm:pr-10
                        text-sm sm:text-base text-gray-700
                        focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20
-                       transition-all duration-200 shadow-sm w-full"
+                       transition-all duration-200 shadow-sm w-full`}
                 >
                   {sortOptions.map((option) => (
                     <option key={option} value={option}>
@@ -657,7 +642,13 @@ const MyLibrary = () => {
           </div>
         ) : filteredPdfs.length === 0 ? (
           <div className="text-center py-16">
-            <div className="bg-gradient-to-br from-blue-50 to-blue-100 rounded-full w-24 h-24 flex items-center justify-center mx-auto mb-4">
+            <div
+              className={`${
+                isDark
+                  ? "bg-gray-800"
+                  : "bg-gradient-to-br from-blue-50 to-blue-100"
+              } rounded-full w-24 h-24 flex items-center justify-center mx-auto mb-4`}
+            >
               <FileText className="w-12 h-12 text-blue-400" />
             </div>
             <h3 className="text-xl font-medium text-gray-900 mb-2">
@@ -679,7 +670,9 @@ const MyLibrary = () => {
             {filteredPdfs.map((pdf) => (
               <div
                 key={pdf._id}
-                className="group relative h-full bg-white rounded-2xl transition-all duration-300 hover:shadow-2xl hover:-translate-y-1 cursor-pointer overflow-hidden border border-gray-100"
+                className={`group relative h-full ${
+                  isDark ? "bg-gray-800" : "bg-white"
+                } rounded-2xl transition-all duration-300 hover:shadow-2xl hover:-translate-y-1 cursor-pointer overflow-hidden border border-gray-100`}
                 onClick={(e) => {
                   if (!e.target.closest('button, a, [role="button"]')) {
                     handlePdfDetails(pdf._id);
@@ -792,11 +785,21 @@ const MyLibrary = () => {
 
                   {/* PDF Title and Metadata */}
                   <div className="mb-5">
-                    <h3 className="text-xl font-bold text-gray-900 mb-2 line-clamp-2 group-hover:text-blue-600 transition-colors h-[56px]">
+                    <h3
+                      className={`text-xl font-bold ${
+                        isDark ? "text-gray-100" : "text-gray-900"
+                      } mb-2 line-clamp-2 group-hover:text-blue-600 transition-colors h-[56px]`}
+                    >
                       {pdf.title}
                     </h3>
                     <div className="flex items-center justify-between mb-3">
-                      <span className="px-3 py-1 bg-blue-50 text-blue-700 rounded-full text-xs font-medium">
+                      <span
+                        className={`px-3 py-1 ${
+                          isDark
+                            ? "bg-gray-700 text-gray-100"
+                            : "bg-blue-50 text-blue-700"
+                        } rounded-full text-xs font-medium`}
+                      >
                         {pdf.category || "Uncategorized"}
                       </span>
                       {/* Favorite badge for mobile view */}
@@ -818,14 +821,24 @@ const MyLibrary = () => {
                     {pdf.tags.slice(0, 3).map((tag) => (
                       <span
                         key={tag}
-                        className="inline-flex items-center px-3 py-1 text-xs font-medium bg-gray-100 text-gray-700 rounded-full border border-gray-200"
+                        className={`inline-flex items-center px-3 py-1 text-xs font-medium ${
+                          isDark
+                            ? "bg-gray-700 text-gray-100"
+                            : "bg-gray-100 text-gray-700"
+                        } rounded-full border border-gray-200`}
                       >
                         <Tag className="w-3 h-3 mr-1" />
                         {tag}
                       </span>
                     ))}
                     {pdf.tags.length > 3 && (
-                      <span className="inline-flex items-center px-2 py-1 text-xs font-medium bg-gray-100 text-gray-500 rounded-full">
+                      <span
+                        className={`inline-flex items-center px-2 py-1 text-xs font-medium ${
+                          isDark
+                            ? "bg-gray-700 text-gray-100"
+                            : "bg-gray-100 text-gray-500"
+                        } rounded-full`}
+                      >
                         +{pdf.tags.length - 3}
                       </span>
                     )}
@@ -834,14 +847,26 @@ const MyLibrary = () => {
                   {/* Progress Bar */}
                   <div className="mb-6">
                     <div className="flex justify-between items-center mb-2">
-                      <span className="text-sm text-gray-600">
+                      <span
+                        className={`text-sm ${
+                          isDark ? "text-gray-400" : "text-gray-600"
+                        }`}
+                      >
                         Reading Progress
                       </span>
-                      <span className="text-sm font-medium text-gray-900">
+                      <span
+                        className={`text-sm font-medium ${
+                          isDark ? "text-gray-100" : "text-gray-900"
+                        }`}
+                      >
                         {pdf.progress}%
                       </span>
                     </div>
-                    <div className="w-full bg-gray-200 rounded-full h-2.5 overflow-hidden">
+                    <div
+                      className={`w-full ${
+                        isDark ? "bg-gray-700" : "bg-gray-200"
+                      } rounded-full h-2.5 overflow-hidden`}
+                    >
                       <div
                         className={`h-2.5 rounded-full ${getProgressColor(
                           pdf.progress
@@ -854,19 +879,37 @@ const MyLibrary = () => {
                   {/* Feature Chips */}
                   <div className="flex flex-wrap gap-2 mb-6 min-h-[40px]">
                     {pdf?.isQuizGenerated && (
-                      <div className="inline-flex items-center px-3 py-1.5 bg-gray-50 text-gray-700 rounded-lg text-xs font-medium border border-gray-100">
+                      <div
+                        className={`inline-flex items-center px-3 py-1.5 ${
+                          isDark
+                            ? "bg-gray-700 text-gray-100"
+                            : "bg-gray-50 text-gray-700"
+                        } rounded-lg text-xs font-medium border border-gray-100`}
+                      >
                         {getFeatureIcon("Quiz")}
                         <span className="ml-1.5">Quiz</span>
                       </div>
                     )}
                     {pdf?.isFlashcardGenerated && (
-                      <div className="inline-flex items-center px-3 py-1.5 bg-gray-50 text-gray-700 rounded-lg text-xs font-medium border border-gray-100">
+                      <div
+                        className={`inline-flex items-center px-3 py-1.5 ${
+                          isDark
+                            ? "bg-gray-700 text-gray-100"
+                            : "bg-gray-50 text-gray-700"
+                        } rounded-lg text-xs font-medium border border-gray-100`}
+                      >
                         {getFeatureIcon("Flashcards")}
                         <span className="ml-1.5">Flashcards</span>
                       </div>
                     )}
                     {pdf.isSummarized && (
-                      <div className="inline-flex items-center px-3 py-1.5 bg-gray-50 text-gray-700 rounded-lg text-xs font-medium border border-gray-100">
+                      <div
+                        className={`inline-flex items-center px-3 py-1.5 ${
+                          isDark
+                            ? "bg-gray-700 text-gray-100"
+                            : "bg-gray-50 text-gray-700"
+                        } rounded-lg text-xs font-medium border border-gray-100`}
+                      >
                         {getFeatureIcon("Summary")}
                         <span className="ml-1.5">Summary</span>
                       </div>
@@ -876,7 +919,11 @@ const MyLibrary = () => {
                   {/* Action Buttons */}
                   <div className="flex gap-3 mt-4">
                     <button
-                      className="flex-1 flex items-center justify-center space-x-2 px-4 py-3.5 bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white rounded-xl font-medium transition-all duration-200 hover:shadow-lg shadow-blue-500/20"
+                      className={`flex-1 flex items-center justify-center space-x-2 px-4 py-3.5 ${
+                        isDark
+                          ? "bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white"
+                          : "bg-gray-100 text-gray-600"
+                      } rounded-xl font-medium transition-all duration-200 hover:shadow-lg shadow-blue-500/20`}
                       onClick={(e) => {
                         e.stopPropagation();
                         handleRead(pdf);
@@ -886,7 +933,11 @@ const MyLibrary = () => {
                       <span>Read Now</span>
                     </button>
                     <button
-                      className="p-3.5 bg-gray-100 hover:bg-gray-200 text-gray-600 rounded-xl transition-all duration-200 hover:shadow-md"
+                      className={`p-3.5 ${
+                        isDark
+                          ? "bg-gray-700 text-gray-100"
+                          : "bg-gray-100 text-gray-600"
+                      } rounded-xl transition-all duration-200 hover:shadow-md`}
                       onClick={(e) => {
                         e.stopPropagation();
                         handledownload(pdf);
@@ -1118,7 +1169,11 @@ const MyLibrary = () => {
       </div>
 
       {/* Stats Footer */}
-      <div className="border-t border-gray-200 bg-white">
+      <div
+        className={`border-t border-gray-200 ${
+          isDark ? "bg-gray-800/95 text-gray-100" : "bg-white/95 text-gray-900"
+        } backdrop-blur-sm`}
+      >
         <div className="max-w-7xl mx-auto px-3 sm:px-4 lg:px-6 py-6 sm:py-8">
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4 lg:gap-6">
             {/* Total Documents */}

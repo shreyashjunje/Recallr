@@ -101,7 +101,7 @@ const deleteFAQ = async (req, res) => {
       // meta: { question: faq.question },
     });
 
-    res.status(200).json({ message: "FAQ deleted successfully" });
+    res.status(200).json({ message: "FAQ deleted successfully",data:faq });
   } catch (err) {
     res.status(500).json({ message: "Server error", error: err.message });
   }

@@ -4,8 +4,10 @@ const sendEmail = require("../services/sendEmail");
 require("dotenv").config(); // make sure this is at the very top!
 
 const createTicket = async (req, res) => {
+  
   try {
     const { subject, message, name, email } = req.body;
+    console.log("email:", email);
 
     let ticketData = { subject, message };
     let finalName, finalEmail;
@@ -339,6 +341,8 @@ const deleteTicket = async (req, res) => {
 const updateTicket = async (req, res) => {
   const { id } = req.params;
   const { status, useremail, subject, ticketId, message, note } = req.body;
+  console.log("useremail:", useremail);
+  console.log("ticketId:", ticketId);
 
   if (!id) {
     return res.status(400).json({ message: "Ticket ID is required" });
@@ -367,7 +371,7 @@ const updateTicket = async (req, res) => {
 
       // also log it in replies timeline
       ticket.replies.push({
-        sender: note.author || "Admin",
+        sender: note.author || "admin",
         message: note.content,
         createdAt: note.createdAt || new Date(),
       });
@@ -381,12 +385,19 @@ const updateTicket = async (req, res) => {
 
     await ticket.save();
 
+    // await Activity.create({
+    //   action: "ticket_updated",
+    //   description: "Ticket updated",
+    //   userEmail: req.body.useremail || "Admin",
+    //   ticketId: ticketId || ticket._id,
+    //   // meta: { oldStatus, newStatus },
+    // });
     await Activity.create({
       action: "ticket_updated",
       description: "Ticket updated",
       userEmail: req.body.useremail || "Admin",
-      ticketId: ticketId || ticket._id,
-      meta: { oldStatus, newStatus },
+      ticket: ticket._id, // Mongo ObjectId reference
+      ticketCode: ticketId || ticket.ticketId, // custom string
     });
 
     // ✅ Send email notification (for note or status update)
@@ -399,34 +410,36 @@ const updateTicket = async (req, res) => {
             ticketId || ticket._id
           } has been updated.`,
           `
-          <div style="font-family: Arial, sans-serif; background-color: #f9fafb; padding: 20px; color: #333;">
-            <div style="max-width: 600px; margin: 0 auto; background: #ffffff; border-radius: 12px; box-shadow: 0 4px 12px rgba(0,0,0,0.08); overflow: hidden;">
-              <div style="background: linear-gradient(135deg, #4f46e5, #06b6d4); padding: 20px; text-align: center; color: #fff;">
-                <h1 style="margin: 0; font-size: 22px;">Support Ticket Updated</h1>
-              </div>
-              <div style="padding: 25px;">
-                <h2 style="margin-top: 0; font-size: 20px; color: #111;">Hi ${
-                  ticket.user.name
-                },</h2>
-                <p>Your support ticket has been updated:</p>
-                <div style="margin: 20px 0; padding: 15px; background: #f3f4f6; border-left: 4px solid #4f46e5; border-radius: 6px;">
-                  <p><strong>Ticket ID:</strong> ${ticketId || ticket._id}</p>
-                  <p><strong>Subject:</strong> ${subject || ticket.subject}</p>
-                  ${
-                    didUpdateStatus
-                      ? `<p><strong>Status:</strong> ${status}</p>`
-                      : ""
-                  }
-                  ${
-                    note
-                      ? `<p><strong>Admin Note:</strong> ${note.content}</p>`
-                      : ""
-                  }
+            <div style="font-family: Arial, sans-serif; background-color: #f9fafb; padding: 20px; color: #333;">
+              <div style="max-width: 600px; margin: 0 auto; background: #ffffff; border-radius: 12px; box-shadow: 0 4px 12px rgba(0,0,0,0.08); overflow: hidden;">
+                <div style="background: linear-gradient(135deg, #4f46e5, #06b6d4); padding: 20px; text-align: center; color: #fff;">
+                  <h1 style="margin: 0; font-size: 22px;">Support Ticket Updated</h1>
+                </div>
+                <div style="padding: 25px;">
+                  <h2 style="margin-top: 0; font-size: 20px; color: #111;">Hi ${
+                    ticket.user.name
+                  },</h2>
+                  <p>Your support ticket has been updated:</p>
+                  <div style="margin: 20px 0; padding: 15px; background: #f3f4f6; border-left: 4px solid #4f46e5; border-radius: 6px;">
+                    <p><strong>Ticket ID:</strong> ${ticketId || ticket._id}</p>
+                    <p><strong>Subject:</strong> ${
+                      subject || ticket.subject
+                    }</p>
+                    ${
+                      didUpdateStatus
+                        ? `<p><strong>Status:</strong> ${status}</p>`
+                        : ""
+                    }
+                    ${
+                      note
+                        ? `<p><strong>Admin Note:</strong> ${note.content}</p>`
+                        : ""
+                    }
+                  </div>
                 </div>
               </div>
             </div>
-          </div>
-          `
+            `
         );
       } catch (emailErr) {
         console.error("Failed to send ticket update email:", emailErr.message);
@@ -470,34 +483,79 @@ const trackTicket = async (req, res) => {
   }
 };
 
+// const getWeeklyTicketVolume = async (req, res) => {
+//   try {
+//     const now = new Date();
+//     const lastWeek = new Date();
+//     lastWeek.setDate(now.getDate() - 6); // last 7 days including today
+
+//     const tickets = await Ticket.aggregate([
+//       {
+//         $match: {
+//           createdAt: { $gte: lastWeek, $lte: now },
+//         },
+//       },
+//       {
+//         $group: {
+//           _id: { $dayOfWeek: "$createdAt" }, // 1=Sunday, 7=Saturday
+//           count: { $sum: 1 },
+//         },
+//       },
+//     ]);
+
+//     // Map results into fixed Mon-Sun order
+//     const days = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
+//     const weeklyData = days.map((day, i) => {
+//       const dayData = tickets.find((t) => t._id === i + 1);
+//       return { day, tickets: dayData ? dayData.count : 0 };
+//     });
+
+//     // res.json(weeklyData);
+//     res
+//       .status(200)
+//       .json({ message: "Weekly ticket volume fetched", data: weeklyData });
+//   } catch (error) {
+//     console.error(error);
+//     res.status(500).json({ error: "Failed to fetch weekly tickets" });
+//   }
+// };
 const getWeeklyTicketVolume = async (req, res) => {
   try {
     const now = new Date();
-    const lastWeek = new Date();
-    lastWeek.setDate(now.getDate() - 6); // last 7 days including today
 
+    // Choose week start day: 0 = Sunday, 1 = Monday
+    const weekStartDay = 1; // 👈 change to 0 if you want Sunday start
+
+    const startOfWeek = new Date(now);
+    const day = now.getDay(); // 0=Sunday ... 6=Saturday
+    const diff =
+      day >= weekStartDay ? day - weekStartDay : 7 - (weekStartDay - day);
+
+    startOfWeek.setDate(now.getDate() - diff);
+    startOfWeek.setHours(0, 0, 0, 0); // set to 00:00:00
+
+    // Aggregate tickets within current week
     const tickets = await Ticket.aggregate([
       {
         $match: {
-          createdAt: { $gte: lastWeek, $lte: now },
+          createdAt: { $gte: startOfWeek, $lte: now },
         },
       },
       {
         $group: {
-          _id: { $dayOfWeek: "$createdAt" }, // 1=Sunday, 7=Saturday
+          _id: { $dayOfWeek: "$createdAt" }, // 1=Sunday ... 7=Saturday
           count: { $sum: 1 },
         },
       },
     ]);
 
-    // Map results into fixed Mon-Sun order
+    // Fixed order for labels
     const days = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
     const weeklyData = days.map((day, i) => {
       const dayData = tickets.find((t) => t._id === i + 1);
       return { day, tickets: dayData ? dayData.count : 0 };
     });
 
-    // res.json(weeklyData);
     res
       .status(200)
       .json({ message: "Weekly ticket volume fetched", data: weeklyData });

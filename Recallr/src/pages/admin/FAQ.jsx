@@ -1,6 +1,15 @@
 import React, { useState, useEffect } from "react";
 import { motion } from "framer-motion";
-import { Plus, Search, Edit, Trash2, Menu, X, ChevronDown, ChevronUp } from "lucide-react";
+import {
+  Plus,
+  Search,
+  Edit,
+  Trash2,
+  Menu,
+  X,
+  ChevronDown,
+  ChevronUp,
+} from "lucide-react";
 import Modal from "../../components/common/Modal";
 import Button from "../../components/common/Button";
 import axios from "axios";
@@ -105,14 +114,16 @@ const FAQs = () => {
 
   const handleDelete = async (id) => {
     try {
-      await axios.delete(`${API_URL}/faqs/delete-faq/${id}`, {
+      const res = await axios.delete(`${API_URL}/faqs/delete-faq/${id}`, {
         headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
       });
 
-      setConfirmModal({ open: false, faqId: null });
-      setFaqs(faqs.filter((faq) => faq._id !== id));
+      if (res.status === 200) {
+        setConfirmModal({ open: false, faqId: null });
+        setFaqs(faqs.filter((faq) => faq._id !== id));
 
-      toast.success("FAQ deleted successfully!");
+        toast.success("FAQ deleted successfully!");
+      }
     } catch (error) {
       console.error("Failed to delete FAQ:", error);
       alert("Failed to delete FAQ. Try again.");
@@ -129,6 +140,18 @@ const FAQs = () => {
     setIsModalOpen(true);
   };
 
+  // const handleEdit=async (faq)=>{
+  //   try{
+  //     const res=await axios.put(`${API_URL}/faqs/update-faq/${faq._id}`,formData,{
+  //       headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
+  //     });
+
+
+
+  //   }catch(err){
+  //     console.error("Error in handleEdit:", err);
+  //   }
+  // }
   const handleCloseModal = () => {
     setIsModalOpen(false);
     setEditingFaq(null);
@@ -136,9 +159,9 @@ const FAQs = () => {
   };
 
   const toggleExpand = (id) => {
-    setExpandedFaqs(prev => ({
+    setExpandedFaqs((prev) => ({
       ...prev,
-      [id]: !prev[id]
+      [id]: !prev[id],
     }));
   };
 
@@ -167,7 +190,10 @@ const FAQs = () => {
             Create and manage frequently asked questions
           </p>
         </div>
-        <Button onClick={() => setIsModalOpen(true)} className="w-full sm:w-auto">
+        <Button
+          onClick={() => setIsModalOpen(true)}
+          className="w-full sm:w-auto"
+        >
           <Plus size={16} className="mr-2" />
           Add FAQ
         </Button>
@@ -233,7 +259,7 @@ const FAQs = () => {
                         )}
                       </button>
                     </div>
-                    
+
                     <div className="flex items-center justify-between">
                       <span className="inline-flex px-2 py-1 text-xs font-semibold rounded-full bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200">
                         {faq.category}
@@ -244,7 +270,7 @@ const FAQs = () => {
                     </div>
                   </div>
                 </div>
-                
+
                 {(expandedFaqs[faq._id] || windowWidth >= 768) && (
                   <div className="mt-3">
                     <p className="text-sm text-gray-600 dark:text-gray-400 mb-3">
@@ -258,7 +284,9 @@ const FAQs = () => {
                         <Edit size={16} />
                       </button>
                       <button
-                        onClick={() => setConfirmModal({ open: true, faqId: faq._id })}
+                        onClick={() =>
+                          setConfirmModal({ open: true, faqId: faq._id })
+                        }
                         className="p-1 text-red-600 hover:bg-red-100 dark:hover:bg-red-900 rounded"
                       >
                         <Trash2 size={16} />
@@ -322,7 +350,9 @@ const FAQs = () => {
                           <Edit size={16} />
                         </button>
                         <button
-                          onClick={() => setConfirmModal({ open: true, faqId: faq._id })}
+                          onClick={() =>
+                            setConfirmModal({ open: true, faqId: faq._id })
+                          }
                           className="p-1 text-red-600 hover:bg-red-100 dark:hover:bg-red-900 rounded"
                         >
                           <Trash2 size={16} />
@@ -390,7 +420,9 @@ const FAQs = () => {
                           <Edit size={16} />
                         </button>
                         <button
-                          onClick={() => setConfirmModal({ open: true, faqId: faq._id })}
+                          onClick={() =>
+                            setConfirmModal({ open: true, faqId: faq._id })
+                          }
                           className="p-1 text-red-600 hover:bg-red-100 dark:hover:bg-red-900 rounded"
                         >
                           <Trash2 size={16} />
@@ -468,7 +500,11 @@ const FAQs = () => {
           </div>
 
           <div className="flex flex-col sm:flex-row justify-end space-y-3 sm:space-y-0 sm:space-x-3 pt-4">
-            <Button variant="secondary" onClick={handleCloseModal} className="w-full sm:w-auto">
+            <Button
+              variant="secondary"
+              onClick={handleCloseModal}
+              className="w-full sm:w-auto"
+            >
               Cancel
             </Button>
             <Button type="submit" className="w-full sm:w-auto">
@@ -486,7 +522,8 @@ const FAQs = () => {
               Confirm Delete
             </h2>
             <p className="text-sm text-gray-600 dark:text-gray-400 mt-2">
-              This action is permanent. Are you sure you want to delete this FAQ?
+              This action is permanent. Are you sure you want to delete this
+              FAQ?
             </p>
 
             <div className="mt-4 flex flex-col sm:flex-row justify-end gap-3">

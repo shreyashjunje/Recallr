@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 
-const RecallrAnimation = () => {
+const RecallrAnimation = ({ isDark = false }) => {
   const [isMobile, setIsMobile] = useState(false);
 
   // Check if device is mobile
@@ -204,20 +204,37 @@ const RecallrAnimation = () => {
             position: relative;
             width: 100%;
             height: 100%;
-            background: linear-gradient(to bottom right, #ffffff, #f8fafc);
             border-radius: 1rem;
             overflow: hidden;
             box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
-            border: 1px solid #e2e8f0;
+            border: 1px solid;
+            transition: all 0.5s ease;
+          }
+
+          .recallr-animation.dark-mode {
+            background: linear-gradient(to bottom right, #1f2937, #111827);
+            border-color: #374151;
+          }
+
+          .recallr-animation.light-mode {
+            background: linear-gradient(to bottom right, #ffffff, #f8fafc);
+            border-color: #e2e8f0;
           }
 
           .recallr-animation .bg-particle {
             position: absolute;
             width: 2px;
             height: 2px;
-            background: rgba(102, 126, 234, 0.3);
             border-radius: 50%;
             animation: float 8s ease-in-out infinite;
+          }
+
+          .recallr-animation.dark-mode .bg-particle {
+            background: rgba(102, 126, 234, 0.4);
+          }
+
+          .recallr-animation.light-mode .bg-particle {
+            background: rgba(102, 126, 234, 0.3);
           }
 
           .recallr-animation .bg-particle:nth-child(odd) {
@@ -238,9 +255,17 @@ const RecallrAnimation = () => {
             position: absolute;
             width: 120px;
             height: 120px;
-            border: 2px solid rgba(102, 126, 234, 0.2);
+            border: 2px solid;
             border-radius: 50%;
             animation: rotate 20s linear infinite;
+          }
+
+          .recallr-animation.dark-mode .hub-outer-ring {
+            border-color: rgba(102, 126, 234, 0.3);
+          }
+
+          .recallr-animation.light-mode .hub-outer-ring {
+            border-color: rgba(102, 126, 234, 0.2);
           }
 
           .recallr-animation .hub-inner-ring {
@@ -249,9 +274,17 @@ const RecallrAnimation = () => {
             left: 15px;
             width: 90px;
             height: 90px;
-            border: 1px solid rgba(118, 75, 162, 0.3);
+            border: 1px solid;
             border-radius: 50%;
             animation: rotate 15s linear infinite reverse;
+          }
+
+          .recallr-animation.dark-mode .hub-inner-ring {
+            border-color: rgba(118, 75, 162, 0.4);
+          }
+
+          .recallr-animation.light-mode .hub-inner-ring {
+            border-color: rgba(118, 75, 162, 0.3);
           }
 
           .recallr-animation .recallr-core {
@@ -289,12 +322,21 @@ const RecallrAnimation = () => {
             position: absolute;
             width: 32px;
             height: 40px;
-            background: linear-gradient(135deg, #ffffff 0%, #f8fafc 100%);
             border-radius: 6px;
             box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
             opacity: 0;
             z-index: 50;
-            border: 1px solid rgba(226, 232, 240, 0.6);
+            border: 1px solid;
+          }
+
+          .recallr-animation.dark-mode .pdf-document {
+            background: linear-gradient(135deg, #374151 0%, #1f2937 100%);
+            border-color: #4b5563;
+          }
+
+          .recallr-animation.light-mode .pdf-document {
+            background: linear-gradient(135deg, #ffffff 0%, #f8fafc 100%);
+            border-color: rgba(226, 232, 240, 0.6);
           }
 
           .recallr-animation .pdf-document::before {
@@ -315,11 +357,21 @@ const RecallrAnimation = () => {
             left: 4px;
             right: 8px;
             bottom: 4px;
+            border-radius: 2px;
+          }
+
+          .recallr-animation.dark-mode .pdf-document::after {
+            background: 
+              linear-gradient(90deg, #4b5563 0%, transparent 100%) 0 0/100% 1px,
+              linear-gradient(90deg, #4b5563 0%, transparent 80%) 0 3px/100% 1px,
+              linear-gradient(90deg, #4b5563 0%, transparent 60%) 0 6px/100% 1px;
+          }
+
+          .recallr-animation.light-mode .pdf-document::after {
             background: 
               linear-gradient(90deg, #e2e8f0 0%, transparent 100%) 0 0/100% 1px,
               linear-gradient(90deg, #e2e8f0 0%, transparent 80%) 0 3px/100% 1px,
               linear-gradient(90deg, #e2e8f0 0%, transparent 60%) 0 6px/100% 1px;
-            background-repeat: no-repeat;
           }
 
           .recallr-animation .pdf-icon {
@@ -378,14 +430,24 @@ const RecallrAnimation = () => {
 
           .recallr-animation .output-card {
             position: absolute;
-            background: rgba(255, 255, 255, 0.95);
             backdrop-filter: blur(20px);
             border-radius: 12px;
             padding: 16px;
             box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.2), 0 15px 30px rgba(0, 0, 0, 0.08);
             opacity: 0;
             transform: translateY(20px) scale(0.95);
-            border: 1px solid rgba(226, 232, 240, 0.3);
+            border: 1px solid;
+            transition: all 0.3s ease;
+          }
+
+          .recallr-animation.dark-mode .output-card {
+            background: rgba(31, 41, 55, 0.9);
+            border-color: rgba(75, 85, 99, 0.5);
+          }
+
+          .recallr-animation.light-mode .output-card {
+            background: rgba(255, 255, 255, 0.95);
+            border-color: rgba(226, 232, 240, 0.3);
           }
 
           .recallr-animation .card-header {
@@ -410,6 +472,13 @@ const RecallrAnimation = () => {
           .recallr-animation .card-title {
             font-size: 14px;
             font-weight: 700;
+          }
+
+          .recallr-animation.dark-mode .card-title {
+            color: #f3f4f6;
+          }
+
+          .recallr-animation.light-mode .card-title {
             color: #1e293b;
           }
 
@@ -438,8 +507,15 @@ const RecallrAnimation = () => {
 
           .recallr-animation .summary-text {
             font-size: 11px;
-            color: #475569;
             font-weight: 500;
+          }
+
+          .recallr-animation.dark-mode .summary-text {
+            color: #d1d5db;
+          }
+
+          .recallr-animation.light-mode .summary-text {
+            color: #475569;
           }
 
           .recallr-animation .quiz-output {
@@ -452,9 +528,16 @@ const RecallrAnimation = () => {
           .recallr-animation .quiz-question {
             font-size: 12px;
             font-weight: 600;
-            color: #1e293b;
             margin-bottom: 12px;
             line-height: 1.4;
+          }
+
+          .recallr-animation.dark-mode .quiz-question {
+            color: #f3f4f6;
+          }
+
+          .recallr-animation.light-mode .quiz-question {
+            color: #1e293b;
           }
 
           .recallr-animation .quiz-option {
@@ -463,24 +546,43 @@ const RecallrAnimation = () => {
             gap: 8px;
             padding: 6px 8px;
             margin: 4px 0;
-            background: rgba(248, 250, 252, 0.8);
             border-radius: 6px;
             opacity: 0;
             transform: translateX(-10px);
             font-size: 10px;
+            border: 1px solid;
+            transition: all 0.3s ease;
+          }
+
+          .recallr-animation.dark-mode .quiz-option {
+            background: rgba(55, 65, 81, 0.8);
+            color: #e5e7eb;
+            border-color: #4b5563;
+          }
+
+          .recallr-animation.light-mode .quiz-option {
+            background: rgba(248, 250, 252, 0.8);
             color: #475569;
-            border: 1px solid rgba(226, 232, 240, 0.5);
+            border-color: rgba(226, 232, 240, 0.5);
           }
 
           .recallr-animation .option-indicator {
             width: 12px;
             height: 12px;
-            border: 1px solid #cbd5e0;
+            border: 1px solid;
             border-radius: 50%;
             display: flex;
             align-items: center;
             justify-content: center;
             font-size: 8px;
+          }
+
+          .recallr-animation.dark-mode .option-indicator {
+            border-color: #6b7280;
+          }
+
+          .recallr-animation.light-mode .option-indicator {
+            border-color: #cbd5e0;
           }
 
           .recallr-animation .quiz-option.correct .option-indicator {
@@ -505,7 +607,6 @@ const RecallrAnimation = () => {
 
           .recallr-animation .smart-folder {
             aspect-ratio: 1;
-            background: linear-gradient(135deg, rgba(102, 126, 234, 0.1) 0%, rgba(118, 75, 162, 0.1) 100%);
             border-radius: 8px;
             display: flex;
             flex-direction: column;
@@ -513,7 +614,18 @@ const RecallrAnimation = () => {
             justify-content: center;
             opacity: 0;
             transform: scale(0);
-            border: 1px solid rgba(102, 126, 234, 0.2);
+            border: 1px solid;
+            transition: all 0.3s ease;
+          }
+
+          .recallr-animation.dark-mode .smart-folder {
+            background: linear-gradient(135deg, rgba(102, 126, 234, 0.15) 0%, rgba(118, 75, 162, 0.15) 100%);
+            border-color: rgba(102, 126, 234, 0.3);
+          }
+
+          .recallr-animation.light-mode .smart-folder {
+            background: linear-gradient(135deg, rgba(102, 126, 234, 0.1) 0%, rgba(118, 75, 162, 0.1) 100%);
+            border-color: rgba(102, 126, 234, 0.2);
           }
 
           .recallr-animation .folder-icon {
@@ -524,8 +636,15 @@ const RecallrAnimation = () => {
           .recallr-animation .folder-label {
             font-size: 8px;
             font-weight: 600;
-            color: #475569;
             text-align: center;
+          }
+
+          .recallr-animation.dark-mode .folder-label {
+            color: #d1d5db;
+          }
+
+          .recallr-animation.light-mode .folder-label {
+            color: #475569;
           }
 
           .recallr-animation .search-output {
@@ -543,12 +662,23 @@ const RecallrAnimation = () => {
           .recallr-animation .search-input {
             width: 100%;
             height: 28px;
-            border: 1px solid rgba(226, 232, 240, 0.6);
             border-radius: 8px;
             padding: 0 12px 0 28px;
             font-size: 10px;
             outline: none;
+            border: 1px solid;
+            transition: all 0.3s ease;
+          }
+
+          .recallr-animation.dark-mode .search-input {
+            background: rgba(55, 65, 81, 0.8);
+            border-color: #4b5563;
+            color: #e5e7eb;
+          }
+
+          .recallr-animation.light-mode .search-input {
             background: rgba(248, 250, 252, 0.8);
+            border-color: rgba(226, 232, 240, 0.6);
             color: #1e293b;
           }
 
@@ -557,8 +687,15 @@ const RecallrAnimation = () => {
             left: 8px;
             top: 50%;
             transform: translateY(-50%);
-            color: #94a3b8;
             font-size: 12px;
+          }
+
+          .recallr-animation.dark-mode .search-icon {
+            color: #9ca3af;
+          }
+
+          .recallr-animation.light-mode .search-icon {
+            color: #94a3b8;
           }
 
           .recallr-animation .search-result {
@@ -567,19 +704,34 @@ const RecallrAnimation = () => {
             gap: 6px;
             margin: 4px 0;
             font-size: 9px;
-            color: #64748b;
             opacity: 0;
+          }
+
+          .recallr-animation.dark-mode .search-result {
+            color: #d1d5db;
+          }
+
+          .recallr-animation.light-mode .search-result {
+            color: #64748b;
           }
 
           .recallr-animation .result-icon {
             width: 12px;
             height: 12px;
-            background: rgba(102, 126, 234, 0.1);
             border-radius: 3px;
             display: flex;
             align-items: center;
             justify-content: center;
             font-size: 6px;
+          }
+
+          .recallr-animation.dark-mode .result-icon {
+            background: rgba(102, 126, 234, 0.2);
+            color: #818cf8;
+          }
+
+          .recallr-animation.light-mode .result-icon {
+            background: rgba(102, 126, 234, 0.1);
             color: #667eea;
           }
 
@@ -616,10 +768,21 @@ const RecallrAnimation = () => {
           }
 
           .recallr-animation .ai-message {
-            background: rgba(248, 250, 252, 0.9);
             color: #1e293b;
-            border: 1px solid rgba(226, 232, 240, 0.5);
+            border: 1px solid;
             border-bottom-left-radius: 3px;
+          }
+
+          .recallr-animation.dark-mode .ai-message {
+            background: rgba(55, 65, 81, 0.9);
+            border-color: #4b5563;
+            color: #e5e7eb;
+          }
+
+          .recallr-animation.light-mode .ai-message {
+            background: rgba(248, 250, 252, 0.9);
+            border-color: rgba(226, 232, 240, 0.5);
+            color: #1e293b;
           }
 
           /* Animation sequences */
@@ -659,7 +822,7 @@ const RecallrAnimation = () => {
         }}
       />
 
-      <div className="relative w-full h-full bg-gradient-to-br from-white to-gray-50 rounded-3xl overflow-hidden shadow-2xl border border-gray-100 recallr-animation">
+      <div className={`relative w-full h-full rounded-3xl overflow-hidden shadow-2xl border recallr-animation ${isDark ? 'dark-mode' : 'light-mode'}`}>
         {/* Background Particles */}
         <div
           className="bg-particle"
