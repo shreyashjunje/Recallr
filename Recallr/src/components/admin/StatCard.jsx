@@ -22,10 +22,10 @@ const StatCard = ({ title, value, icon: Icon, color, index }) => {
     >
       <div className="flex items-center justify-between">
         <div>
-          <p className="text-sm font-medium text-gray-600 dark:text-gray-400">
+          <p className="text-sm font-medium text-gray-600 dark:text-gray-800">
             {title}
           </p>
-          <p className="text-2xl font-bold text-gray-900 dark:text-white mt-2">
+          <p className="text-2xl font-bold text-gray-900 dark:text-gray-900 mt-2">
             {value.toLocaleString()}
           </p>
         </div>

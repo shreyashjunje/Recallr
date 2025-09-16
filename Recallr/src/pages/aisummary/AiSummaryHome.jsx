@@ -237,7 +237,7 @@ const AiSummaryHome = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-indigo-50 via-white to-purple-50 p-4 sm:p-6">
+    <div className="min-h-screen bg-gradient-to-br from-indigo-50 via-white to-purple-50 dark:from-gray-900 dark:via-gray-950 dark:to-black p-4 sm:p-6">
       <div className="max-w-3xl mx-auto">
         {/* Header */}
         <div className="text-center mb-8 sm:mb-12">
@@ -247,7 +247,7 @@ const AiSummaryHome = () => {
           <h1 className="text-3xl sm:text-4xl font-bold bg-gradient-to-r from-indigo-600 to-purple-600 bg-clip-text text-transparent mb-3 sm:mb-4">
             Summify: Learn Smarter{" "}
           </h1>
-          <p className="text-gray-600 text-base sm:text-lg max-w-2xl mx-auto">
+          <p className="text-gray-600 dark:text-gray-300 text-base sm:text-lg max-w-2xl mx-auto">
             Transform your documents into concise, insightful summaries with the
             power of AI
           </p>
@@ -256,20 +256,20 @@ const AiSummaryHome = () => {
         {/* Input Section */}
         <div className="space-y-6">
           {/* File Source Selection */}
-          <div className="bg-white rounded-xl sm:rounded-2xl shadow-lg sm:shadow-xl border border-gray-100 p-4 sm:p-6">
-            <h2 className="text-xl sm:text-2xl font-bold text-gray-800 mb-4 sm:mb-6 flex items-center">
+          <div className="bg-white dark:bg-gray-800 rounded-xl sm:rounded-2xl shadow-lg sm:shadow-xl border border-gray-100 dark:border-gray-700 p-4 sm:p-6">
+            <h2 className="text-xl sm:text-2xl font-bold text-gray-800 dark:text-gray-100 mb-4 sm:mb-6 flex items-center">
               <FileText className="mr-3 text-indigo-600 h-5 w-5 sm:h-6 sm:w-6" />
               Choose Your Document
             </h2>
 
             {/* Source Toggle */}
-            <div className="flex bg-gray-100 rounded-lg sm:rounded-xl p-1 mb-4 sm:mb-6">
+            <div className="flex bg-gray-100 dark:bg-gray-700 rounded-lg sm:rounded-xl p-1 mb-4 sm:mb-6">
               <button
                 onClick={() => setFileSource("local")}
                 className={`flex-1 py-2 sm:py-3 px-3 sm:px-4 rounded-md sm:rounded-lg font-medium transition-all duration-300 text-sm sm:text-base ${
                   fileSource === "local"
-                    ? "bg-white shadow-md text-indigo-600"
-                    : "text-gray-600 hover:text-gray-800"
+                    ? "bg-white dark:bg-gray-900 shadow-md text-indigo-600"
+                    : "text-gray-600 dark:text-gray-300 hover:text-gray-800 dark:hover:text-gray-100"
                 }`}
               >
                 <Upload className="w-4 h-4 inline mr-2" />
@@ -279,8 +279,8 @@ const AiSummaryHome = () => {
                 onClick={() => setFileSource("library")}
                 className={`flex-1 py-2 sm:py-3 px-3 sm:px-4 rounded-md sm:rounded-lg font-medium transition-all duration-300 text-sm sm:text-base ${
                   fileSource === "library"
-                    ? "bg-white shadow-md text-indigo-600"
-                    : "text-gray-600 hover:text-gray-800"
+                    ? "bg-white dark:bg-gray-900 shadow-md text-indigo-600"
+                    : "text-gray-600 dark:text-gray-300 hover:text-gray-800 dark:hover:text-gray-100"
                 }`}
               >
                 <BookOpen className="w-4 h-4 inline mr-2" />
@@ -290,7 +290,7 @@ const AiSummaryHome = () => {
 
             {/* Local Upload Section */}
             {fileSource === "local" && (
-              <div className="border-2 border-dashed border-indigo-300 rounded-xl p-4 sm:p-8 text-center bg-indigo-50/50 hover:bg-indigo-50 transition-colors duration-300">
+              <div className="border-2 border-dashed border-indigo-300 rounded-xl p-4 sm:p-8 text-center bg-indigo-50/50 dark:bg-gray-700/50 hover:bg-indigo-50 dark:hover:bg-gray-700 transition-colors duration-300">
                 <input
                   ref={fileInputRef}
                   type="file"
@@ -300,19 +300,19 @@ const AiSummaryHome = () => {
                   id="file-upload"
                 />
                 <label htmlFor="file-upload" className="cursor-pointer">
-                  <div className="mx-auto w-12 h-12 sm:w-16 sm:h-16 bg-indigo-100 rounded-full flex items-center justify-center mb-3 sm:mb-4">
+                  <div className="mx-auto w-12 h-12 sm:w-16 sm:h-16 bg-indigo-100 dark:bg-gray-600 rounded-full flex items-center justify-center mb-3 sm:mb-4">
                     <Upload className="w-6 h-6 sm:w-8 sm:h-8 text-indigo-600" />
                   </div>
-                  <p className="text-base sm:text-lg font-medium text-gray-700 mb-2">
+                  <p className="text-base sm:text-lg font-medium text-gray-700 dark:text-gray-200 mb-2">
                     {selectedFile ? selectedFile.name : "Click to upload PDF"}
                   </p>
-                  <p className="text-gray-500 text-sm">
+                  <p className="text-gray-500 dark:text-gray-400 text-sm">
                     or drag and drop your file here
                   </p>
                 </label>
                 {selectedFile && (
-                  <div className="mt-4 p-3 bg-white rounded-lg border border-indigo-200">
-                    <p className="text-sm text-gray-600">
+                  <div className="mt-4 p-3 bg-white dark:bg-gray-900 rounded-lg border border-indigo-200 dark:border-gray-600">
+                    <p className="text-sm text-gray-600 dark:text-gray-300">
                       Selected: {selectedFile.name} (
                       {(selectedFile.size / 1024 / 1024).toFixed(1)} MB)
                     </p>
@@ -321,7 +321,6 @@ const AiSummaryHome = () => {
               </div>
             )}
 
-            {/* Library Section */}
             {/* Library Section */}
             {fileSource === "library" && (
               <div className="space-y-4">
@@ -333,23 +332,24 @@ const AiSummaryHome = () => {
                     placeholder="Search your PDF library..."
                     value={searchQuery}
                     onChange={(e) => setSearchQuery(e.target.value)}
-                    className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+                    className="w-full pl-10 pr-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent bg-white dark:bg-gray-900 text-gray-700 dark:text-gray-200"
                   />
                 </div>
 
                 {isLoadingLibrary ? (
                   <div className="flex flex-col items-center justify-center py-8">
                     <RefreshCw className="w-8 h-8 text-indigo-600 animate-spin mb-2" />
-                    <p className="text-gray-600">Loading your PDF library...</p>
+                    <p className="text-gray-600 dark:text-gray-300">
+                      Loading your PDF library...
+                    </p>
                   </div>
                 ) : filteredLibraryFiles?.length === 0 ? (
-                  <div className="text-center py-8 text-gray-500">
+                  <div className="text-center py-8 text-gray-500 dark:text-gray-400">
                     <FolderOpen className="w-12 h-12 mx-auto mb-2 text-gray-400" />
                     <p>No PDF files found in your library</p>
                   </div>
                 ) : (
                   <div>
-                    {/* Dropdown instead of cards */}
                     <select
                       value={selectedLibraryFile?.id || ""}
                       onChange={(e) => {
@@ -358,13 +358,12 @@ const AiSummaryHome = () => {
                         );
                         if (selected) handleLibraryFileSelect(selected);
                       }}
-                      className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+                      className="w-full p-3 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent bg-white dark:bg-gray-900 text-gray-700 dark:text-gray-200"
                     >
                       <option value="">Select a PDF...</option>
                       {filteredLibraryFiles?.map((file) => (
                         <option key={file.id} value={file.id}>
-                          {file.name}{" "}
-                          {/* Make sure this matches your file object */}
+                          {file.name}
                         </option>
                       ))}
                     </select>
@@ -375,15 +374,15 @@ const AiSummaryHome = () => {
           </div>
 
           {/* Prompt Section */}
-          <div className="bg-white rounded-xl sm:rounded-2xl shadow-lg sm:shadow-xl border border-gray-100 p-4 sm:p-6">
-            <h2 className="text-xl sm:text-2xl font-bold text-gray-800 mb-4 sm:mb-6 flex items-center">
+          <div className="bg-white dark:bg-gray-800 rounded-xl sm:rounded-2xl shadow-lg sm:shadow-xl border border-gray-100 dark:border-gray-700 p-4 sm:p-6">
+            <h2 className="text-xl sm:text-2xl font-bold text-gray-800 dark:text-gray-100 mb-4 sm:mb-6 flex items-center">
               <Sparkles className="mr-3 text-purple-600 h-5 w-5 sm:h-6 sm:w-6" />
               Customize Your Summary
             </h2>
 
             {/* Prompt Templates */}
             <div className="mb-4">
-              <p className="text-sm font-medium text-gray-700 mb-3">
+              <p className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-3">
                 Quick Templates:
               </p>
               <div className="flex flex-wrap gap-2">
@@ -391,7 +390,7 @@ const AiSummaryHome = () => {
                   <button
                     key={index}
                     onClick={() => setCustomPrompt(template)}
-                    className="text-xs px-3 py-1.5 bg-gray-100 hover:bg-indigo-100 rounded-lg text-gray-700 hover:text-indigo-700 transition-colors duration-200"
+                    className="text-xs px-3 py-1.5 bg-gray-100 dark:bg-gray-700 hover:bg-indigo-100 dark:hover:bg-gray-600 rounded-lg text-gray-700 dark:text-gray-200 hover:text-indigo-700 transition-colors duration-200"
                   >
                     {template.substring(0, 30)}...
                   </button>
@@ -402,14 +401,14 @@ const AiSummaryHome = () => {
             <textarea
               value={customPrompt}
               onChange={(e) => setCustomPrompt(e.target.value)}
-              placeholder="Describe how you want your summary to be generated. Be specific about style, length, focus areas, or format preferences..."
-              className="w-full h-32 p-4 border border-gray-300 rounded-xl resize-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all duration-300 text-sm sm:text-base"
+              placeholder="Describe how you want your summary to be generated..."
+              className="w-full h-32 p-4 border border-gray-300 dark:border-gray-600 rounded-xl resize-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all duration-300 text-sm sm:text-base bg-white dark:bg-gray-900 text-gray-700 dark:text-gray-200"
             />
 
             {/* Selected File Info */}
             {(selectedFile || selectedLibraryFile) && (
-              <div className="mt-4 p-3 bg-blue-50 rounded-lg border border-blue-200">
-                <p className="text-sm text-blue-800 font-medium">
+              <div className="mt-4 p-3 bg-blue-50 dark:bg-blue-900/40 rounded-lg border border-blue-200 dark:border-blue-700">
+                <p className="text-sm text-blue-800 dark:text-blue-200 font-medium">
                   Selected:{" "}
                   {selectedLibraryFile
                     ? selectedLibraryFile.name
@@ -443,7 +442,7 @@ const AiSummaryHome = () => {
               </button>
               <button
                 onClick={resetForm}
-                className="px-4 sm:px-6 py-3 sm:py-4 border border-gray-300 rounded-xl text-gray-700 hover:bg-gray-50 transition-colors duration-300 font-medium text-sm sm:text-base"
+                className="px-4 sm:px-6 py-3 sm:py-4 border border-gray-300 dark:border-gray-600 rounded-xl text-gray-700 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors duration-300 font-medium text-sm sm:text-base"
               >
                 Reset
               </button>
@@ -452,7 +451,7 @@ const AiSummaryHome = () => {
         </div>
 
         {/* Footer */}
-        <div className="text-center mt-8 sm:mt-12 text-gray-500 text-sm sm:text-base">
+        <div className="text-center mt-8 sm:mt-12 text-gray-500 dark:text-gray-400 text-sm sm:text-base">
           <p>
             Powered by Gemini AI • Transform documents into actionable insights
           </p>

@@ -151,17 +151,19 @@ const FlashcardsSettings = ({
           exit={{ opacity: 0, y: 15 }}
           transition={{ duration: 0.3 }}
           className={`${
-            onClose ? "fixed inset-0 z-50 bg-white" : "p-4 md:p-6"
+            onClose
+              ? "fixed inset-0 z-50 bg-white dark:bg-gray-900"
+              : "p-4 md:p-6"
           } overflow-y-auto`}
         >
           {/* Header */}
-          <div className="sticky top-0 z-10 flex items-center justify-between bg-white border-b border-slate-200 px-4 py-3 md:px-6 md:py-4 shadow-sm">
-            <h2 className="text-xl md:text-2xl font-bold text-slate-800">
+          <div className="sticky top-0 z-10 flex items-center justify-between bg-white dark:bg-gray-900 border-b border-slate-200 dark:border-gray-700 px-4 py-3 md:px-6 md:py-4 shadow-sm">
+            <h2 className="text-xl md:text-2xl font-bold text-slate-800 dark:text-white">
               Generate Flashcards
             </h2>
             <button
               onClick={handleClose}
-              className="text-slate-500 hover:text-slate-700 transition-colors p-1"
+              className="text-slate-500 dark:text-gray-400 hover:text-slate-700 dark:hover:text-gray-300 transition-colors p-1"
               aria-label="Close"
             >
               <X size={24} className="md:w-7 md:h-7" />
@@ -170,14 +172,14 @@ const FlashcardsSettings = ({
 
           {/* Content */}
           <div className="max-w-3xl mx-auto px-4 py-6 md:px-6 md:py-10 space-y-8 md:space-y-10">
-            <p className="text-slate-600 text-base md:text-lg text-center">
+            <p className="text-slate-600 dark:text-gray-300 text-base md:text-lg text-center">
               Configure your AI-powered flashcard generation
             </p>
 
             {/* Only show source selection if not generating for a specific PDF */}
             {!existingPdfId && (
               <div>
-                <label className="block text-slate-700 font-semibold mb-3 md:mb-4">
+                <label className="block text-slate-700 dark:text-gray-200 font-semibold mb-3 md:mb-4">
                   Source
                 </label>
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 md:gap-4">
@@ -188,24 +190,30 @@ const FlashcardsSettings = ({
                     onClick={() => setSourceType("upload")}
                     className={`relative p-4 md:p-6 rounded-xl md:rounded-2xl border-2 transition-all duration-300 ${
                       sourceType === "upload"
-                        ? "border-blue-400 bg-blue-50"
-                        : "border-slate-200 bg-slate-50 hover:bg-slate-100"
+                        ? "border-blue-400 bg-blue-50 dark:bg-blue-900/30"
+                        : "border-slate-200 dark:border-gray-600 bg-slate-50 dark:bg-gray-800 hover:bg-slate-100 dark:hover:bg-gray-700"
                     }`}
                   >
-                    <Upload className="mx-auto mb-2 md:mb-3 text-blue-500 md:w-8 md:h-8" size={28}  />
-                    <div className="text-slate-800 font-medium text-sm md:text-base">
+                    <Upload
+                      className="mx-auto mb-2 md:mb-3 text-blue-500 dark:text-blue-400 md:w-8 md:h-8"
+                      size={28}
+                    />
+                    <div className="text-slate-800 dark:text-white font-medium text-sm md:text-base">
                       Upload File
                     </div>
-                    <div className="text-slate-600 text-xs md:text-sm mt-1">
+                    <div className="text-slate-600 dark:text-gray-400 text-xs md:text-sm mt-1">
                       From your device
                     </div>
                     {sourceType === "upload" && (
                       <motion.div
                         initial={{ scale: 0 }}
                         animate={{ scale: 1 }}
-                        className="absolute top-2 right-2 w-5 h-5 md:top-3 md:right-3 md:w-6 md:h-6 bg-blue-500 rounded-full flex items-center justify-center"
+                        className="absolute top-2 right-2 w-5 h-5 md:top-3 md:right-3 md:w-6 md:h-6 bg-blue-500 dark:bg-blue-600 rounded-full flex items-center justify-center"
                       >
-                        <Check size={12} className="text-white md:w-3.5 md:h-3.5" />
+                        <Check
+                          size={12}
+                          className="text-white md:w-3.5 md:h-3.5"
+                        />
                       </motion.div>
                     )}
                   </motion.button>
@@ -217,26 +225,30 @@ const FlashcardsSettings = ({
                     onClick={() => setSourceType("library")}
                     className={`relative p-4 md:p-6 rounded-xl md:rounded-2xl border-2 transition-all duration-300 ${
                       sourceType === "library"
-                        ? "border-purple-400 bg-purple-50"
-                        : "border-slate-200 bg-slate-50 hover:bg-slate-100"
+                        ? "border-purple-400 bg-purple-50 dark:bg-purple-900/30"
+                        : "border-slate-200 dark:border-gray-600 bg-slate-50 dark:bg-gray-800 hover:bg-slate-100 dark:hover:bg-gray-700"
                     }`}
                   >
                     <Library
-                      className="mx-auto mb-2 md:mb-3 text-purple-500 md:w-8 md:h-8"
+                      className="mx-auto mb-2 md:mb-3 text-purple-500 dark:text-purple-400 md:w-8 md:h-8"
                       size={28}
-                      // className="md:w-8 md:h-8"
                     />
-                    <div className="text-slate-800 font-medium text-sm md:text-base">My Library</div>
-                    <div className="text-slate-600 text-xs md:text-sm mt-1">
+                    <div className="text-slate-800 dark:text-white font-medium text-sm md:text-base">
+                      My Library
+                    </div>
+                    <div className="text-slate-600 dark:text-gray-400 text-xs md:text-sm mt-1">
                       Saved content
                     </div>
                     {sourceType === "library" && (
                       <motion.div
                         initial={{ scale: 0 }}
                         animate={{ scale: 1 }}
-                        className="absolute top-2 right-2 w-5 h-5 md:top-3 md:right-3 md:w-6 md:h-6 bg-purple-500 rounded-full flex items-center justify-center"
+                        className="absolute top-2 right-2 w-5 h-5 md:top-3 md:right-3 md:w-6 md:h-6 bg-purple-500 dark:bg-purple-600 rounded-full flex items-center justify-center"
                       >
-                        <Check size={12} className="text-white md:w-3.5 md:h-3.5" />
+                        <Check
+                          size={12}
+                          className="text-white md:w-3.5 md:h-3.5"
+                        />
                       </motion.div>
                     )}
                   </motion.button>
@@ -247,17 +259,17 @@ const FlashcardsSettings = ({
             {/* File Picker for new uploads */}
             {sourceType === "upload" && !existingPdfId && (
               <div>
-                <label className="block text-slate-600 mb-2 text-sm md:text-base">
+                <label className="block text-slate-600 dark:text-gray-300 mb-2 text-sm md:text-base">
                   Choose a PDF file:
                 </label>
                 <input
                   type="file"
                   accept="application/pdf"
                   onChange={(e) => setFile(e.target.files[0])}
-                  className="block w-full text-slate-700 text-sm md:text-base border border-slate-300 rounded-lg p-2 md:p-3"
+                  className="block w-full text-slate-700 dark:text-gray-300 text-sm md:text-base border border-slate-300 dark:border-gray-600 rounded-lg p-2 md:p-3 bg-white dark:bg-gray-800"
                 />
                 {file && (
-                  <p className="mt-2 text-sm text-green-600">
+                  <p className="mt-2 text-sm text-green-600 dark:text-green-400">
                     Selected: {file.name}
                   </p>
                 )}
@@ -267,13 +279,13 @@ const FlashcardsSettings = ({
             {/* PDF Selection from Library */}
             {sourceType === "library" && !existingPdfId && (
               <div>
-                <label className="block text-slate-600 mb-2 text-sm md:text-base">
+                <label className="block text-slate-600 dark:text-gray-300 mb-2 text-sm md:text-base">
                   Select a PDF from your library:
                 </label>
                 <select
                   value={selectedLibraryPdf || ""}
                   onChange={(e) => setSelectedLibraryPdf(e.target.value)}
-                  className="block w-full text-slate-700 text-sm md:text-base border border-slate-300 rounded-lg p-2 md:p-3"
+                  className="block w-full text-slate-700 dark:text-gray-300 text-sm md:text-base border border-slate-300 dark:border-gray-600 rounded-lg p-2 md:p-3 bg-white dark:bg-gray-800"
                 >
                   <option value="">Select a PDF</option>
                   {libraryPdfs?.map((pdf) => (
@@ -287,8 +299,8 @@ const FlashcardsSettings = ({
 
             {/* Show info when generating for a specific PDF */}
             {existingPdfId && (
-              <div className="p-3 md:p-4 bg-blue-50 rounded-lg border border-blue-200">
-                <p className="text-blue-700 font-medium text-sm md:text-base">
+              <div className="p-3 md:p-4 bg-blue-50 dark:bg-blue-900/30 rounded-lg border border-blue-200 dark:border-blue-700">
+                <p className="text-blue-700 dark:text-blue-300 font-medium text-sm md:text-base">
                   Generating flashcards for your selected PDF
                 </p>
               </div>
@@ -296,9 +308,11 @@ const FlashcardsSettings = ({
 
             {/* Slider */}
             <div>
-              <label className="block text-slate-700 font-semibold mb-3 md:mb-4 text-sm md:text-base">
+              <label className="block text-slate-700 dark:text-gray-200 font-semibold mb-3 md:mb-4 text-sm md:text-base">
                 Number of Flashcards:{" "}
-                <span className="text-blue-500">{numCards}</span>
+                <span className="text-blue-500 dark:text-blue-400">
+                  {numCards}
+                </span>
               </label>
               <input
                 type="range"
@@ -306,9 +320,9 @@ const FlashcardsSettings = ({
                 max="15"
                 value={numCards}
                 onChange={(e) => setNumCards(Number(e.target.value))}
-                className="w-full h-2 bg-slate-200 rounded-lg appearance-none cursor-pointer slider"
+                className="w-full h-2 bg-slate-200 dark:bg-gray-600 rounded-lg appearance-none cursor-pointer slider"
               />
-              <div className="flex justify-between text-slate-500 text-xs md:text-sm mt-2">
+              <div className="flex justify-between text-slate-500 dark:text-gray-400 text-xs md:text-sm mt-2">
                 <span>1</span>
                 <span>15</span>
               </div>
@@ -316,7 +330,7 @@ const FlashcardsSettings = ({
 
             {/* Question Types */}
             <div>
-              <label className="block text-slate-700 font-semibold mb-3 md:mb-4 text-sm md:text-base">
+              <label className="block text-slate-700 dark:text-gray-200 font-semibold mb-3 md:mb-4 text-sm md:text-base">
                 Question Type
               </label>
               <div className="flex flex-wrap gap-2 md:gap-3">
@@ -329,7 +343,7 @@ const FlashcardsSettings = ({
                     className={`px-4 py-2 md:px-6 md:py-3 rounded-full font-medium transition-all duration-300 text-xs md:text-sm ${
                       questionType === type
                         ? "bg-gradient-to-r from-blue-500 to-purple-600 text-white shadow-md"
-                        : "bg-slate-100 text-slate-700 hover:bg-slate-200"
+                        : "bg-slate-100 dark:bg-gray-700 text-slate-700 dark:text-gray-200 hover:bg-slate-200 dark:hover:bg-gray-600"
                     }`}
                   >
                     {type}
@@ -340,7 +354,7 @@ const FlashcardsSettings = ({
 
             {/* Difficulty */}
             <div>
-              <label className="block text-slate-700 font-semibold mb-3 md:mb-4 text-sm md:text-base">
+              <label className="block text-slate-700 dark:text-gray-200 font-semibold mb-3 md:mb-4 text-sm md:text-base">
                 Difficulty
               </label>
               <div className="grid grid-cols-2 gap-2 md:gap-3">
@@ -353,7 +367,7 @@ const FlashcardsSettings = ({
                     className={`p-3 md:p-4 rounded-lg md:rounded-xl font-medium transition-all duration-300 text-sm md:text-base ${
                       difficulty === diff.name
                         ? `bg-gradient-to-r ${diff.color} text-white shadow-md`
-                        : "bg-slate-100 text-slate-700 hover:bg-slate-200"
+                        : "bg-slate-100 dark:bg-gray-700 text-slate-700 dark:text-gray-200 hover:bg-slate-200 dark:hover:bg-gray-600"
                     }`}
                   >
                     {diff.name}

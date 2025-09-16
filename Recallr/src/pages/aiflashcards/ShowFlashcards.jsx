@@ -12,6 +12,7 @@ import {
 import { toast } from "react-toastify";
 import axios from "axios";
 import { useParams } from "react-router-dom";
+import { useTheme } from "@/context/AdminThemeContext";
 const API_URL = import.meta.env.VITE_API_URL;
 
 const ShowFlashcards = () => {
@@ -22,6 +23,8 @@ const ShowFlashcards = () => {
   const [isShuffled, setIsShuffled] = useState(false);
   const [pdf, setPdf] = useState({});
   const [flashcards, setFlashcards] = useState([]);
+
+  const { isDark, toggleTheme } = useTheme(); // Get theme state and toggle function
 
   const fetchFlashcards = async () => {
     try {
@@ -78,7 +81,10 @@ const ShowFlashcards = () => {
   const prevCard = () => {
     setIsFlipped(false);
     setTimeout(
-      () => setCurrentIndex((prev) => (prev - 1 + flashcards.length) % flashcards.length),
+      () =>
+        setCurrentIndex(
+          (prev) => (prev - 1 + flashcards.length) % flashcards.length
+        ),
       150
     );
   };
@@ -103,24 +109,56 @@ const ShowFlashcards = () => {
   const currentCard = flashcards[currentIndex];
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-100 p-2 sm:p-4 md:p-6">
+    <div
+      className={`min-h-screen p-2 sm:p-4 md:p-6 transition-colors duration-300 ${
+        isDark
+          ? "bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900"
+          : "bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-100"
+      }`}
+    >
       <div className="max-w-5xl mx-auto">
         {/* Header */}
         <div className="mb-6 sm:mb-8 text-center">
-          <div className="bg-white/80 backdrop-blur-sm rounded-2xl p-4 sm:p-6 shadow-lg border border-white/50">
-            <h1 className="text-xl sm:text-2xl md:text-3xl font-bold text-gray-800 mb-3 flex items-center justify-center gap-2">
-              <BookOpen className="text-indigo-600 w-6 h-6 sm:w-7 sm:h-7" />
+          <div
+            className={`backdrop-blur-sm rounded-2xl p-4 sm:p-6 shadow-lg border transition-colors ${
+              isDark
+                ? "bg-gray-800/80 border-gray-700/50"
+                : "bg-white/80 border-white/50"
+            }`}
+          >
+            <h1
+              className={`text-xl sm:text-2xl md:text-3xl font-bold mb-3 flex items-center justify-center gap-2 ${
+                isDark ? "text-white" : "text-gray-800"
+              }`}
+            >
+              <BookOpen
+                className={`w-6 h-6 sm:w-7 sm:h-7 ${
+                  isDark ? "text-indigo-400" : "text-indigo-600"
+                }`}
+              />
               {pdf.title}
             </h1>
 
-            <div className="flex flex-wrap items-center justify-center gap-3 sm:gap-4 text-xs sm:text-sm text-gray-600 mb-4">
+            <div
+              className={`flex flex-wrap items-center justify-center gap-3 sm:gap-4 text-xs sm:text-sm mb-4 ${
+                isDark ? "text-gray-400" : "text-gray-600"
+              }`}
+            >
               <div className="flex items-center gap-1">
-                <Target className="w-4 h-4 text-purple-500" />
+                <Target
+                  className={`w-4 h-4 ${
+                    isDark ? "text-purple-400" : "text-purple-500"
+                  }`}
+                />
                 <span className="font-medium">{pdf.category}</span>
               </div>
 
               <div className="flex items-center gap-1">
-                <Calendar className="w-4 h-4 text-blue-500" />
+                <Calendar
+                  className={`w-4 h-4 ${
+                    isDark ? "text-blue-400" : "text-blue-500"
+                  }`}
+                />
                 <span>{formatDate(pdf.flashcardsGeneratedAt)}</span>
               </div>
             </div>
@@ -129,7 +167,11 @@ const ShowFlashcards = () => {
               {pdf.tags?.map((tag, i) => (
                 <span
                   key={i}
-                  className="inline-flex items-center gap-1 px-2 sm:px-3 py-1 bg-gradient-to-r from-indigo-100 to-purple-100 text-indigo-700 rounded-full text-xs sm:text-sm font-medium border border-indigo-200"
+                  className={`inline-flex items-center gap-1 px-2 sm:px-3 py-1 rounded-full text-xs sm:text-sm font-medium border transition-colors ${
+                    isDark
+                      ? "bg-indigo-900/40 text-indigo-300 border-indigo-700/50"
+                      : "bg-gradient-to-r from-indigo-100 to-purple-100 text-indigo-700 border-indigo-200"
+                  }`}
                 >
                   <Tag className="w-3 h-3" />
                   {tag}
@@ -141,7 +183,11 @@ const ShowFlashcards = () => {
 
         {/* Progress Bar */}
         <div className="mb-4 sm:mb-6">
-          <div className="bg-white/50 rounded-full p-0.5 shadow-inner">
+          <div
+            className={`rounded-full p-0.5 shadow-inner transition-colors ${
+              isDark ? "bg-gray-700" : "bg-white/50"
+            }`}
+          >
             <div
               className="h-2 bg-gradient-to-r from-indigo-500 to-purple-500 rounded-full transition-all duration-500 ease-out"
               style={{
@@ -149,7 +195,11 @@ const ShowFlashcards = () => {
               }}
             />
           </div>
-          <p className="text-center text-xs sm:text-sm text-gray-600 mt-1 sm:mt-2 font-medium">
+          <p
+            className={`text-center text-xs sm:text-sm mt-1 sm:mt-2 font-medium ${
+              isDark ? "text-gray-400" : "text-gray-600"
+            }`}
+          >
             Card {currentIndex + 1} of {flashcards.length}
           </p>
         </div>
@@ -168,7 +218,11 @@ const ShowFlashcards = () => {
                 difficultyBorders[currentCard?.difficulty]
               }`}
             >
-              <div className="h-full bg-white/90 backdrop-blur-sm rounded-2xl sm:rounded-3xl p-4 sm:p-6 flex flex-col">
+              <div
+                className={`h-full backdrop-blur-sm rounded-2xl sm:rounded-3xl p-4 sm:p-6 flex flex-col transition-colors ${
+                  isDark ? "bg-gray-800/90 border-gray-600" : "bg-white/90"
+                }`}
+              >
                 <div className="flex justify-between items-start mb-2 sm:mb-4">
                   <span
                     className={`px-2 sm:px-3 py-1 rounded-full text-xs sm:text-sm font-bold text-white bg-gradient-to-r ${
@@ -177,18 +231,30 @@ const ShowFlashcards = () => {
                   >
                     {currentCard?.difficulty}
                   </span>
-                  <span className="text-[10px] sm:text-xs text-gray-500 font-medium">
+                  <span
+                    className={`text-[10px] sm:text-xs font-medium ${
+                      isDark ? "text-gray-400" : "text-gray-500"
+                    }`}
+                  >
                     QUESTION
                   </span>
                 </div>
 
                 <div className="flex-1 flex items-center justify-center">
-                  <p className="text-base sm:text-lg md:text-xl font-medium text-gray-800 text-center leading-relaxed">
+                  <p
+                    className={`text-base sm:text-lg md:text-xl font-medium text-center leading-relaxed ${
+                      isDark ? "text-gray-200" : "text-gray-800"
+                    }`}
+                  >
                     {currentCard?.question}
                   </p>
                 </div>
 
-                <div className="text-center text-xs sm:text-sm text-gray-400 font-medium">
+                <div
+                  className={`text-center text-xs sm:text-sm font-medium ${
+                    isDark ? "text-gray-500" : "text-gray-400"
+                  }`}
+                >
                   Tap to reveal answer
                 </div>
               </div>
@@ -200,7 +266,13 @@ const ShowFlashcards = () => {
                 difficultyBorders[currentCard?.difficulty]
               }`}
             >
-              <div className="h-full bg-gradient-to-br from-white to-gray-50/80 backdrop-blur-sm rounded-2xl sm:rounded-3xl p-4 sm:p-6 flex flex-col">
+              <div
+                className={`h-full backdrop-blur-sm rounded-2xl sm:rounded-3xl p-4 sm:p-6 flex flex-col transition-colors ${
+                  isDark
+                    ? "bg-gradient-to-br from-gray-800 to-gray-700/80 border-gray-600"
+                    : "bg-gradient-to-br from-white to-gray-50/80"
+                }`}
+              >
                 <div className="flex justify-between items-start mb-2 sm:mb-4">
                   <span
                     className={`px-2 sm:px-3 py-1 rounded-full text-xs sm:text-sm font-bold text-white bg-gradient-to-r ${
@@ -209,18 +281,30 @@ const ShowFlashcards = () => {
                   >
                     {currentCard?.difficulty}
                   </span>
-                  <span className="text-[10px] sm:text-xs text-gray-500 font-medium">
+                  <span
+                    className={`text-[10px] sm:text-xs font-medium ${
+                      isDark ? "text-gray-400" : "text-gray-500"
+                    }`}
+                  >
                     ANSWER
                   </span>
                 </div>
 
                 <div className="flex-1 flex items-center justify-center">
-                  <p className="text-sm sm:text-base md:text-lg text-gray-700 text-center leading-relaxed">
+                  <p
+                    className={`text-sm sm:text-base md:text-lg text-center leading-relaxed ${
+                      isDark ? "text-gray-300" : "text-gray-700"
+                    }`}
+                  >
                     {currentCard?.answer}
                   </p>
                 </div>
 
-                <div className="text-center text-xs sm:text-sm text-gray-400 font-medium">
+                <div
+                  className={`text-center text-xs sm:text-sm font-medium ${
+                    isDark ? "text-gray-500" : "text-gray-400"
+                  }`}
+                >
                   Tap to see question
                 </div>
               </div>
@@ -233,14 +317,22 @@ const ShowFlashcards = () => {
           <button
             onClick={prevCard}
             disabled={flashcards.length <= 1}
-            className="p-2 sm:p-3 bg-white/80 rounded-full shadow-lg border text-gray-600 hover:text-indigo-600 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+            className={`p-2 sm:p-3 rounded-full shadow-lg border transition-all disabled:opacity-50 disabled:cursor-not-allowed ${
+              isDark
+                ? "bg-gray-700/80 text-gray-300 hover:text-indigo-400 border-gray-600"
+                : "bg-white/80 text-gray-600 hover:text-indigo-600 border-gray-200"
+            }`}
           >
             <ChevronLeft className="w-5 h-5 sm:w-6 sm:h-6" />
           </button>
 
           <button
             onClick={resetCards}
-            className="p-2 sm:p-3 bg-white/80 rounded-full shadow-lg border text-gray-600 hover:text-green-600 transition-all"
+            className={`p-2 sm:p-3 rounded-full shadow-lg border transition-all ${
+              isDark
+                ? "bg-gray-700/80 text-gray-300 hover:text-green-400 border-gray-600"
+                : "bg-white/80 text-gray-600 hover:text-green-600 border-gray-200"
+            }`}
           >
             <RotateCcw className="w-4 h-4 sm:w-5 sm:h-5" />
           </button>
@@ -248,7 +340,11 @@ const ShowFlashcards = () => {
           <button
             onClick={shuffleCards}
             disabled={flashcards.length <= 1}
-            className="p-2 sm:p-3 bg-white/80 rounded-full shadow-lg border text-gray-600 hover:text-purple-600 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+            className={`p-2 sm:p-3 rounded-full shadow-lg border transition-all disabled:opacity-50 disabled:cursor-not-allowed ${
+              isDark
+                ? "bg-gray-700/80 text-gray-300 hover:text-purple-400 border-gray-600"
+                : "bg-white/80 text-gray-600 hover:text-purple-600 border-gray-200"
+            }`}
           >
             <Shuffle
               className={`w-4 h-4 sm:w-5 sm:h-5 ${
@@ -260,7 +356,11 @@ const ShowFlashcards = () => {
           <button
             onClick={nextCard}
             disabled={flashcards.length <= 1}
-            className="p-2 sm:p-3 bg-white/80 rounded-full shadow-lg border text-gray-600 hover:text-indigo-600 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+            className={`p-2 sm:p-3 rounded-full shadow-lg border transition-all disabled:opacity-50 disabled:cursor-not-allowed ${
+              isDark
+                ? "bg-gray-700/80 text-gray-300 hover:text-indigo-400 border-gray-600"
+                : "bg-white/80 text-gray-600 hover:text-indigo-600 border-gray-200"
+            }`}
           >
             <ChevronRight className="w-5 h-5 sm:w-6 sm:h-6" />
           </button>
@@ -268,23 +368,59 @@ const ShowFlashcards = () => {
 
         {/* Stats */}
         <div className="mt-6 sm:mt-8 grid grid-cols-3 gap-2 sm:gap-4 text-center">
-          <div className="bg-white/50 rounded-xl p-3 sm:p-4 border">
+          <div
+            className={`rounded-xl p-3 sm:p-4 border transition-colors ${
+              isDark
+                ? "bg-gray-800/50 border-gray-700"
+                : "bg-white/50 border-gray-200"
+            }`}
+          >
             <div className="text-lg sm:text-xl md:text-2xl font-bold text-emerald-600">
               {flashcards?.filter((c) => c.difficulty === "Easy").length}
             </div>
-            <div className="text-xs sm:text-sm text-gray-600">Easy</div>
+            <div
+              className={`text-xs sm:text-sm ${
+                isDark ? "text-gray-400" : "text-gray-600"
+              }`}
+            >
+              Easy
+            </div>
           </div>
-          <div className="bg-white/50 rounded-xl p-3 sm:p-4 border">
+          <div
+            className={`rounded-xl p-3 sm:p-4 border transition-colors ${
+              isDark
+                ? "bg-gray-800/50 border-gray-700"
+                : "bg-white/50 border-gray-200"
+            }`}
+          >
             <div className="text-lg sm:text-xl md:text-2xl font-bold text-amber-600">
               {flashcards?.filter((c) => c.difficulty === "Medium").length}
             </div>
-            <div className="text-xs sm:text-sm text-gray-600">Medium</div>
+            <div
+              className={`text-xs sm:text-sm ${
+                isDark ? "text-gray-400" : "text-gray-600"
+              }`}
+            >
+              Medium
+            </div>
           </div>
-          <div className="bg-white/50 rounded-xl p-3 sm:p-4 border">
+          <div
+            className={`rounded-xl p-3 sm:p-4 border transition-colors ${
+              isDark
+                ? "bg-gray-800/50 border-gray-700"
+                : "bg-white/50 border-gray-200"
+            }`}
+          >
             <div className="text-lg sm:text-xl md:text-2xl font-bold text-red-600">
               {flashcards.filter((c) => c.difficulty === "Hard").length}
             </div>
-            <div className="text-xs sm:text-sm text-gray-600">Hard</div>
+            <div
+              className={`text-xs sm:text-sm ${
+                isDark ? "text-gray-400" : "text-gray-600"
+              }`}
+            >
+              Hard
+            </div>
           </div>
         </div>
       </div>

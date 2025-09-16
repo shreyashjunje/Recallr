@@ -1,11 +1,11 @@
 import { useLocation, useNavigate } from "react-router-dom";
-import { Menu, X, ChevronRight, User } from "lucide-react";
+import { Menu, X, ChevronRight, User, Moon, Sun } from "lucide-react";
 import logo from "../assets/newLogo.png";
 import { useState, useEffect } from "react";
 import useAuth from "../hooks/useAuth";
 import SidebarUserNav from "./dashboard/helper/SidebarUserNav";
 
-const Navbar = ({isDark}) => {
+const Navbar = ({ isDark, toggleTheme }) => {
   const { user, logout } = useAuth();
   const [isLoggedIn, setIsLoggedIn] = useState(!!user);
 
@@ -17,25 +17,7 @@ const Navbar = ({isDark}) => {
 
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isScrolled, setIsScrolled] = useState(false);
-  // const [isLoggedIn, setIsLoggedIn] = useState(false);
 
-  // Handle scroll effect for navbar
-  // useEffect(() => {
-  //   const handleScroll = () => {
-  //     setIsScrolled(window.scrollY > 10);
-  //   };
-  //   window.addEventListener("scroll", handleScroll);
-  //   return () => window.removeEventListener("scroll", handleScroll);
-  // }, []);
-
-  // useEffect(() => {
-  //   if (user) {
-  //     setIsLoggedIn(true);
-  //   } else {
-  //     setIsLoggedIn(false);
-  //   }
-  // }, [user]);
-  // 🔑 Whenever user or route changes, sync auth state
   useEffect(() => {
     const token = localStorage.getItem("token");
     setIsLoggedIn(!!(user || token));
@@ -49,40 +31,6 @@ const Navbar = ({isDark}) => {
     setIsMenuOpen(false);
   };
 
-  // const loginHandler = () => {
-  //   if (isLoggedIn) {
-  //     // If already on dashboard, go to home, otherwise go to dashboard
-  //     if (window.location.pathname === "/dashboard") {
-  //       navigate("/", { replace: true });
-  //     } else {
-  //       navigate("/dashboard", { replace: true });
-  //     }
-  //   } else {
-  //     navigate("/login");
-  //   }
-  //   setIsMenuOpen(false);
-  // };
-
-  //   const loginHandler = () => {
-  //     if (isLoggedIn) {
-  //       // If already on dashboard or any dashboard sub-route, go to home
-  //       if (location.pathname.startsWith("/dashboard") ||
-  //           location.pathname === "/dashboard") {
-  //         navigate("/", { replace: true });
-  //       } else {
-  //         navigate("/dashboard", { replace: true });
-  //       }
-  //     } else {
-  //       navigate("/login");
-  //     }
-  //     setIsMenuOpen(false);
-  //   };
-  // // Update button text dynamically
-  // const getButtonText = () => {
-  //   if (!isLoggedIn) return "Login";
-  //   return (location.pathname.startsWith("/dashboard") ||
-  //           location.pathname === "/dashboard") ? "Home" : "Dashboard";
-  // };
   const toggleMenu = () => {
     setIsMenuOpen(!isMenuOpen);
   };
@@ -105,9 +53,9 @@ const Navbar = ({isDark}) => {
 
   return (
     <nav
-      className={`sticky top-0 z-50 py-2 ${isDark ? "bg-gray-600" : "bg-white"} transition-all duration-300 ${
-        isScrolled ? "shadow-md" : "shadow-sm"
-      }`}
+      className={`sticky top-0 z-50 py-2 ${
+        isDark ? "bg-gray-600" : "bg-white"
+      } transition-all duration-300 ${isScrolled ? "shadow-md" : "shadow-sm"}`}
     >
       {/* Main Navbar */}
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -120,7 +68,11 @@ const Navbar = ({isDark}) => {
               className="h-10 w-auto md:h-12 cursor-pointer"
               onClick={() => navigate("/")}
             />
-            <h1 className={`text-2xl sm:text-3xl font-bold ${isDark ? "text-gray-300" : "text-gray-900"}`}>
+            <h1
+              className={`text-2xl sm:text-3xl font-bold ${
+                isDark ? "text-gray-300" : "text-gray-900"
+              }`}
+            >
               Recallr
             </h1>
           </div>
@@ -129,29 +81,41 @@ const Navbar = ({isDark}) => {
           <div className="hidden md:flex items-center space-x-8">
             <a
               href="#features"
-              className={`text-gray-600 hover:text-gray-900 transition-colors text-sm lg:text-base font-medium ${isDark ? "text-white" : "text-gray-600"}`}
+              className={`text-gray-600 hover:text-gray-900 transition-colors text-sm lg:text-base font-medium ${
+                isDark ? "text-white" : "text-gray-600"
+              }`}
             >
               Features
             </a>
             <a
               href="#how-it-works"
-              className={`text-gray-600 hover:text-gray-900 transition-colors text-sm lg:text-base font-medium ${isDark ? "text-white" : "text-gray-600"}`}
+              className={`text-gray-600 hover:text-gray-900 transition-colors text-sm lg:text-base font-medium ${
+                isDark ? "text-white" : "text-gray-600"
+              }`}
             >
               How it works
             </a>
             <a
               href="#demo"
-              className={`text-gray-600 hover:text-gray-900 transition-colors text-sm lg:text-base font-medium ${isDark ? "text-white" : "text-gray-600"}`}
+              className={`text-gray-600 hover:text-gray-900 transition-colors text-sm lg:text-base font-medium ${
+                isDark ? "text-white" : "text-gray-600"
+              }`}
             >
               Demo
             </a>
             <div className="flex gap-2">
-              {/* <button
-                onClick={loginHandler}
-                className="bg-gradient-to-r from-blue-500 to-purple-600 text-white px-5 py-2.5 rounded-lg hover:shadow-lg transition-all duration-300 text-sm lg:text-base font-medium hover:from-blue-600 hover:to-purple-700"
+              <button
+                onClick={toggleTheme}
+                className="p-2 rounded-full bg-gray-200 dark:bg-gray-700 shadow-md transition"
+                aria-label="Toggle Dark Mode"
               >
-                {!isLoggedIn ? "Login" : "Dashboard"}
-              </button> */}
+                {isDark ? (
+                  <Sun className="w-6 h-6 text-yellow-400" />
+                ) : (
+                  <Moon className="w-6 h-6 text-gray-800" />
+                )}
+              </button>
+
               <button
                 onClick={loginHandler}
                 className="bg-gradient-to-r from-blue-500 to-purple-600 text-white px-5 py-2.5 rounded-lg hover:shadow-lg transition-all duration-300 text-sm lg:text-base font-medium hover:from-blue-600 hover:to-purple-700"

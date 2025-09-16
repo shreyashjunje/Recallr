@@ -123,12 +123,12 @@ const AiSummaryDisplay = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 to-blue-50 ">
+    <div className="min-h-screen bg-gradient-to-br from-slate-50 to-blue-50 dark:from-slate-900 dark:to-slate-950">
       {/* Header */}
-      <header className="bg-white/80 backdrop-blur-sm border-b border-slate-200 sticky top-0 z-10">
+      <header className="bg-white/80 dark:bg-slate-900/80 backdrop-blur-sm border-b border-slate-200 dark:border-slate-700 sticky top-0 z-10">
         <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
           <div className="flex items-center justify-between">
-            <button className="flex items-center gap-2 text-slate-600 hover:text-slate-900 transition-colors text-sm sm:text-base">
+            <button className="flex items-center gap-2 text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white transition-colors text-sm sm:text-base">
               <ArrowLeft size={18} />
               <span>Back to Summaries</span>
             </button>
@@ -137,25 +137,28 @@ const AiSummaryDisplay = () => {
                 onClick={handleFavorite}
                 className={`p-2 rounded-full transition-all duration-200 ${
                   isFavorite
-                    ? "bg-red-100 text-red-600 scale-110"
-                    : "bg-slate-100 text-slate-600 hover:bg-slate-200"
+                    ? "bg-red-100 text-red-600 dark:bg-red-900/40 dark:text-red-400 scale-110"
+                    : "bg-slate-100 text-slate-600 hover:bg-slate-200 dark:bg-slate-800 dark:text-slate-300 dark:hover:bg-slate-700"
                 }`}
               >
                 <Heart size={18} fill={isFavorite ? "currentColor" : "none"} />
               </button>
               <button
                 onClick={handleCopy}
-                className="p-2 bg-slate-100 text-slate-600 rounded-full hover:bg-slate-200 transition-colors"
+                className="p-2 bg-slate-100 text-slate-600 rounded-full hover:bg-slate-200 dark:bg-slate-800 dark:text-slate-300 dark:hover:bg-slate-700 transition-colors"
               >
                 {copied ? (
-                  <Check size={18} className="text-green-600" />
+                  <Check
+                    size={18}
+                    className="text-green-600 dark:text-green-400"
+                  />
                 ) : (
                   <Copy size={18} />
                 )}
               </button>
               <button
                 onClick={handlePDFDownload}
-                className="p-2 bg-blue-100 text-blue-600 rounded-full hover:bg-blue-200 transition-colors"
+                className="p-2 bg-blue-100 text-blue-600 dark:bg-blue-900/40 dark:text-blue-400 rounded-full hover:bg-blue-200 dark:hover:bg-blue-800 transition-colors"
               >
                 <Download size={18} />
               </button>
@@ -168,11 +171,11 @@ const AiSummaryDisplay = () => {
       <main className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-10">
         <div ref={pdfRef}>
           {/* Title Section */}
-          <div className="bg-white rounded-2xl shadow-sm border border-slate-200 p-4 sm:p-6 lg:p-8 mb-6">
-            <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-slate-900 leading-tight mb-4">
+          <div className="bg-white dark:bg-slate-900 rounded-2xl shadow-sm border border-slate-200 dark:border-slate-700 p-4 sm:p-6 lg:p-8 mb-6">
+            <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-slate-900 dark:text-white leading-tight mb-4">
               {summaryinfo.title}
             </h1>
-            <div className="flex lg:flex-col lg:items-start flex-wrap items-center gap-4 text-xs sm:text-sm text-slate-600">
+            <div className="flex lg:flex-col lg:items-start flex-wrap items-center gap-4 text-xs sm:text-sm text-slate-600 dark:text-slate-400">
               <div className="flex items-center gap-1">
                 <Calendar size={14} />
                 <span>
@@ -181,19 +184,25 @@ const AiSummaryDisplay = () => {
                 </span>
               </div>
               <div className="flex items-center gap-2">
-                <Bookmark className="text-blue-600" size={14} />
-                <span className="px-2 sm:px-3 py-1 bg-blue-100 text-blue-800 rounded-full text-xs sm:text-sm font-medium">
+                <Bookmark
+                  className="text-blue-600 dark:text-blue-400"
+                  size={14}
+                />
+                <span className="px-2 sm:px-3 py-1 bg-blue-100 text-blue-800 dark:bg-blue-900/40 dark:text-blue-300 rounded-full text-xs sm:text-sm font-medium">
                   {summaryinfo.category}
                 </span>
               </div>
               {summaryinfo?.tags?.length > 0 && (
                 <div className="flex items-center gap-2">
-                  <Tag className="text-slate-500" size={14} />
+                  <Tag
+                    className="text-slate-500 dark:text-slate-400"
+                    size={14}
+                  />
                   <div className="flex flex-wrap gap-2">
                     {summaryinfo.tags.map((tag, i) => (
                       <span
                         key={i}
-                        className="px-2 py-1 bg-slate-100 text-slate-700 rounded-full text-xs sm:text-sm font-medium"
+                        className="px-2 py-1 bg-slate-100 text-slate-700 dark:bg-slate-800 dark:text-slate-300 rounded-full text-xs sm:text-sm font-medium"
                       >
                         {tag}
                       </span>
@@ -205,16 +214,19 @@ const AiSummaryDisplay = () => {
           </div>
 
           {/* Summary */}
-          <div className="bg-white rounded-2xl shadow-sm border border-slate-200 p-4 sm:p-6 lg:p-8 mb-6">
-            <h2 className="text-lg sm:text-xl font-semibold text-slate-900 mb-4 flex items-center gap-2">
-              <BookOpen className="text-blue-600" size={18} />
+          <div className="bg-white dark:bg-slate-900 rounded-2xl shadow-sm border border-slate-200 dark:border-slate-700 p-4 sm:p-6 lg:p-8 mb-6">
+            <h2 className="text-lg sm:text-xl font-semibold text-slate-900 dark:text-white mb-4 flex items-center gap-2">
+              <BookOpen
+                className="text-blue-600 dark:text-blue-400"
+                size={18}
+              />
               Summary
             </h2>
             <div className="space-y-3 sm:space-y-4">
               {summaryinfo.summary?.map((para, i) => (
                 <p
                   key={i}
-                  className="text-slate-700 leading-relaxed text-sm sm:text-base lg:text-lg"
+                  className="text-slate-700 dark:text-slate-300 leading-relaxed text-sm sm:text-base lg:text-lg"
                 >
                   {para}
                 </p>
@@ -223,8 +235,8 @@ const AiSummaryDisplay = () => {
           </div>
 
           {/* Key Points */}
-          <div className="bg-white rounded-2xl shadow-sm border border-slate-200 p-4 sm:p-6 lg:p-8">
-            <h2 className="text-lg sm:text-xl font-semibold text-slate-900 mb-4 flex items-center gap-2">
+          <div className="bg-white dark:bg-slate-900 rounded-2xl shadow-sm border border-slate-200 dark:border-slate-700 p-4 sm:p-6 lg:p-8">
+            <h2 className="text-lg sm:text-xl font-semibold text-slate-900 dark:text-white mb-4 flex items-center gap-2">
               <Star className="text-amber-500" size={18} />
               Key Points
             </h2>
@@ -234,20 +246,22 @@ const AiSummaryDisplay = () => {
                   key={i}
                   className={`flex items-start gap-3 sm:gap-4 p-3 sm:p-4 rounded-xl ${
                     kp.important
-                      ? "bg-amber-50 border-l-4 border-amber-400"
-                      : "bg-slate-50 hover:bg-slate-100"
+                      ? "bg-amber-50 border-l-4 border-amber-400 dark:bg-amber-900/30 dark:border-amber-500"
+                      : "bg-slate-50 hover:bg-slate-100 dark:bg-slate-800 dark:hover:bg-slate-700"
                   }`}
                 >
                   <div
                     className={`w-2 h-2 rounded-full mt-2 ${
-                      kp.important ? "bg-amber-500" : "bg-slate-400"
+                      kp.important
+                        ? "bg-amber-500"
+                        : "bg-slate-400 dark:bg-slate-500"
                     }`}
                   />
-                  <p className="text-slate-700 text-sm sm:text-base lg:text-lg flex-1">
+                  <p className="text-slate-700 dark:text-slate-300 text-sm sm:text-base lg:text-lg flex-1">
                     {kp.point}
                   </p>
                   {kp.important && (
-                    <span className="hidden sm:inline px-2 py-1 rounded-full text-xs font-medium bg-amber-100 text-amber-800">
+                    <span className="hidden sm:inline px-2 py-1 rounded-full text-xs font-medium bg-amber-100 text-amber-800 dark:bg-amber-900/40 dark:text-amber-300">
                       Important
                     </span>
                   )}
@@ -258,14 +272,14 @@ const AiSummaryDisplay = () => {
         </div>
 
         {/* Footer */}
-        <div className="mt-6 bg-white rounded-2xl shadow-sm border border-slate-200 p-4 sm:p-6 flex flex-col sm:flex-row items-center justify-between gap-4">
+        <div className="mt-6 bg-white dark:bg-slate-900 rounded-2xl shadow-sm border border-slate-200 dark:border-slate-700 p-4 sm:p-6 flex flex-col sm:flex-row items-center justify-between gap-4">
           <div className="flex flex-col sm:flex-row items-center gap-3 w-full sm:w-auto">
             <button
               onClick={handleFavorite}
               className={`flex items-center justify-center gap-2 w-full sm:w-auto px-4 py-2 rounded-lg text-sm sm:text-base font-medium ${
                 isFavorite
-                  ? "bg-red-100 text-red-700 hover:bg-red-200"
-                  : "bg-slate-100 text-slate-700 hover:bg-slate-200"
+                  ? "bg-red-100 text-red-700 hover:bg-red-200 dark:bg-red-900/40 dark:text-red-400 dark:hover:bg-red-800/60"
+                  : "bg-slate-100 text-slate-700 hover:bg-slate-200 dark:bg-slate-800 dark:text-slate-300 dark:hover:bg-slate-700"
               }`}
             >
               <Heart size={16} fill={isFavorite ? "currentColor" : "none"} />
@@ -273,7 +287,7 @@ const AiSummaryDisplay = () => {
             </button>
             <button
               onClick={handleCopy}
-              className="flex items-center justify-center gap-2 w-full sm:w-auto px-4 py-2 bg-slate-100 text-slate-700 rounded-lg font-medium hover:bg-slate-200 text-sm sm:text-base"
+              className="flex items-center justify-center gap-2 w-full sm:w-auto px-4 py-2 bg-slate-100 text-slate-700 dark:bg-slate-800 dark:text-slate-300 rounded-lg font-medium hover:bg-slate-200 dark:hover:bg-slate-700 text-sm sm:text-base"
             >
               {copied ? <Check size={16} /> : <Copy size={16} />}
               {copied ? "Copied!" : "Copy"}

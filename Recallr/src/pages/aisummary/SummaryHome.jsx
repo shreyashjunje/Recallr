@@ -33,6 +33,7 @@ import { toast } from "react-toastify";
 const API_URL = import.meta.env.VITE_API_URL;
 import logo from "../../assets/logoR.png";
 import { jwtDecode } from "jwt-decode";
+import { useTheme } from "@/context/AdminThemeContext";
 
 // import React, { useEffect, useState, useMemo } from "react";
 const SummaryHome = () => {
@@ -51,6 +52,8 @@ const SummaryHome = () => {
   const [totalCategories, setTotalCategories] = useState(0);
   const [pdfs, setPdfs] = useState([]);
   const [loading, setLoading] = useState(false);
+
+  const { isDark, toggleTheme } = useTheme(); // Get theme state and toggle function
 
   const fetchAllSummaries = async () => {
     try {
@@ -176,33 +179,6 @@ const SummaryHome = () => {
     return new Date(dateString).toLocaleDateString(undefined, options);
   };
 
-  // Filter summaries using the search query (safe for different shapes)
-  // const filteredSummaries = useMemo(() => {
-  //   const q = (filters.search || "").trim().toLowerCase();
-  //   if (!q) return summaries;
-
-  //   return summaries.filter((s) => {
-  //     const title = (s.title || s.name || s.fileName || "")
-  //       .toString()
-  //       .toLowerCase();
-  //     const category = (s.category || "").toString().toLowerCase();
-
-  //     const tagsArr = Array.isArray(s.tags) ? s.tags : [];
-  //     const tagsString = tagsArr
-  //       .map((t) => {
-  //         if (typeof t === "string") return t;
-  //         if (t && typeof t === "object")
-  //           return t.name || t.label || t.value || "";
-  //         return "";
-  //       })
-  //       .join(" ")
-  //       .toLowerCase();
-
-  //     return (
-  //       title.includes(q) || category.includes(q) || tagsString.includes(q)
-  //     );
-  //   });
-  // }, [summaries, filters.search]);
   const filteredSummaries = useMemo(() => {
     const q = (filters.search || "").trim().toLowerCase();
     if (!q) return summaries;
@@ -236,48 +212,8 @@ const SummaryHome = () => {
     return filteredSummaries.slice(0, 3);
   }, [filteredSummaries, showAllQuizzes]);
 
-  //   const filteredQuizzes = mockQuizzes.filter((quiz) => {
-  //     const matchesCategory =
-  //       filters.category === "All" || quiz.category === filters.category;
-  //     const matchesDifficulty =
-  //       filters.difficulty === "All" || quiz.difficulty === filters.difficulty;
-  //     const matchesMode = filters.mode === "All" || quiz.mode === filters.mode;
-  //     const matchesSearch =
-  //       quiz.title.toLowerCase().includes(filters.search.toLowerCase()) ||
-  //       quiz.tags.some((tag) =>
-  //         tag.toLowerCase().includes(filters.search.toLowerCase())
-  //       );
-
-  //     return matchesCategory && matchesDifficulty && matchesMode && matchesSearch;
-  //   });
-
-  //   const displayedQuizzes = showAllQuizzes
-  //     ? filteredQuizzes
-  //     : filteredQuizzes.slice(0, 3);
-
-  //   const getDifficultyColor = (difficulty) => {
-  //     switch (difficulty) {
-  //       case "Easy":
-  //         return "text-green-600 bg-green-100";
-  //       case "Medium":
-  //         return "text-yellow-600 bg-yellow-100";
-  //       case "Hard":
-  //         return "text-red-600 bg-red-100";
-  //       default:
-  //         return "text-purple-600 bg-purple-100";
-  //     }
-  //   };
-
-  //   const getModeIcon = (mode) => {
-  //     return mode === "Exam" ? (
-  //       <Award className="w-4 h-4" />
-  //     ) : (
-  //       <Play className="w-4 h-4" />
-  //     );
-  //   };
-
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className={`min-h-screen ${isDark ? "bg-gray-900" : "bg-gray-50"}`}>
       <div className="relative max-w-6xl mx-auto px-2 lg:px-6 py-12">
         {/* Header */}
         <header className="text-center mb-16 ">
@@ -286,10 +222,20 @@ const SummaryHome = () => {
               <BookOpen className="w-8 h-8 text-white" />
               {/* <img src={logo} alt="" className="w-8 h-8 text-white" /> */}
             </div>
-            <h1 className="text-2xl font-bold text-slate-800">Summify</h1>
+            <h1
+              className={`text-2xl font-bold ${
+                isDark ? "text-slate-300" : "text-slate-800"
+              }`}
+            >
+              Summify
+            </h1>
           </div>
 
-          <h2 className="text-5xl md:text-6xl font-bold text-slate-900 mb-6 leading-tight">
+          <h2
+            className={`text-5xl md:text-6xl font-bold ${
+              isDark ? "text-slate-300" : "text-slate-900"
+            } mb-6 leading-tight`}
+          >
             Smart Summary
             <span className="bg-gradient-to-r from-blue-600 to-cyan-600 bg-clip-text text-transparent">
               {" "}
@@ -297,7 +243,11 @@ const SummaryHome = () => {
             </span>
           </h2>
 
-          <p className="text-xl text-slate-600 mb-10 max-w-2xl mx-auto leading-relaxed">
+          <p
+            className={`text-xl ${
+              isDark ? "text-slate-600" : "text-slate-600"
+            } mb-10 max-w-2xl mx-auto leading-relaxed`}
+          >
             Transform your documents into concise, insightful summaries with the
             power of AI
           </p>
@@ -328,7 +278,9 @@ const SummaryHome = () => {
           {stats.map((stat, index) => (
             <div
               key={index}
-              className="group relative overflow-hidden bg-white rounded-2xl shadow-lg hover:shadow-2xl transition-all duration-500 hover:-translate-y-2"
+              className={`group relative overflow-hidden ${
+                isDark ? "bg-gray-800" : "bg-white"
+              } rounded-2xl shadow-lg hover:shadow-2xl transition-all duration-500 hover:-translate-y-2`}
             >
               <div
                 className={`absolute inset-0 bg-gradient-to-br ${stat.gradient} opacity-0 group-hover:opacity-10 transition-opacity duration-500`}
@@ -350,10 +302,18 @@ const SummaryHome = () => {
                   </div>
                 </div>
                 <div>
-                  <p className="text-sm font-medium text-gray-600 mb-1">
+                  <p
+                    className={`text-sm font-medium ${
+                      isDark ? "text-gray-400" : "text-gray-600"
+                    } mb-1`}
+                  >
                     {stat.title}
                   </p>
-                  <p className="text-3xl font-bold text-gray-900">
+                  <p
+                    className={`text-3xl font-bold ${
+                      isDark ? "text-gray-300" : "text-gray-900"
+                    }`}
+                  >
                     {stat.value}
                   </p>
                 </div>
@@ -367,10 +327,14 @@ const SummaryHome = () => {
           {/* Header Section */}
           <div className="flex flex-col lg:flex-row justify-between items-start lg:items-center mb-8 gap-4">
             <div>
-              <h2 className="text-3xl font-bold text-gray-900 mb-2">
+              <h2
+                className={`text-3xl font-bold ${
+                  isDark ? "text-gray-300" : "text-gray-900"
+                } mb-2`}
+              >
                 Quick Recaps
               </h2>
-              <p className="text-gray-600">
+              <p className={` ${isDark ? "text-gray-400" : "text-gray-600"}`}>
                 Review core concepts in seconds before exams
               </p>
             </div>
@@ -385,7 +349,11 @@ const SummaryHome = () => {
                 onChange={(e) =>
                   setFilters((prev) => ({ ...prev, search: e.target.value }))
                 }
-                className="w-full pl-10 pr-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
+                className={`w-full pl-10 pr-4 py-3 border ${
+                  isDark
+                    ? "border-gray-700 bg-gray-700"
+                    : "border-gray-200 bg-white"
+                } rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all`}
               />
             </div>
           </div>
@@ -407,7 +375,11 @@ const SummaryHome = () => {
               >
                 {/* Top Section */}
                 <div className="flex justify-between items-start mb-6">
-                  <span className="text-xs font-medium bg-white/70 px-3 py-1 rounded-full shadow-sm">
+                  <span
+                    className={`text-xs font-medium ${
+                      isDark ? "bg-gray-800" : "bg-white/70"
+                    } px-3 py-1 rounded-full shadow-sm`}
+                  >
                     {formatDate(summary.uploadedAt)}
                   </span>
                   <div className="w-8 h-8 flex items-center justify-center rounded-full bg-white shadow-md group-hover:rotate-12 transition-transform duration-300">

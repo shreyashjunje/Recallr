@@ -179,43 +179,48 @@ const AdminSidebar = ({ isOpen, toggleSidebar }) => {
       )}
     </AnimatePresence>
   );
-
   // Desktop sidebar component
   const DesktopSidebar = () => (
     <motion.div
       ref={sidebarRef}
       initial={false}
       animate={{ width: collapsed ? 80 : 288 }}
-      className="hidden lg:flex fixed top-0 left-0 h-screen bg-gradient-to-br from-slate-50 to-blue-50/30 border-r border-gray-200/60 flex-col overflow-y-auto z-10"
+      className="hidden lg:flex fixed top-0 left-0 h-screen 
+      bg-gradient-to-br from-slate-50 to-blue-50/30 border-r border-gray-200/60 
+      flex-col overflow-y-auto z-10
+      dark:from-gray-900 dark:to-gray-800 dark:border-gray-700"
     >
       {/* Header */}
       <div className="p-4 relative z-10 flex-shrink-0">
         <div className="flex items-center justify-between">
           {!collapsed && (
             <div className="flex items-center space-x-2">
-              <div className="w-10 h-10 rounded-xl flex items-center justify-center shadow-lg bg-white">
-                {/* <LayoutDashboard className="h-5 w-5 text-blue-600" /> */}
+              <div className="w-10 h-10 rounded-xl flex items-center justify-center shadow-lg bg-white dark:bg-gray-800">
                 <img src={logo} className="h-10 w-8" alt="" />
               </div>
               <div>
-                <h1 className="font-bold text-lg text-gray-900">Recallr Admin</h1>
-                <p className="text-xs text-gray-600">Administration Portal</p>
+                <h1 className="font-bold text-lg text-gray-900 dark:text-gray-100">
+                  Recallr Admin
+                </h1>
+                <p className="text-xs text-gray-600 dark:text-gray-400">
+                  Administration Portal
+                </p>
               </div>
             </div>
           )}
           {collapsed && (
-            <div className="w-10 h-10 rounded-xl flex items-center justify-center shadow-lg bg-white mx-auto">
+            <div className="w-10 h-10 rounded-xl flex items-center justify-center shadow-lg bg-white dark:bg-gray-800 mx-auto">
               <LayoutDashboard className="h-5 w-5 text-blue-600" />
             </div>
           )}
           <button
             onClick={toggleCollapse}
-            className="p-1.5 rounded-lg hover:bg-white/40 transition-colors"
+            className="p-1.5 rounded-lg hover:bg-white/40 dark:hover:bg-gray-700 transition-colors"
             aria-label={collapsed ? "Expand sidebar" : "Collapse sidebar"}
           >
             <ChevronLeft
               size={16}
-              className={`text-gray-500 transition-transform ${
+              className={`text-gray-500 dark:text-gray-400 transition-transform ${
                 collapsed ? "rotate-180" : ""
               }`}
             />
@@ -229,10 +234,10 @@ const AdminSidebar = ({ isOpen, toggleSidebar }) => {
           <div key={sectionIndex} className="mb-6">
             {!collapsed && (
               <div className="flex items-center space-x-2 px-3 mb-3">
-                <h3 className="text-xs font-bold text-gray-500 uppercase tracking-wider">
+                <h3 className="text-xs font-bold text-gray-500 dark:text-gray-400 uppercase tracking-wider">
                   {section.section}
                 </h3>
-                <div className="flex-1 h-px bg-gradient-to-r from-gray-200 to-transparent"></div>
+                <div className="flex-1 h-px bg-gradient-to-r from-gray-200 dark:from-gray-700 to-transparent"></div>
               </div>
             )}
 
@@ -260,24 +265,24 @@ const AdminSidebar = ({ isOpen, toggleSidebar }) => {
                           : "space-x-3 px-3 py-3"
                       } rounded-xl transition-all duration-300 ${
                         isActive
-                          ? `${item.bgAccent} shadow-lg shadow-black/5 border border-white/40`
+                          ? `${item.bgAccent} shadow-lg shadow-black/5 border border-white/40 dark:border-gray-600`
                           : isHovered
-                          ? "bg-white/60 backdrop-blur-sm shadow-md shadow-black/5"
-                          : "hover:bg-white/40"
+                          ? "bg-white/60 dark:bg-gray-700 backdrop-blur-sm shadow-md shadow-black/5"
+                          : "hover:bg-white/40 dark:hover:bg-gray-700/50"
                       }`}
                     >
                       <div
                         className={`relative p-2 rounded-xl transition-all duration-300 ${
                           isActive || isHovered
                             ? `bg-gradient-to-r ${item.color} shadow-lg`
-                            : "bg-gray-100"
+                            : "bg-gray-100 dark:bg-gray-800"
                         }`}
                       >
                         <Icon
                           className={`w-4 h-4 transition-all duration-300 ${
                             isActive || isHovered
                               ? "text-white"
-                              : "text-gray-600"
+                              : "text-gray-600 dark:text-gray-300"
                           }`}
                         />
                       </div>
@@ -285,29 +290,26 @@ const AdminSidebar = ({ isOpen, toggleSidebar }) => {
                         <div className="flex-1 flex items-center justify-between">
                           <span
                             className={`font-medium transition-all duration-300 ${
-                              isActive ? "text-gray-900" : "text-gray-700"
+                              isActive
+                                ? "text-gray-900 dark:text-graay-300"
+                                : "text-gray-700 dark:text-gray-300"
                             }`}
                           >
                             {item.name}
                           </span>
                           <div className="flex items-center space-x-2">
                             {(isActive || isHovered) && (
-                              <ChevronRight className="w-3 h-3 text-gray-400 transition-transform duration-300 transform translate-x-0 group-hover:translate-x-1" />
+                              <ChevronRight className="w-3 h-3 text-gray-400 dark:text-gray-500 transition-transform duration-300 transform translate-x-0 group-hover:translate-x-1" />
                             )}
                           </div>
                         </div>
                       )}
                     </div>
-                    {isActive && !collapsed && (
+                    {(isActive && !collapsed) || (isActive && collapsed) ? (
                       <div
                         className={`absolute left-0 top-1/2 transform -translate-y-1/2 w-1 h-6 bg-gradient-to-b ${item.color} rounded-r-full shadow-lg`}
                       ></div>
-                    )}
-                    {isActive && collapsed && (
-                      <div
-                        className={`absolute left-0 top-1/2 transform -translate-y-1/2 w-1 h-6 bg-gradient-to-b ${item.color} rounded-r-full shadow-lg`}
-                      ></div>
-                    )}
+                    ) : null}
                   </button>
                 );
               })}
@@ -323,7 +325,7 @@ const AdminSidebar = ({ isOpen, toggleSidebar }) => {
             user={user}
             trigger={
               <div className="p-3 relative z-10 cursor-pointer">
-                <div className="bg-white/60 backdrop-blur-sm rounded-xl p-3 border border-white/20 shadow-lg">
+                <div className="bg-white/60 dark:bg-gray-800/60 backdrop-blur-sm rounded-xl p-3 border border-white/20 dark:border-gray-700 shadow-lg">
                   <div className="flex items-center space-x-3">
                     <div className="relative">
                       <div className="w-10 h-10 rounded-xl flex items-center justify-center shadow-lg overflow-hidden">
@@ -339,14 +341,13 @@ const AdminSidebar = ({ isOpen, toggleSidebar }) => {
                           </div>
                         )}
                       </div>
-
-                      <div className="absolute -bottom-1 -right-1 w-3 h-3 bg-green-500 border-2 border-white rounded-full"></div>
+                      <div className="absolute -bottom-1 -right-1 w-3 h-3 bg-green-500 border-2 border-white dark:border-gray-800 rounded-full"></div>
                     </div>
                     <div className="flex-1 min-w-0">
-                      <p className="text-sm font-bold text-gray-900 truncate">
+                      <p className="text-sm font-bold text-gray-900 dark:text-gray-100 truncate">
                         {user?.userName || "Admin User"}
                       </p>
-                      <p className="text-xs text-gray-500 truncate">
+                      <p className="text-xs text-gray-500 dark:text-gray-400 truncate">
                         Administrator
                       </p>
                     </div>
@@ -365,7 +366,7 @@ const AdminSidebar = ({ isOpen, toggleSidebar }) => {
           <SidebarUserNav
             user={user}
             trigger={
-              <div className="bg-white/60 backdrop-blur-sm rounded-xl p-2 border border-white/20 shadow-lg flex justify-center">
+              <div className="bg-white/60 dark:bg-gray-800/60 backdrop-blur-sm rounded-xl p-2 border border-white/20 dark:border-gray-700 shadow-lg flex justify-center">
                 <div className="relative">
                   <div className="w-8 h-8 rounded-lg flex items-center justify-center shadow-lg overflow-hidden">
                     {user.profilePicture ? (
@@ -380,7 +381,7 @@ const AdminSidebar = ({ isOpen, toggleSidebar }) => {
                       </div>
                     )}
                   </div>
-                  <div className="absolute -bottom-1 -right-1 w-2 h-2 bg-green-500 border-2 border-white rounded-full"></div>
+                  <div className="absolute -bottom-1 -right-1 w-2 h-2 bg-green-500 border-2 border-white dark:border-gray-800 rounded-full"></div>
                 </div>
               </div>
             }
@@ -398,25 +399,28 @@ const AdminSidebar = ({ isOpen, toggleSidebar }) => {
         initial={false}
         animate={{ x: isOpen ? 0 : -288 }}
         transition={{ duration: 0.3, ease: "easeInOut" }}
-        className="fixed left-0 top-0 z-30 h-full w-72 bg-gradient-to-br from-slate-50 to-blue-50/30 border-r border-gray-200/60 shadow-xl lg:hidden flex flex-col"
+        className="fixed left-0 top-0 z-30 h-full w-72 bg-gradient-to-br from-slate-50 to-blue-50/30 border-r border-gray-200/60 shadow-xl lg:hidden flex flex-col
+        dark:from-gray-900 dark:to-gray-800 dark:border-gray-700"
       >
         {/* Header */}
         <div className="p-4 relative z-10 flex-shrink-0">
           <div className="flex items-center justify-between">
             <div className="flex items-center space-x-2">
-              <div className="w-10 h-10 rounded-xl flex items-center justify-center shadow-lg bg-white">
+              <div className="w-10 h-10 rounded-xl flex items-center justify-center shadow-lg bg-white dark:bg-gray-800">
                 <LayoutDashboard className="h-5 w-5 text-blue-600" />
               </div>
               <div>
-                <h1 className="font-bold text-lg text-gray-900">Admin Panel</h1>
+                <h1 className="font-bold text-lg text-gray-900 dark:text-gray-100">
+                  Admin Panel
+                </h1>
               </div>
             </div>
             <button
               onClick={toggleSidebar}
-              className="p-2 rounded-lg hover:bg-white/40 transition-colors"
+              className="p-2 rounded-lg hover:bg-white/40 dark:hover:bg-gray-700 transition-colors"
               aria-label="Close sidebar"
             >
-              <X size={20} className="text-gray-500" />
+              <X size={20} className="text-gray-500 dark:text-gray-400" />
             </button>
           </div>
         </div>
@@ -426,10 +430,10 @@ const AdminSidebar = ({ isOpen, toggleSidebar }) => {
           {menuItems.map((section, sectionIndex) => (
             <div key={sectionIndex} className="mb-6">
               <div className="flex items-center space-x-2 px-3 mb-3">
-                <h3 className="text-xs font-bold text-gray-500 uppercase tracking-wider">
+                <h3 className="text-xs font-bold text-gray-500 dark:text-gray-400 uppercase tracking-wider">
                   {section.section}
                 </h3>
-                <div className="flex-1 h-px bg-gradient-to-r from-gray-200 to-transparent"></div>
+                <div className="flex-1 h-px bg-gradient-to-r from-gray-200 dark:from-gray-700 to-transparent"></div>
               </div>
 
               <nav className="space-y-1">
@@ -444,19 +448,19 @@ const AdminSidebar = ({ isOpen, toggleSidebar }) => {
                       className={`w-full flex items-center space-x-3 p-3 rounded-xl transition-all duration-200 ${
                         isActive
                           ? `${item.bgAccent} shadow-md`
-                          : "hover:bg-white/40"
+                          : "hover:bg-white/40 dark:hover:bg-gray-700/50"
                       }`}
                     >
                       <div
                         className={`p-2 rounded-lg ${
                           isActive
                             ? `bg-gradient-to-r ${item.color} text-white`
-                            : "bg-gray-100 text-gray-600"
+                            : "bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-300"
                         }`}
                       >
                         <Icon className="w-4 h-4" />
                       </div>
-                      <span className="font-medium text-gray-800">
+                      <span className="font-medium text-gray-800 dark:text-gray-200">
                         {item.name}
                       </span>
                     </button>
@@ -472,7 +476,7 @@ const AdminSidebar = ({ isOpen, toggleSidebar }) => {
           <SidebarUserNav
             user={user}
             trigger={
-              <div className="bg-white/60 backdrop-blur-sm rounded-xl p-3 border border-white/20 shadow-lg">
+              <div className="bg-white/60 dark:bg-gray-800/60 backdrop-blur-sm rounded-xl p-3 border border-white/20 dark:border-gray-700 shadow-lg">
                 <div className="flex items-center space-x-3">
                   <div className="relative">
                     <div className="w-10 h-10 rounded-xl flex items-center justify-center shadow-lg overflow-hidden">
@@ -488,13 +492,13 @@ const AdminSidebar = ({ isOpen, toggleSidebar }) => {
                         </div>
                       )}
                     </div>
-                    <div className="absolute -bottom-1 -right-1 w-3 h-3 bg-green-500 border-2 border-white rounded-full"></div>
+                    <div className="absolute -bottom-1 -right-1 w-3 h-3 bg-green-500 border-2 border-white dark:border-gray-800 rounded-full"></div>
                   </div>
                   <div className="flex-1 min-w-0">
-                    <p className="text-sm font-bold text-gray-900 truncate">
+                    <p className="text-sm font-bold text-gray-900 dark:text-gray-100 truncate">
                       {user?.userName || "Admin User"}
                     </p>
-                    <p className="text-xs text-gray-500 truncate">
+                    <p className="text-xs text-gray-500 dark:text-gray-400 truncate">
                       Administrator
                     </p>
                   </div>

@@ -214,7 +214,7 @@ const HelpSupportPage = () => {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.1 }}
-            className="text-4xl font-bold text-gray-900 mb-4"
+            className="text-4xl font-bold text-gray-900 dark:text-white mb-4"
           >
             How can we help you today?
           </motion.h1>
@@ -222,7 +222,7 @@ const HelpSupportPage = () => {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.2 }}
-            className="text-xl text-gray-600 mb-8"
+            className="text-xl text-gray-600 dark:text-gray-300 mb-8"
           >
             Search our knowledge base or get in touch with our support team
           </motion.p>
@@ -240,14 +240,14 @@ const HelpSupportPage = () => {
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               placeholder="Search for help articles, guides, and more..."
-              className="w-full pl-12 pr-4 py-4 bg-white/70 backdrop-blur-sm border border-gray-200 rounded-2xl shadow-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent text-lg"
+              className="w-full pl-12 pr-4 py-4 bg-white/70 dark:bg-gray-800/70 backdrop-blur-sm border border-gray-200 dark:border-gray-700 rounded-2xl shadow-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent text-lg dark:text-white"
             />
           </motion.div>
         </div>
 
         {/* Support Categories */}
         <div>
-          <h2 className="text-2xl font-bold text-gray-900 mb-8 text-center">
+          <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-8 text-center">
             Browse by Category
           </h2>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
@@ -260,17 +260,17 @@ const HelpSupportPage = () => {
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ delay: index * 0.1 }}
                   whileHover={{ scale: 1.05, y: -5 }}
-                  className="bg-white/70 backdrop-blur-sm rounded-2xl shadow-xl border border-white/20 p-6 cursor-pointer hover:shadow-2xl transition-all duration-300"
+                  className="bg-white/70 dark:bg-gray-800/70 backdrop-blur-sm rounded-2xl shadow-xl border border-white/20 dark:border-gray-700/30 p-6 cursor-pointer hover:shadow-2xl transition-all duration-300"
                 >
                   <div
                     className={`w-12 h-12 bg-gradient-to-r ${category.color} rounded-xl flex items-center justify-center mb-4`}
                   >
                     <Icon className="w-6 h-6 text-white" />
                   </div>
-                  <h3 className="font-semibold text-gray-900 mb-2">
+                  <h3 className="font-semibold text-gray-900 dark:text-white mb-2">
                     {category.title}
                   </h3>
-                  <p className="text-sm text-gray-600 leading-relaxed">
+                  <p className="text-sm text-gray-600 dark:text-gray-300 leading-relaxed">
                     {category.description}
                   </p>
                 </motion.div>
@@ -281,12 +281,12 @@ const HelpSupportPage = () => {
 
         {/* Tabs for FAQ and Contact */}
         <div className="max-w-3xl mx-auto">
-          <div className="flex border-b border-gray-200 mb-6">
+          <div className="flex border-b border-gray-200 dark:border-gray-700 mb-6">
             <button
               className={`py-2 px-4 font-medium ${
                 activeTab === "faq"
-                  ? "text-indigo-600 border-b-2 border-indigo-600"
-                  : "text-gray-500"
+                  ? "text-indigo-600 dark:text-indigo-400 border-b-2 border-indigo-600 dark:border-indigo-400"
+                  : "text-gray-500 dark:text-gray-400"
               }`}
               onClick={() => setActiveTab("faq")}
             >
@@ -295,8 +295,8 @@ const HelpSupportPage = () => {
             <button
               className={`py-2 px-4 font-medium ${
                 activeTab === "contact"
-                  ? "text-indigo-600 border-b-2 border-indigo-600"
-                  : "text-gray-500"
+                  ? "text-indigo-600 dark:text-indigo-400 border-b-2 border-indigo-600 dark:border-indigo-400"
+                  : "text-gray-500 dark:text-gray-400"
               }`}
               onClick={() => setActiveTab("contact")}
             >
@@ -307,8 +307,8 @@ const HelpSupportPage = () => {
               <button
                 className={`py-2 px-4 font-medium ${
                   activeTab === "my-tickets"
-                    ? "text-indigo-600 border-b-2 border-indigo-600"
-                    : "text-gray-500"
+                    ? "text-indigo-600 dark:text-indigo-400 border-b-2 border-indigo-600 dark:border-indigo-400"
+                    : "text-gray-500 dark:text-gray-400"
                 }`}
                 onClick={() => setActiveTab("my-tickets")}
               >
@@ -318,8 +318,8 @@ const HelpSupportPage = () => {
               <button
                 className={`py-2 px-4 font-medium ${
                   activeTab === "track-ticket"
-                    ? "text-indigo-600 border-b-2 border-indigo-600"
-                    : "text-gray-500"
+                    ? "text-indigo-600 dark:text-indigo-400 border-b-2 border-indigo-600 dark:border-indigo-400"
+                    : "text-gray-500 dark:text-gray-400"
                 }`}
                 onClick={() => setActiveTab("track-ticket")}
               >
@@ -338,7 +338,7 @@ const HelpSupportPage = () => {
                     initial={{ opacity: 0, y: 10 }}
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ delay: index * 0.1 }}
-                    className="bg-white/70 backdrop-blur-sm rounded-2xl shadow-xl border border-white/20 overflow-hidden"
+                    className="bg-white/70 dark:bg-gray-800/70 backdrop-blur-sm rounded-2xl shadow-xl border border-white/20 dark:border-gray-700/30 overflow-hidden"
                   >
                     <motion.button
                       whileHover={{
@@ -347,16 +347,16 @@ const HelpSupportPage = () => {
                       onClick={() =>
                         setOpenFAQ(openFAQ === index ? null : index)
                       }
-                      className="w-full px-6 py-4 text-left flex items-center justify-between transition-colors duration-200"
+                      className="w-full px-6 py-4 text-left flex items-center justify-between transition-colors duration-200 dark:text-white"
                     >
-                      <h3 className="font-semibold text-gray-900">
+                      <h3 className="font-semibold text-gray-900 dark:text-white">
                         {item.question}
                       </h3>
                       <motion.div
                         animate={{ rotate: openFAQ === index ? 180 : 0 }}
                         transition={{ duration: 0.2 }}
                       >
-                        <ChevronDown className="w-5 h-5 text-gray-500" />
+                        <ChevronDown className="w-5 h-5 text-gray-500 dark:text-gray-400" />
                       </motion.div>
                     </motion.button>
 
@@ -370,7 +370,7 @@ const HelpSupportPage = () => {
                           className="overflow-hidden"
                         >
                           <div className="px-6 pb-4">
-                            <p className="text-gray-600 leading-relaxed">
+                            <p className="text-gray-600 dark:text-gray-300 leading-relaxed">
                               {item.answer}
                             </p>
                           </div>
@@ -381,10 +381,10 @@ const HelpSupportPage = () => {
                 ))
               ) : (
                 <div className="text-center py-8">
-                  <p className="text-gray-500">
+                  <p className="text-gray-500 dark:text-gray-400">
                     No results found for "{searchQuery}"
                   </p>
-                  <p className="text-gray-500 mt-2">
+                  <p className="text-gray-500 dark:text-gray-400 mt-2">
                     Try different keywords or contact our support team
                   </p>
                 </div>
@@ -398,12 +398,12 @@ const HelpSupportPage = () => {
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               onSubmit={handleContactSubmit}
-              className="bg-white/70 backdrop-blur-sm rounded-2xl shadow-xl border border-white/20 p-6 space-y-4"
+              className="bg-white/70 dark:bg-gray-800/70 backdrop-blur-sm rounded-2xl shadow-xl border border-white/20 dark:border-gray-700/30 p-6 space-y-4"
             >
               <div>
                 <label
                   htmlFor="name"
-                  className="block text-sm font-medium text-gray-700 mb-1"
+                  className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1"
                 >
                   Name
                 </label>
@@ -414,13 +414,13 @@ const HelpSupportPage = () => {
                   value={contactForm.name}
                   onChange={handleInputChange}
                   required
-                  className="w-full px-4 py-2 border border-gray-200 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+                  className="w-full px-4 py-2 border border-gray-200 dark:border-gray-700 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent dark:bg-gray-700 dark:text-white"
                 />
               </div>
               <div>
                 <label
                   htmlFor="email"
-                  className="block text-sm font-medium text-gray-700 mb-1"
+                  className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1"
                 >
                   Email
                 </label>
@@ -431,13 +431,13 @@ const HelpSupportPage = () => {
                   value={contactForm.email}
                   onChange={handleInputChange}
                   required
-                  className="w-full px-4 py-2 border border-gray-200 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+                  className="w-full px-4 py-2 border border-gray-200 dark:border-gray-700 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent dark:bg-gray-700 dark:text-white"
                 />
               </div>
               <div>
                 <label
                   htmlFor="subject"
-                  className="block text-sm font-medium text-gray-700 mb-1"
+                  className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1"
                 >
                   Subject
                 </label>
@@ -448,13 +448,13 @@ const HelpSupportPage = () => {
                   value={contactForm.subject}
                   onChange={handleInputChange}
                   required
-                  className="w-full px-4 py-2 border border-gray-200 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+                  className="w-full px-4 py-2 border border-gray-200 dark:border-gray-700 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent dark:bg-gray-700 dark:text-white"
                 />
               </div>
               <div>
                 <label
                   htmlFor="message"
-                  className="block text-sm font-medium text-gray-700 mb-1"
+                  className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1"
                 >
                   Message
                 </label>
@@ -465,7 +465,7 @@ const HelpSupportPage = () => {
                   onChange={handleInputChange}
                   required
                   rows={4}
-                  className="w-full px-4 py-2 border border-gray-200 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+                  className="w-full px-4 py-2 border border-gray-200 dark:border-gray-700 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent dark:bg-gray-700 dark:text-white"
                 />
               </div>
               <button
@@ -480,7 +480,7 @@ const HelpSupportPage = () => {
           {/* My Tickets (only if logged in) */}
           {activeTab === "my-tickets" && token && (
             <div className="mt-6">
-              <h2 className="text-xl font-semibold mb-5 text-gray-800">
+              <h2 className="text-xl font-semibold mb-5 text-gray-800 dark:text-white">
                 🎫 My Tickets
               </h2>
 
@@ -489,11 +489,11 @@ const HelpSupportPage = () => {
                   {tickets.map((t) => (
                     <div
                       key={t._id}
-                      className="p-5 bg-white rounded-xl shadow-sm border border-gray-100 hover:shadow-md transition-all cursor-pointer"
+                      className="p-5 bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-100 dark:border-gray-700 hover:shadow-md transition-all cursor-pointer"
                     >
                       {/* Ticket Subject */}
                       <div className="flex items-center justify-between">
-                        <h3 className="text-base font-semibold text-gray-900">
+                        <h3 className="text-base font-semibold text-gray-900 dark:text-white">
                           {t.subject}
                         </h3>
 
@@ -501,10 +501,10 @@ const HelpSupportPage = () => {
                         <span
                           className={`px-3 py-1 text-xs font-medium rounded-full ${
                             t.status === "Open"
-                              ? "bg-green-100 text-green-700"
+                              ? "bg-green-100 text-green-700 dark:bg-green-900 dark:text-green-200"
                               : t.status === "Pending"
-                              ? "bg-yellow-100 text-yellow-700"
-                              : "bg-gray-200 text-gray-700"
+                              ? "bg-yellow-100 text-yellow-700 dark:bg-yellow-900 dark:text-yellow-200"
+                              : "bg-gray-200 text-gray-700 dark:bg-gray-700 dark:text-gray-200"
                           }`}
                         >
                           {t.status}
@@ -512,7 +512,7 @@ const HelpSupportPage = () => {
                       </div>
 
                       {/* Extra Info */}
-                      <div className="mt-2 text-sm text-gray-500">
+                      <div className="mt-2 text-sm text-gray-500 dark:text-gray-400">
                         <p>
                           <span className="font-medium">Ticket ID:</span>{" "}
                           {t._id}
@@ -526,8 +526,10 @@ const HelpSupportPage = () => {
                   ))}
                 </div>
               ) : (
-                <div className="text-center py-10 bg-gray-50 rounded-xl border">
-                  <p className="text-gray-500">No tickets found.</p>
+                <div className="text-center py-10 bg-gray-50 dark:bg-gray-800 rounded-xl border dark:border-gray-700">
+                  <p className="text-gray-500 dark:text-gray-400">
+                    No tickets found.
+                  </p>
                 </div>
               )}
             </div>
@@ -536,12 +538,14 @@ const HelpSupportPage = () => {
           {/* Track Ticket (only if NOT logged in) */}
           {activeTab === "track-ticket" && !token && (
             <div>
-              <h2 className="text-lg font-bold mb-3">Track Your Ticket</h2>
+              <h2 className="text-lg font-bold mb-3 dark:text-white">
+                Track Your Ticket
+              </h2>
               <form onSubmit={handleTrackTicket} className="space-y-4">
                 <input
                   type="email"
                   placeholder="Enter your email"
-                  className="w-full border p-2 rounded"
+                  className="w-full border border-gray-200 dark:border-gray-700 p-2 rounded dark:bg-gray-700 dark:text-white"
                   value={trackForm.email}
                   onChange={(e) =>
                     setTrackForm({ ...trackForm, email: e.target.value })
@@ -551,7 +555,7 @@ const HelpSupportPage = () => {
                 <input
                   type="text"
                   placeholder="Enter Ticket ID"
-                  className="w-full border p-2 rounded"
+                  className="w-full border border-gray-200 dark:border-gray-700 p-2 rounded dark:bg-gray-700 dark:text-white"
                   value={trackForm.ticketId}
                   onChange={(e) =>
                     setTrackForm({ ...trackForm, ticketId: e.target.value })
@@ -567,14 +571,14 @@ const HelpSupportPage = () => {
               </form>
 
               {trackedTicket && (
-                <div className="mt-4 p-3 border rounded bg-green-50">
-                  <p>
+                <div className="mt-4 p-3 border border-gray-200 dark:border-gray-700 rounded bg-green-50 dark:bg-green-900/30">
+                  <p className="dark:text-white">
                     <strong>Subject:</strong> {trackedTicket.subject}
                   </p>
-                  <p>
+                  <p className="dark:text-white">
                     <strong>Status:</strong> {trackedTicket.status}
                   </p>
-                  <p>
+                  <p className="dark:text-white">
                     <strong>Created:</strong>{" "}
                     {new Date(trackedTicket.createdAt).toLocaleString()}
                   </p>
@@ -607,22 +611,22 @@ const HelpSupportPage = () => {
             initial={{ opacity: 0, scale: 0.5, y: 20 }}
             animate={{ opacity: 1, scale: 1, y: 0 }}
             exit={{ opacity: 0, scale: 0.5, y: 20 }}
-            className="fixed bottom-24 right-8 w-96 h-96 bg-white/90 backdrop-blur-md rounded-2xl shadow-2xl border border-white/20 p-6 flex flex-col"
+            className="fixed bottom-24 right-8 w-96 h-96 bg-white/90 dark:bg-gray-800/90 backdrop-blur-md rounded-2xl shadow-2xl border border-white/20 dark:border-gray-700/30 p-6 flex flex-col"
           >
             <div className="flex items-center justify-between mb-4">
-              <h3 className="text-lg font-semibold text-gray-900">
+              <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
                 Live Support
               </h3>
               <button
                 onClick={() => setShowChat(false)}
-                className="text-gray-500 hover:text-gray-700"
+                className="text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200"
               >
                 <X className="w-5 h-5" />
               </button>
             </div>
-            <div className="flex-1 bg-gray-50/50 rounded-xl p-4 mb-4 overflow-y-auto h-48">
+            <div className="flex-1 bg-gray-50/50 dark:bg-gray-700/50 rounded-xl p-4 mb-4 overflow-y-auto h-48">
               {chatMessages.length === 0 ? (
-                <p className="text-gray-600 text-center py-14">
+                <p className="text-gray-600 dark:text-gray-300 text-center py-14">
                   Start a conversation with our support team
                 </p>
               ) : (
@@ -637,7 +641,7 @@ const HelpSupportPage = () => {
                       className={`inline-block px-4 py-2 rounded-lg ${
                         msg.sender === "user"
                           ? "bg-indigo-600 text-white"
-                          : "bg-gray-200 text-gray-800"
+                          : "bg-gray-200 dark:bg-gray-600 text-gray-800 dark:text-white"
                       }`}
                     >
                       {msg.text}
@@ -653,7 +657,7 @@ const HelpSupportPage = () => {
                 onChange={(e) => setMessage(e.target.value)}
                 onKeyPress={(e) => e.key === "Enter" && handleSendMessage()}
                 placeholder="Type your message..."
-                className="flex-1 px-4 py-2 border border-gray-200 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+                className="flex-1 px-4 py-2 border border-gray-200 dark:border-gray-700 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-transparent dark:bg-gray-700 dark:text-white"
               />
               <button
                 onClick={handleSendMessage}

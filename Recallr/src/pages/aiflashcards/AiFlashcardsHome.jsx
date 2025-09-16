@@ -25,6 +25,7 @@ import { toast } from "react-toastify";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
 import { jwtDecode } from "jwt-decode";
+import { useTheme } from "@/context/AdminThemeContext";
 
 const API_URL = import.meta.env.VITE_API_URL;
 
@@ -41,6 +42,7 @@ const FlashcardHome = () => {
   const [expandedTags, setExpandedTags] = useState({});
   const [pdfs, setPdfs] = useState([]);
   const [loading, setLoading] = useState(false);
+  const { isDark, toggleTheme } = useTheme(); // Get theme state and toggle function
 
   const navigate = useNavigate();
 
@@ -287,9 +289,19 @@ const FlashcardHome = () => {
   );
 
   return (
-    <div className="min-h-screen bg-white">
+    <div
+      className={`min-h-screen transition-colors duration-300 ${
+        isDark ? "bg-gray-900" : "bg-white"
+      }`}
+    >
       {/* Background Pattern */}
-      <div className="absolute inset-0 bg-grid-pattern opacity-5"></div>
+      <div
+        className={`absolute inset-0 transition-opacity duration-300 ${
+          isDark
+            ? "bg-grid-pattern-dark opacity-10"
+            : "bg-grid-pattern opacity-5"
+        }`}
+      ></div>
 
       <div className="relative max-w-6xl mx-auto px-2 md:px-4 lg:px-6 py-12">
         {/* Header */}
@@ -298,22 +310,32 @@ const FlashcardHome = () => {
             <div className="bg-gradient-to-r from-pink-400 to-orange-300 p-1 rounded-xl mr-2 group-hover:scale-110 transition-transform duration-300">
               <SquareStack className="w-8 h-8 text-white" />
             </div>
-            <h1 className="text-2xl font-bold text-slate-800">FlashGenius</h1>
+            <h1
+              className={`text-2xl font-bold transition-colors duration-300 ${
+                isDark ? "text-gray-100" : "text-slate-800"
+              }`}
+            >
+              FlashGenius
+            </h1>
           </div>
 
-          <h2 className="text-5xl md:text-6xl font-bold text-slate-900 mb-6 leading-tight">
+          <h2
+            className={`text-5xl md:text-6xl font-bold mb-6 leading-tight transition-colors duration-300 ${
+              isDark ? "text-gray-100" : "text-slate-900"
+            }`}
+          >
             Smart Flashcard
-            <span
-              className="bg-gradient-to-r  bg-clip-text text-transparent 
-            from-pink-500 to-orange-400
-"
-            >
+            <span className="bg-gradient-to-r from-pink-500 to-orange-400 bg-clip-text text-transparent">
               {" "}
               Generator
             </span>
           </h2>
 
-          <p className="text-xl text-slate-600 mb-10 max-w-2xl mx-auto leading-relaxed">
+          <p
+            className={`text-xl mb-10 max-w-2xl mx-auto leading-relaxed transition-colors duration-300 ${
+              isDark ? "text-gray-400" : "text-slate-600"
+            }`}
+          >
             Transform your learning experience with AI-powered flashcards.
             Create, study, and master any subject efficiently.
           </p>
@@ -321,8 +343,7 @@ const FlashcardHome = () => {
           <button
             onClick={generateFlashcards}
             disabled={isGenerating}
-            className="bg-gradient-to-r from-pink-400 to-orange-300 hover:from-pink-500 hover:to-orange-400
- text-white px-8 py-4 rounded-full font-bold text-lg shadow-lg hover:shadow-xl transform hover:-translate-y-1 transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed inline-flex items-center gap-3"
+            className="bg-gradient-to-r from-pink-400 to-orange-300 hover:from-pink-500 hover:to-orange-400 text-white px-8 py-4 rounded-full font-bold text-lg shadow-lg hover:shadow-xl transform hover:-translate-y-1 transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed inline-flex items-center gap-3"
           >
             {isGenerating ? (
               <>
@@ -330,11 +351,7 @@ const FlashcardHome = () => {
                 Generating...
               </>
             ) : (
-              <>
-                {/* <Plus className="w-5 h-5" /> */}
-                Generate Flashcards
-                {/* <ArrowRight className="w-5 h-5" /> */}
-              </>
+              <>Generate Flashcards</>
             )}
           </button>
         </header>
@@ -343,7 +360,13 @@ const FlashcardHome = () => {
         {isLoading && (
           <div className="text-center py-16">
             <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-500 mx-auto mb-4"></div>
-            <p className="text-slate-600">Loading your flashcards...</p>
+            <p
+              className={`transition-colors duration-300 ${
+                isDark ? "text-gray-400" : "text-slate-600"
+              }`}
+            >
+              Loading your flashcards...
+            </p>
           </div>
         )}
 
@@ -355,7 +378,9 @@ const FlashcardHome = () => {
               {stats.map((stat, index) => (
                 <div
                   key={index}
-                  className="group relative overflow-hidden bg-white rounded-2xl shadow-lg hover:shadow-2xl transition-all duration-500 hover:-translate-y-2"
+                  className={`group relative overflow-hidden rounded-2xl shadow-lg hover:shadow-2xl transition-all duration-500 hover:-translate-y-2 ${
+                    isDark ? "bg-gray-800" : "bg-white"
+                  }`}
                 >
                   <div
                     className={`absolute inset-0 bg-gradient-to-br ${stat.gradient} opacity-0 group-hover:opacity-10 transition-opacity duration-500`}
@@ -370,8 +395,8 @@ const FlashcardHome = () => {
                       <div
                         className={`flex items-center gap-1 text-sm font-medium ${
                           stat.trend === "up"
-                            ? "text-green-600"
-                            : "text-red-600"
+                            ? "text-green-500"
+                            : "text-red-500"
                         }`}
                       >
                         <TrendingUp className="w-4 h-4" />
@@ -379,10 +404,18 @@ const FlashcardHome = () => {
                       </div>
                     </div>
                     <div>
-                      <p className="text-sm font-medium text-gray-600 mb-1">
+                      <p
+                        className={`text-sm font-medium mb-1 transition-colors duration-300 ${
+                          isDark ? "text-gray-400" : "text-gray-600"
+                        }`}
+                      >
                         {stat.title}
                       </p>
-                      <p className="text-3xl font-bold text-gray-900">
+                      <p
+                        className={`text-3xl font-bold transition-colors duration-300 ${
+                          isDark ? "text-gray-100" : "text-gray-900"
+                        }`}
+                      >
                         {stat.value}
                       </p>
                     </div>
@@ -392,10 +425,20 @@ const FlashcardHome = () => {
             </div>
 
             {/* Flashcards Section */}
-            <section className="bg-slate-50 rounded-3xl p-4 lg:p-8 border border-slate-200 mt-8">
+            <section
+              className={`rounded-3xl p-4 lg:p-8 border mt-8 transition-colors duration-300 ${
+                isDark
+                  ? "bg-gray-800 border-gray-700"
+                  : "bg-slate-50 border-slate-200"
+              }`}
+            >
               <div className="flex items-center justify-between mb-8">
                 <div className="flex items-center gap-4">
-                  <h3 className="text-2xl font-bold text-slate-800 flex items-center gap-3">
+                  <h3
+                    className={`text-2xl font-bold flex items-center gap-3 transition-colors duration-300 ${
+                      isDark ? "text-gray-100" : "text-slate-800"
+                    }`}
+                  >
                     <Clock className="w-6 h-6 text-pink-500" />
                     Recent Flashcard Sets
                   </h3>
@@ -412,13 +455,21 @@ const FlashcardHome = () => {
                 <div className="mb-8 space-y-4">
                   {/* Search Bar */}
                   <div className="relative">
-                    <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 text-slate-400 w-5 h-5" />
+                    <Search
+                      className={`absolute left-4 top-1/2 transform -translate-y-1/2 w-5 h-5 transition-colors duration-300 ${
+                        isDark ? "text-gray-500" : "text-slate-400"
+                      }`}
+                    />
                     <input
                       type="text"
                       placeholder="Search flashcards..."
                       value={searchQuery}
                       onChange={(e) => setSearchQuery(e.target.value)}
-                      className="w-full pl-12 pr-4 py-3 rounded-xl border border-slate-200 focus:border-blue-300 focus:ring-2 focus:ring-blue-100 transition-all duration-200"
+                      className={`w-full pl-12 pr-4 py-3 rounded-xl border transition-all duration-200 focus:ring-2 ${
+                        isDark
+                          ? "bg-gray-700 border-gray-600 text-white placeholder-gray-400 focus:border-blue-400 focus:ring-blue-900"
+                          : "border-slate-200 focus:border-blue-300 focus:ring-blue-100"
+                      }`}
                     />
                   </div>
 
@@ -426,7 +477,11 @@ const FlashcardHome = () => {
                   <div className="flex items-center justify-between">
                     <button
                       onClick={() => setShowFilters(!showFilters)}
-                      className="flex items-center gap-2 text-slate-600 hover:text-blue-600 transition-colors"
+                      className={`flex items-center gap-2 transition-colors duration-300 ${
+                        isDark
+                          ? "text-gray-400 hover:text-blue-400"
+                          : "text-slate-600 hover:text-blue-600"
+                      }`}
                     >
                       <Filter className="w-4 h-4" />
                       Filters
@@ -445,7 +500,11 @@ const FlashcardHome = () => {
                     {activeFilters > 0 && (
                       <button
                         onClick={clearFilters}
-                        className="text-sm text-slate-500 hover:text-slate-700 flex items-center gap-1"
+                        className={`text-sm flex items-center gap-1 transition-colors duration-300 ${
+                          isDark
+                            ? "text-gray-500 hover:text-gray-300"
+                            : "text-slate-500 hover:text-slate-700"
+                        }`}
                       >
                         <X className="w-3 h-3" />
                         Clear filters
@@ -455,15 +514,29 @@ const FlashcardHome = () => {
 
                   {/* Filter Controls */}
                   {showFilters && (
-                    <div className="grid md:grid-cols-3 gap-4 p-4 bg-white rounded-xl border border-slate-200">
+                    <div
+                      className={`grid md:grid-cols-3 gap-4 p-4 rounded-xl border transition-colors duration-300 ${
+                        isDark
+                          ? "bg-gray-700 border-gray-600"
+                          : "bg-white border-slate-200"
+                      }`}
+                    >
                       <div>
-                        <label className="block text-sm font-medium text-slate-700 mb-2">
+                        <label
+                          className={`block text-sm font-medium mb-2 transition-colors duration-300 ${
+                            isDark ? "text-gray-300" : "text-slate-700"
+                          }`}
+                        >
                           Category
                         </label>
                         <select
                           value={selectedCategory}
                           onChange={(e) => setSelectedCategory(e.target.value)}
-                          className="w-full p-2 border border-slate-200 rounded-lg focus:border-blue-300 focus:ring-1 focus:ring-blue-100"
+                          className={`w-full p-2 border rounded-lg transition-colors duration-300 ${
+                            isDark
+                              ? "bg-gray-600 border-gray-500 text-white focus:border-blue-400 focus:ring-blue-900"
+                              : "border-slate-200 focus:border-blue-300 focus:ring-blue-100"
+                          }`}
                         >
                           {categories.map((category) => (
                             <option key={category} value={category}>
@@ -474,7 +547,11 @@ const FlashcardHome = () => {
                       </div>
 
                       <div>
-                        <label className="block text-sm font-medium text-slate-700 mb-2">
+                        <label
+                          className={`block text-sm font-medium mb-2 transition-colors duration-300 ${
+                            isDark ? "text-gray-300" : "text-slate-700"
+                          }`}
+                        >
                           Difficulty
                         </label>
                         <select
@@ -482,7 +559,11 @@ const FlashcardHome = () => {
                           onChange={(e) =>
                             setSelectedDifficulty(e.target.value)
                           }
-                          className="w-full p-2 border border-slate-200 rounded-lg focus:border-blue-300 focus:ring-1 focus:ring-blue-100"
+                          className={`w-full p-2 border rounded-lg transition-colors duration-300 ${
+                            isDark
+                              ? "bg-gray-600 border-gray-500 text-white focus:border-blue-400 focus:ring-blue-900"
+                              : "border-slate-200 focus:border-blue-300 focus:ring-blue-100"
+                          }`}
                         >
                           {difficulties.map((difficulty) => (
                             <option key={difficulty} value={difficulty}>
@@ -493,13 +574,21 @@ const FlashcardHome = () => {
                       </div>
 
                       <div>
-                        <label className="block text-sm font-medium text-slate-700 mb-2">
+                        <label
+                          className={`block text-sm font-medium mb-2 transition-colors duration-300 ${
+                            isDark ? "text-gray-300" : "text-slate-700"
+                          }`}
+                        >
                           Question Type
                         </label>
                         <select
                           value={selectedType}
                           onChange={(e) => setSelectedType(e.target.value)}
-                          className="w-full p-2 border border-slate-200 rounded-lg focus:border-blue-300 focus:ring-1 focus:ring-blue-100"
+                          className={`w-full p-2 border rounded-lg transition-colors duration-300 ${
+                            isDark
+                              ? "bg-gray-600 border-gray-500 text-white focus:border-blue-400 focus:ring-blue-900"
+                              : "border-slate-200 focus:border-blue-300 focus:ring-blue-100"
+                          }`}
                         >
                           {types.map((type) => (
                             <option key={type} value={type}>
@@ -515,25 +604,57 @@ const FlashcardHome = () => {
 
               {flashcards.length === 0 ? (
                 <div className="text-center py-16">
-                  <div className="w-16 h-16 bg-slate-200 rounded-full flex items-center justify-center mx-auto mb-4">
-                    <BookOpen className="w-8 h-8 text-slate-400" />
+                  <div
+                    className={`w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4 transition-colors duration-300 ${
+                      isDark ? "bg-gray-700" : "bg-slate-200"
+                    }`}
+                  >
+                    <BookOpen
+                      className={`w-8 h-8 transition-colors duration-300 ${
+                        isDark ? "text-gray-400" : "text-slate-400"
+                      }`}
+                    />
                   </div>
-                  <h4 className="text-xl font-medium text-slate-500 mb-2">
+                  <h4
+                    className={`text-xl font-medium mb-2 transition-colors duration-300 ${
+                      isDark ? "text-gray-400" : "text-slate-500"
+                    }`}
+                  >
                     No flashcards yet
                   </h4>
-                  <p className="text-slate-500">
+                  <p
+                    className={`transition-colors duration-300 ${
+                      isDark ? "text-gray-500" : "text-slate-500"
+                    }`}
+                  >
                     Create your first set to get started with smart learning
                   </p>
                 </div>
               ) : filteredFlashcards.length === 0 ? (
                 <div className="text-center py-16">
-                  <div className="w-16 h-16 bg-slate-200 rounded-full flex items-center justify-center mx-auto mb-4">
-                    <Search className="w-8 h-8 text-slate-400" />
+                  <div
+                    className={`w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4 transition-colors duration-300 ${
+                      isDark ? "bg-gray-700" : "bg-slate-200"
+                    }`}
+                  >
+                    <Search
+                      className={`w-8 h-8 transition-colors duration-300 ${
+                        isDark ? "text-gray-400" : "text-slate-400"
+                      }`}
+                    />
                   </div>
-                  <h4 className="text-xl font-medium text-slate-500 mb-2">
+                  <h4
+                    className={`text-xl font-medium mb-2 transition-colors duration-300 ${
+                      isDark ? "text-gray-400" : "text-slate-500"
+                    }`}
+                  >
                     No matching flashcards
                   </h4>
-                  <p className="text-slate-500">
+                  <p
+                    className={`transition-colors duration-300 ${
+                      isDark ? "text-gray-500" : "text-slate-500"
+                    }`}
+                  >
                     Try adjusting your search or filter criteria
                   </p>
                 </div>
@@ -542,9 +663,11 @@ const FlashcardHome = () => {
                   {filteredFlashcards.map((card, index) => (
                     <div
                       key={card._id}
-                      className="relative rounded-2xl sm:rounded-3xl shadow-md transition-all duration-500 ease-out 
+                      className={`relative rounded-2xl sm:rounded-3xl shadow-md transition-all duration-500 ease-out 
                  p-4 sm:p-6 flex flex-col justify-between 
-                 transform hover:-translate-y-2 hover:scale-[1.02] hover:shadow-2xl cursor-pointer group"
+                 transform hover:-translate-y-2 hover:scale-[1.02] hover:shadow-2xl cursor-pointer group ${
+                   isDark ? "border border-gray-700" : ""
+                 }`}
                       style={{
                         backgroundColor: [
                           "#FFE5D9", // soft peach
@@ -560,7 +683,13 @@ const FlashcardHome = () => {
                     >
                       {/* Top Section */}
                       <div className="flex justify-between items-start mb-4 sm:mb-6">
-                        <span className="text-[10px] sm:text-xs font-medium bg-white/70 px-2 sm:px-3 py-0.5 sm:py-1 rounded-full shadow-sm">
+                        <span
+                          className={`text-[10px] sm:text-xs font-medium px-2 sm:px-3 py-0.5 sm:py-1 rounded-full shadow-sm transition-colors duration-300 ${
+                            isDark
+                              ? "bg-gray-800 text-gray-300"
+                              : "bg-white/70 text-gray-700"
+                          }`}
+                        >
                           {formatDate(card.uploadedAt)}
                         </span>
                         <div className="flex items-center gap-1.5 sm:gap-2">
@@ -579,19 +708,33 @@ const FlashcardHome = () => {
                               }`}
                             />
                           </button>
-                          <span className="text-[10px] sm:text-xs text-slate-700 bg-white/70 px-2 py-0.5 sm:py-1 rounded-full shadow-sm">
+                          <span
+                            className={`text-[10px] sm:text-xs px-2 py-0.5 sm:py-1 rounded-full shadow-sm transition-colors duration-300 ${
+                              isDark
+                                ? "bg-gray-800 text-gray-300"
+                                : "bg-white/70 text-slate-700"
+                            }`}
+                          >
                             {card.totalCards || "10"} cards
                           </span>
                         </div>
                       </div>
 
                       {/* Title */}
-                      <h4 className="text-base sm:text-lg font-bold text-gray-900 mb-1 sm:mb-2 group-hover:text-gray-800 transition-colors py-2 sm:py-4">
+                      <h4
+                        className={`text-base sm:text-lg font-bold mb-1 sm:mb-2 group-hover:text-gray-800 transition-colors py-2 sm:py-4
+                  text-gray-900
+                  }`}
+                      >
                         {card.title}
                       </h4>
 
                       {/* Category */}
-                      <p className="text-xs sm:text-sm text-gray-700 font-medium mb-3 sm:mb-4 py-1 sm:py-2">
+                      <p
+                        className={`text-xs sm:text-sm font-medium mb-3 sm:mb-4 py-1 sm:py-2 transition-colors duration-300 
+                    text-gray-700
+                  }`}
+                      >
                         {card.category}
                       </p>
 
@@ -603,7 +746,11 @@ const FlashcardHome = () => {
                         ).map((tag, index) => (
                           <span
                             key={index}
-                            className="px-2 sm:px-3 py-0.5 sm:py-1 text-[10px] sm:text-xs font-medium bg-white/70 text-gray-800 rounded-full shadow-sm transition-transform duration-300 hover:scale-105"
+                            className={`px-2 sm:px-3 py-0.5 sm:py-1 text-[10px] sm:text-xs font-medium rounded-full shadow-sm transition-transform duration-300 hover:scale-105 ${
+                              isDark
+                                ? "bg-white/70 text-gray-800"
+                                : "bg-white/70 text-gray-800"
+                            }`}
                           >
                             {tag}
                           </span>
@@ -611,7 +758,11 @@ const FlashcardHome = () => {
                         {card.tags.length > 3 && (
                           <button
                             onClick={() => toggleTags(card._id)}
-                            className="px-2 py-0.5 sm:py-1 text-[10px] sm:text-xs text-gray-700 bg-white/60 hover:bg-white rounded-full transition-transform duration-300 hover:scale-105"
+                            className={`px-2 py-0.5 sm:py-1 text-[10px] sm:text-xs rounded-full transition-transform duration-300 hover:scale-105 ${
+                              isDark
+                                ? "text-gray-700 bg-white/60 hover:bg-white"
+                                : "text-gray-700 bg-white/60 hover:bg-white"
+                            }`}
                           >
                             {expandedTags[card._id]
                               ? "See less"
@@ -622,7 +773,11 @@ const FlashcardHome = () => {
 
                       {/* Footer */}
                       <div className="flex items-center justify-between">
-                        <span className="text-xs sm:text-sm font-semibold text-gray-800">
+                        <span
+                          className={`text-xs sm:text-sm font-semibold transition-colors duration-300
+                      text-gray-800
+                    }`}
+                        >
                           📘 Study Material
                         </span>
                         <button
@@ -637,34 +792,6 @@ const FlashcardHome = () => {
                 </div>
               )}
             </section>
-
-            {/* Features */}
-            {/* <section className="grid md:grid-cols-3 gap-8 mb-16 mt-16">
-              {features.map((feature, index) => (
-                <div
-                  key={index}
-                  className="bg-slate-50 rounded-2xl p-8 border border-slate-200 hover:border-blue-300 transition-all duration-300 hover:transform hover:-translate-y-2 group"
-                >
-                  <div className="text-blue-500 mb-4 group-hover:scale-110 transition-transform duration-300">
-                    {feature.icon}
-                  </div>
-                  <h3 className="text-xl font-semibold text-slate-800 mb-3">
-                    {feature.title}
-                  </h3>
-                  <p className="text-slate-600 leading-relaxed">
-                    {feature.description}
-                  </p>
-                </div>
-              ))}
-            </section> */}
-
-            {/* Footer CTA */}
-            {/* <div className="text-center mt-16">
-              <div className="inline-flex items-center gap-2 text-slate-500 mb-4">
-                <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>
-                <span className="text-sm">Ready to boost your learning?</span>
-              </div>
-            </div> */}
           </>
         )}
       </div>
@@ -687,6 +814,19 @@ const FlashcardHome = () => {
               transparent 1px
             ),
             linear-gradient(90deg, rgba(59, 130, 246, 0.1) 1px, transparent 1px);
+          background-size: 50px 50px;
+        }
+
+        .bg-grid-pattern-dark {
+          background-image: linear-gradient(
+              rgba(59, 130, 246, 0.15) 1px,
+              transparent 1px
+            ),
+            linear-gradient(
+              90deg,
+              rgba(59, 130, 246, 0.15) 1px,
+              transparent 1px
+            );
           background-size: 50px 50px;
         }
 

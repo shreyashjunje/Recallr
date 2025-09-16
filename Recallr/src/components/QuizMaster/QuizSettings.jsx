@@ -46,9 +46,9 @@ const QuizSetup = () => {
       const userId = decodedToken.id;
 
       const response = await axios.get(`${API_URL}/pdf/pdfs/`, {
-        headers: { Authorization: `Bearer ${token}` }
+        headers: { Authorization: `Bearer ${token}` },
       });
-      
+
       setUserPdfs(response.data.pdfs);
     } catch (error) {
       console.error("Error fetching user PDFs:", error);
@@ -67,9 +67,9 @@ const QuizSetup = () => {
     // Clear the other source when switching
     if (field === "source") {
       if (value === "library") {
-        setFormData(prev => ({ ...prev, uploadedFile: null }));
+        setFormData((prev) => ({ ...prev, uploadedFile: null }));
       } else {
-        setFormData(prev => ({ ...prev, selectedPDF: "" }));
+        setFormData((prev) => ({ ...prev, selectedPDF: "" }));
       }
     }
   };
@@ -114,7 +114,7 @@ const QuizSetup = () => {
 
       const decodedToken = jwtDecode(token);
       const userId = decodedToken.id;
-      
+
       const fd = new FormData();
       fd.append("userId", userId);
       fd.append("source", formData.source);
@@ -126,7 +126,7 @@ const QuizSetup = () => {
       fd.append("markingScheme", formData.markingScheme);
       fd.append("shuffleQuestions", formData.shuffleQuestions);
       fd.append("shuffleOptions", formData.shuffleOptions);
-      
+
       // Add source-specific data
       if (formData.source === "upload") {
         if (formData.uploadedFile) {
@@ -135,31 +135,32 @@ const QuizSetup = () => {
       } else if (formData.source === "library") {
         fd.append("pdfId", formData.selectedPDF);
       }
-      
+
       // Add question types as array
       formData.questionTypes.forEach((q) => fd.append("questionTypes", q));
 
       const res = await axios.post(`${API_URL}/quiz/generate-quiz`, fd, {
-        headers: { 
+        headers: {
           "Content-Type": "multipart/form-data",
-          Authorization: `Bearer ${token}`
+          Authorization: `Bearer ${token}`,
         },
       });
 
       if (res.status === 200) {
         console.log("Quiz generated successfully:", res.data);
         toast.success("Quiz generated successfully!");
-        
+
         // If using context, update it
         if (generateQuiz) {
           generateQuiz(res.data);
         }
-        
+
         navigate("/quizmaster");
       }
     } catch (err) {
       console.error("Error generating quiz:", err);
-      const errorMessage = err.response?.data?.message || "Failed to generate quiz";
+      const errorMessage =
+        err.response?.data?.message || "Failed to generate quiz";
       toast.error(errorMessage);
     } finally {
       setGenerating(false);
@@ -181,10 +182,10 @@ const QuizSetup = () => {
     <div className="max-w-4xl mx-auto space-y-8">
       {/* Header */}
       <div className="text-center">
-        <h1 className="text-3xl font-bold text-gray-900 mb-4">
+        <h1 className="text-3xl font-bold text-gray-900 dark:text-white mb-4">
           Create New Quiz
         </h1>
-        <p className="text-lg text-gray-600">
+        <p className="text-lg text-gray-600 dark:text-gray-300">
           Generate personalized quizzes from your PDF documents
         </p>
       </div>
@@ -200,7 +201,7 @@ const QuizSetup = () => {
                     ? "text-green-600"
                     : step === index + 1
                     ? "text-blue-600"
-                    : "text-gray-400"
+                    : "text-gray-400 dark:text-gray-500"
                 }`}
               >
                 <div
@@ -209,7 +210,7 @@ const QuizSetup = () => {
                       ? "bg-green-600 text-white"
                       : step === index + 1
                       ? "bg-blue-600 text-white"
-                      : "bg-gray-200 text-gray-600"
+                      : "bg-gray-200 dark:bg-gray-700 text-gray-600 dark:text-gray-300"
                   }`}
                 >
                   {step > index + 1 ? "✓" : index + 1}
@@ -219,7 +220,9 @@ const QuizSetup = () => {
               {index < stepTitles.length - 1 && (
                 <div
                   className={`w-16 h-0.5 ${
-                    step > index + 1 ? "bg-green-600" : "bg-gray-200"
+                    step > index + 1
+                      ? "bg-green-600"
+                      : "bg-gray-200 dark:bg-gray-700"
                   }`}
                 />
               )}
@@ -228,11 +231,11 @@ const QuizSetup = () => {
         </div>
       </div>
 
-      <div className="bg-white rounded-2xl shadow-lg overflow-hidden">
+      <div className="bg-white dark:bg-gray-900 rounded-2xl shadow-lg overflow-hidden border border-gray-200 dark:border-gray-700">
         {/* Step 1: Choose Source */}
         {step === 1 && (
           <div className="p-8">
-            <h2 className="text-2xl font-semibold mb-6 flex items-center">
+            <h2 className="text-2xl font-semibold mb-6 flex items-center text-gray-900 dark:text-white">
               <FileText className="h-6 w-6 mr-2 text-blue-600" />
               Choose PDF Source
             </h2>
@@ -242,8 +245,8 @@ const QuizSetup = () => {
               <div
                 className={`p-6 rounded-xl border-2 cursor-pointer transition-all duration-200 ${
                   formData.source === "library"
-                    ? "border-blue-500 bg-blue-50"
-                    : "border-gray-200 hover:border-gray-300"
+                    ? "border-blue-500 bg-blue-50 dark:bg-blue-900/20"
+                    : "border-gray-200 dark:border-gray-700 hover:border-gray-300 dark:hover:border-gray-600"
                 }`}
                 onClick={() => handleInputChange("source", "library")}
               >
@@ -259,9 +262,11 @@ const QuizSetup = () => {
                     className="mr-3"
                   />
                   <FileText className="h-6 w-6 text-blue-600 mr-2" />
-                  <h3 className="text-lg font-semibold">My Library</h3>
+                  <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
+                    My Library
+                  </h3>
                 </div>
-                <p className="text-gray-600 mb-4">
+                <p className="text-gray-600 dark:text-gray-300 mb-4">
                   Choose from your uploaded PDFs
                 </p>
 
@@ -270,7 +275,9 @@ const QuizSetup = () => {
                     {loadingPdfs ? (
                       <div className="text-center py-4">
                         <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-blue-600 mx-auto"></div>
-                        <p className="text-gray-500 mt-2">Loading PDFs...</p>
+                        <p className="text-gray-500 dark:text-gray-400 mt-2">
+                          Loading PDFs...
+                        </p>
                       </div>
                     ) : userPdfs.length > 0 ? (
                       <select
@@ -278,7 +285,7 @@ const QuizSetup = () => {
                         onChange={(e) =>
                           handleInputChange("selectedPDF", e.target.value)
                         }
-                        className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                        className="w-full p-3 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-200"
                       >
                         <option value="">Select a PDF...</option>
                         {userPdfs.map((pdf) => (
@@ -288,11 +295,11 @@ const QuizSetup = () => {
                         ))}
                       </select>
                     ) : (
-                      <div className="text-center py-4 text-gray-500">
+                      <div className="text-center py-4 text-gray-500 dark:text-gray-400">
                         <p>No PDFs found in your library</p>
-                        <button 
+                        <button
                           onClick={fetchUserPdfs}
-                          className="text-blue-600 hover:text-blue-800 mt-2"
+                          className="text-blue-600 hover:text-blue-800 dark:hover:text-blue-400 mt-2"
                         >
                           Refresh
                         </button>
@@ -306,8 +313,8 @@ const QuizSetup = () => {
               <div
                 className={`p-6 rounded-xl border-2 cursor-pointer transition-all duration-200 ${
                   formData.source === "upload"
-                    ? "border-purple-500 bg-purple-50"
-                    : "border-gray-200 hover:border-gray-300"
+                    ? "border-purple-500 bg-purple-50 dark:bg-purple-900/20"
+                    : "border-gray-200 dark:border-gray-700 hover:border-gray-300 dark:hover:border-gray-600"
                 }`}
                 onClick={() => handleInputChange("source", "upload")}
               >
@@ -323,9 +330,11 @@ const QuizSetup = () => {
                     className="mr-3"
                   />
                   <Upload className="h-6 w-6 text-purple-600 mr-2" />
-                  <h3 className="text-lg font-semibold">Upload New PDF</h3>
+                  <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
+                    Upload New PDF
+                  </h3>
                 </div>
-                <p className="text-gray-600 mb-4">
+                <p className="text-gray-600 dark:text-gray-300 mb-4">
                   Upload a new document for this quiz
                 </p>
 
@@ -342,16 +351,16 @@ const QuizSetup = () => {
                       htmlFor="upload-input"
                       className={`block w-full p-3 border ${
                         formData.uploadedFile
-                          ? "border-green-500 bg-green-50"
-                          : "border-dashed border-gray-300"
+                          ? "border-green-500 bg-green-50 dark:bg-green-900/20"
+                          : "border-dashed border-gray-300 dark:border-gray-600"
                       } rounded-lg text-center cursor-pointer hover:border-purple-500 transition-colors duration-200`}
                     >
                       {formData.uploadedFile ? (
-                        <span className="text-green-600 font-medium">
+                        <span className="text-green-600 dark:text-green-400 font-medium">
                           {formData.uploadedFile.name}
                         </span>
                       ) : (
-                        <span className="text-gray-500">
+                        <span className="text-gray-500 dark:text-gray-400">
                           Click to upload PDF
                         </span>
                       )}
@@ -363,19 +372,24 @@ const QuizSetup = () => {
 
             {/* Selected PDF Info */}
             {formData.source === "library" && formData.selectedPDF && (
-              <div className="mt-6 p-4 bg-blue-50 rounded-lg border border-blue-200">
-                <p className="text-blue-700">
-                  Selected: {userPdfs.find(p => p._id === formData.selectedPDF)?.title}
+              <div className="mt-6 p-4 bg-blue-50 dark:bg-blue-900/20 rounded-lg border border-blue-200 dark:border-blue-700">
+                <p className="text-blue-700 dark:text-blue-300">
+                  Selected:{" "}
+                  {userPdfs.find((p) => p._id === formData.selectedPDF)?.title}
                 </p>
               </div>
             )}
           </div>
         )}
 
+        {/* Step 2, Step 3 & Navigation Buttons */}
+        {/* ⬇️ Apply the same `dark:` classes pattern to remaining steps */}
+        {/* Example: text-gray-900 → dark:text-white, bg-gray-50 → dark:bg-gray-800, border-gray-200 → dark:border-gray-700 */}
+
         {/* Step 2: Quiz Settings */}
         {step === 2 && (
           <div className="p-8">
-            <h2 className="text-2xl font-semibold mb-6 flex items-center">
+            <h2 className="text-2xl font-semibold mb-6 flex items-center text-gray-900 dark:text-white">
               <Settings className="h-6 w-6 mr-2 text-blue-600" />
               Quiz Settings
             </h2>
@@ -385,7 +399,7 @@ const QuizSetup = () => {
               <div className="space-y-6">
                 {/* Number of Questions */}
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                     Number of Questions
                   </label>
                   <input
@@ -401,7 +415,7 @@ const QuizSetup = () => {
                     }
                     className="w-full"
                   />
-                  <div className="flex justify-between text-sm text-gray-500 mt-1">
+                  <div className="flex justify-between text-sm text-gray-500 dark:text-gray-400 mt-1">
                     <span>5</span>
                     <span className="font-medium text-blue-600">
                       {formData.numQuestions}
@@ -412,14 +426,14 @@ const QuizSetup = () => {
 
                 {/* Difficulty */}
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-3">
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-3">
                     Difficulty Level
                   </label>
                   <div className="grid grid-cols-2 gap-3">
                     {["Easy", "Medium", "Hard", "Mixed"].map((diff) => (
                       <label
                         key={diff}
-                        className="flex items-center cursor-pointer"
+                        className="flex items-center cursor-pointer text-gray-800 dark:text-gray-200"
                       >
                         <input
                           type="radio"
@@ -439,7 +453,7 @@ const QuizSetup = () => {
 
                 {/* Time Limit */}
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                     Time Limit (minutes)
                   </label>
                   <input
@@ -450,10 +464,10 @@ const QuizSetup = () => {
                     onChange={(e) =>
                       handleInputChange("timeLimit", parseInt(e.target.value))
                     }
-                    className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    className="w-full p-3 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-200"
                   />
-                  <div className="mt-2">
-                    <label className="flex items-center cursor-pointer">
+                  <div className="mt-2 space-y-1">
+                    <label className="flex items-center cursor-pointer text-gray-800 dark:text-gray-200">
                       <input
                         type="radio"
                         name="timeLimitType"
@@ -466,7 +480,7 @@ const QuizSetup = () => {
                       />
                       <span>Overall quiz time</span>
                     </label>
-                    <label className="flex items-center cursor-pointer">
+                    <label className="flex items-center cursor-pointer text-gray-800 dark:text-gray-200">
                       <input
                         type="radio"
                         name="timeLimitType"
@@ -487,7 +501,7 @@ const QuizSetup = () => {
               <div className="space-y-6">
                 {/* Question Types */}
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-3">
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-3">
                     Question Types
                   </label>
                   <div className="space-y-2">
@@ -499,7 +513,7 @@ const QuizSetup = () => {
                     ].map((type) => (
                       <label
                         key={type.id}
-                        className="flex items-center cursor-pointer"
+                        className="flex items-center cursor-pointer text-gray-800 dark:text-gray-200"
                       >
                         <input
                           type="checkbox"
@@ -517,11 +531,11 @@ const QuizSetup = () => {
 
                 {/* Mode */}
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-3">
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-3">
                     Quiz Mode
                   </label>
                   <div className="space-y-2">
-                    <label className="flex items-center cursor-pointer p-3 border rounded-lg hover:bg-gray-50">
+                    <label className="flex items-center cursor-pointer p-3 border rounded-lg hover:bg-gray-50 dark:hover:bg-gray-800 border-gray-300 dark:border-gray-600 text-gray-800 dark:text-gray-200">
                       <input
                         type="radio"
                         name="mode"
@@ -534,12 +548,12 @@ const QuizSetup = () => {
                       />
                       <div>
                         <div className="font-medium">Practice Mode</div>
-                        <div className="text-sm text-gray-600">
+                        <div className="text-sm text-gray-600 dark:text-gray-400">
                           Instant feedback after each question
                         </div>
                       </div>
                     </label>
-                    <label className="flex items-center cursor-pointer p-3 border rounded-lg hover:bg-gray-50">
+                    <label className="flex items-center cursor-pointer p-3 border rounded-lg hover:bg-gray-50 dark:hover:bg-gray-800 border-gray-300 dark:border-gray-600 text-gray-800 dark:text-gray-200">
                       <input
                         type="radio"
                         name="mode"
@@ -552,7 +566,7 @@ const QuizSetup = () => {
                       />
                       <div>
                         <div className="font-medium">Exam Mode</div>
-                        <div className="text-sm text-gray-600">
+                        <div className="text-sm text-gray-600 dark:text-gray-400">
                           Results shown at the end
                         </div>
                       </div>
@@ -567,7 +581,7 @@ const QuizSetup = () => {
         {/* Step 3: Advanced Options */}
         {step === 3 && (
           <div className="p-8">
-            <h2 className="text-2xl font-semibold mb-6 flex items-center">
+            <h2 className="text-2xl font-semibold mb-6 flex items-center text-gray-900 dark:text-white">
               <Target className="h-6 w-6 mr-2 text-blue-600" />
               Advanced Options
             </h2>
@@ -575,11 +589,11 @@ const QuizSetup = () => {
             <div className="space-y-8">
               {/* Marking Scheme */}
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-4">
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-4">
                   Marking Scheme
                 </label>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  <label className="flex items-center cursor-pointer p-4 border rounded-lg hover:bg-gray-50">
+                  <label className="flex items-center cursor-pointer p-4 border rounded-lg hover:bg-gray-50 dark:hover:bg-gray-800 border-gray-300 dark:border-gray-600 text-gray-800 dark:text-gray-200">
                     <input
                       type="radio"
                       name="markingScheme"
@@ -592,12 +606,12 @@ const QuizSetup = () => {
                     />
                     <div>
                       <div className="font-medium">Normal (+1, 0)</div>
-                      <div className="text-sm text-gray-600">
+                      <div className="text-sm text-gray-600 dark:text-gray-400">
                         +1 for correct, 0 for wrong
                       </div>
                     </div>
                   </label>
-                  <label className="flex items-center cursor-pointer p-4 border rounded-lg hover:bg-gray-50">
+                  <label className="flex items-center cursor-pointer p-4 border rounded-lg hover:bg-gray-50 dark:hover:bg-gray-800 border-gray-300 dark:border-gray-600 text-gray-800 dark:text-gray-200">
                     <input
                       type="radio"
                       name="markingScheme"
@@ -612,7 +626,7 @@ const QuizSetup = () => {
                       <div className="font-medium">
                         Negative Marking (+1, -0.25)
                       </div>
-                      <div className="text-sm text-gray-600">
+                      <div className="text-sm text-gray-600 dark:text-gray-400">
                         +1 for correct, -0.25 for wrong
                       </div>
                     </div>
@@ -622,10 +636,10 @@ const QuizSetup = () => {
 
               {/* Additional Options */}
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-4">
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-4">
                   Additional Options
                 </label>
-                <div className="space-y-3">
+                <div className="space-y-3 text-gray-800 dark:text-gray-200">
                   <label className="flex items-center cursor-pointer">
                     <input
                       type="checkbox"
@@ -652,29 +666,39 @@ const QuizSetup = () => {
               </div>
 
               {/* Quiz Preview */}
-              <div className="bg-gray-50 p-6 rounded-xl">
-                <h3 className="font-semibold mb-4">Quiz Preview</h3>
-                <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm">
+              <div className="bg-gray-50 dark:bg-gray-800 p-6 rounded-xl">
+                <h3 className="font-semibold mb-4 text-gray-900 dark:text-white">
+                  Quiz Preview
+                </h3>
+                <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm text-gray-800 dark:text-gray-200">
                   <div>
-                    <span className="text-gray-600">Questions:</span>
+                    <span className="text-gray-600 dark:text-gray-400">
+                      Questions:
+                    </span>
                     <span className="ml-2 font-medium">
                       {formData.numQuestions}
                     </span>
                   </div>
                   <div>
-                    <span className="text-gray-600">Difficulty:</span>
+                    <span className="text-gray-600 dark:text-gray-400">
+                      Difficulty:
+                    </span>
                     <span className="ml-2 font-medium capitalize">
                       {formData.difficulty}
                     </span>
                   </div>
                   <div>
-                    <span className="text-gray-600">Time:</span>
+                    <span className="text-gray-600 dark:text-gray-400">
+                      Time:
+                    </span>
                     <span className="ml-2 font-medium">
                       {formData.timeLimit} min
                     </span>
                   </div>
                   <div>
-                    <span className="text-gray-600">Mode:</span>
+                    <span className="text-gray-600 dark:text-gray-400">
+                      Mode:
+                    </span>
                     <span className="ml-2 font-medium capitalize">
                       {formData.mode}
                     </span>
@@ -686,11 +710,11 @@ const QuizSetup = () => {
         )}
 
         {/* Navigation Buttons */}
-        <div className="px-8 py-6 bg-gray-50 border-t flex justify-between">
+        <div className="px-8 py-6 bg-gray-50 dark:bg-gray-900 border-t border-gray-200 dark:border-gray-700 flex justify-between">
           <button
             onClick={() => setStep(Math.max(1, step - 1))}
             disabled={step === 1}
-            className="px-6 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-100 disabled:opacity-50 disabled:cursor-not-allowed transition-colors duration-200"
+            className="px-6 py-2 border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-200 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 disabled:opacity-50 disabled:cursor-not-allowed transition-colors duration-200"
           >
             Previous
           </button>

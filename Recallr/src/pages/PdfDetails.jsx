@@ -31,6 +31,7 @@ import { toast } from "react-toastify";
 import axios from "axios";
 import useAuth from "@/hooks/useAuth";
 import { jwtDecode } from "jwt-decode";
+import { useTheme } from "@/context/AdminThemeContext";
 
 const API_URL = import.meta.env.VITE_API_URL;
 
@@ -82,6 +83,7 @@ const PDFDetailsPage = () => {
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
   const [selectedPdf, setSelectedPdf] = useState(null);
   const [isRefreshing, setIsRefreshing] = useState(false);
+  const { isDark, toggleTheme } = useTheme(); // Get theme state and toggle function
 
   const fetchPdfDetails = async () => {
     try {
@@ -366,17 +368,37 @@ const PDFDetailsPage = () => {
   }, [pdf.isFavourite]);
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 to-blue-50 p-4 sm:p-6">
+    <div
+      className={`min-h-screen transition-colors duration-300 ${
+        isDark
+          ? "bg-gradient-to-br from-gray-900 to-gray-800"
+          : "bg-gradient-to-br from-slate-50 to-blue-50"
+      } p-4 sm:p-6`}
+    >
       <div className="max-w-7xl mx-auto">
         {/* Header Section */}
-        <div className="bg-white rounded-xl sm:rounded-2xl shadow-sm border border-gray-100 p-4 sm:p-6 md:p-8 mb-4 sm:mb-6">
+        <div
+          className={`rounded-xl sm:rounded-2xl shadow-sm border p-4 sm:p-6 md:p-8 mb-4 sm:mb-6 transition-colors duration-300 ${
+            isDark ? "bg-gray-800 border-gray-700" : "bg-white border-gray-100"
+          }`}
+        >
           <div className="flex flex-col lg:flex-row gap-4 sm:gap-6 md:gap-8">
             {/* PDF Preview */}
             <div className="flex-shrink-0 mx-auto lg:mx-0">
-              <div className="w-24 h-32 sm:w-28 sm:h-40 md:w-32 md:h-44 bg-gradient-to-br from-blue-100 to-indigo-100 rounded-lg sm:rounded-xl border-2 border-dashed border-blue-200 flex items-center justify-center group hover:from-blue-200 hover:to-indigo-200 transition-all duration-300">
+              <div
+                className={`w-24 h-32 sm:w-28 sm:h-40 md:w-32 md:h-44 rounded-lg sm:rounded-xl border-2 border-dashed flex items-center justify-center group transition-all duration-300 ${
+                  isDark
+                    ? "bg-gradient-to-br from-blue-900/50 to-indigo-900/50 border-blue-700 hover:from-blue-800/50 hover:to-indigo-800/50"
+                    : "bg-gradient-to-br from-blue-100 to-indigo-100 border-blue-200 hover:from-blue-200 hover:to-indigo-200"
+                }`}
+              >
                 <FileText
                   size={36}
-                  className="text-blue-500 group-hover:text-blue-600 transition-colors"
+                  className={`transition-colors ${
+                    isDark
+                      ? "text-blue-400 group-hover:text-blue-300"
+                      : "text-blue-500 group-hover:text-blue-600"
+                  }`}
                 />
               </div>
             </div>
@@ -385,13 +407,26 @@ const PDFDetailsPage = () => {
             <div className="flex-grow">
               <div className="flex flex-col sm:flex-row justify-between items-start gap-4 mb-4">
                 <div className="flex-grow">
-                  <h1 className="text-xl sm:text-2xl md:text-3xl font-bold text-gray-900 mb-2 leading-tight">
+                  <h1
+                    className={`text-xl sm:text-2xl md:text-3xl font-bold mb-2 leading-tight transition-colors duration-300 ${
+                      isDark ? "text-gray-100" : "text-gray-900"
+                    }`}
+                  >
                     {pdf.title}
                   </h1>
                   <div className="flex items-center gap-2 sm:gap-4 mb-4">
                     <div className="flex items-center gap-2">
-                      <Folder size={14} className="text-gray-500" />
-                      <span className="bg-blue-100 text-blue-800 px-2 py-1 text-xs sm:text-sm rounded-full font-medium">
+                      <Folder
+                        size={14}
+                        className={isDark ? "text-gray-400" : "text-gray-500"}
+                      />
+                      <span
+                        className={`px-2 py-1 text-xs sm:text-sm rounded-full font-medium transition-colors duration-300 ${
+                          isDark
+                            ? "bg-blue-900/30 text-blue-300"
+                            : "bg-blue-100 text-blue-800"
+                        }`}
+                      >
                         {pdf.category}
                       </span>
                     </div>
@@ -408,6 +443,8 @@ const PDFDetailsPage = () => {
                     className={`p-2 sm:p-3 rounded-lg sm:rounded-xl transition-all duration-200 ${
                       isFav
                         ? "bg-red-500 text-white shadow-lg hover:bg-red-600"
+                        : isDark
+                        ? "bg-gray-700 text-gray-300 hover:bg-gray-600"
                         : "bg-gray-100 text-gray-600 hover:bg-gray-200"
                     }`}
                   >
@@ -423,19 +460,25 @@ const PDFDetailsPage = () => {
                       e.stopPropagation();
                       handledownload(pdf);
                     }}
-                    className="p-2 sm:p-3 bg-gray-100 text-gray-600 rounded-lg sm:rounded-xl hover:bg-gray-200 transition-all duration-200"
+                    className={`p-2 sm:p-3 rounded-lg sm:rounded-xl transition-all duration-200 ${
+                      isDark
+                        ? "bg-gray-700 text-gray-300 hover:bg-gray-600"
+                        : "bg-gray-100 text-gray-600 hover:bg-gray-200"
+                    }`}
                   >
                     <Download size={16} />
                   </button>
-                  {/* <button className="p-2 sm:p-3 bg-gray-100 text-gray-600 rounded-lg sm:rounded-xl hover:bg-gray-200 transition-all duration-200">
-                    <Share2 size={16} />
-                  </button> */}
+
                   <button
                     onClick={(e) => {
                       e.stopPropagation();
                       handleRefresh();
                     }}
-                    className="p-2 sm:p-3 bg-emerald-500 text-white rounded-lg sm:rounded-xl hover:bg-emerald-600 transition-all duration-200 shadow-lg disabled:opacity-50 disabled:cursor-not-allowed"
+                    className={`p-2 sm:p-3 rounded-lg sm:rounded-xl hover:bg-emerald-600 transition-all duration-200 shadow-lg disabled:opacity-50 disabled:cursor-not-allowed ${
+                      isDark
+                        ? "bg-emerald-600 text-white hover:bg-emerald-700"
+                        : "bg-emerald-500 text-white"
+                    }`}
                     disabled={isRefreshing}
                   >
                     {isRefreshing ? (
@@ -452,7 +495,11 @@ const PDFDetailsPage = () => {
                       setShowDeleteConfirm(true);
                       setSelectedPdf(null);
                     }}
-                    className="p-2 sm:p-3 bg-red-500 text-white rounded-lg sm:rounded-xl hover:bg-red-600 transition-all duration-200 shadow-lg"
+                    className={`p-2 sm:p-3 rounded-lg sm:rounded-xl transition-all duration-200 shadow-lg ${
+                      isDark
+                        ? "bg-red-600 text-white hover:bg-red-700"
+                        : "bg-red-500 text-white hover:bg-red-600"
+                    }`}
                   >
                     <Trash2 size={16} />
                   </button>
@@ -464,26 +511,17 @@ const PDFDetailsPage = () => {
                 {pdf.tags?.map((tag, index) => (
                   <span
                     key={index}
-                    className="bg-gray-100 text-gray-700 px-2 py-1 text-xs sm:text-sm rounded-md font-medium hover:bg-gray-200 transition-colors cursor-pointer"
+                    className={`px-2 py-1 text-xs sm:text-sm rounded-md font-medium transition-colors duration-300 cursor-pointer ${
+                      isDark
+                        ? "bg-gray-700 text-gray-300 hover:bg-gray-600"
+                        : "bg-gray-100 text-gray-700 hover:bg-gray-200"
+                    }`}
                   >
                     <Tag size={10} className="inline mr-1" />
                     {tag}
                   </span>
                 ))}
               </div>
-
-              {/* Description */}
-              {/* <div className="bg-gray-50 rounded-lg sm:rounded-xl p-3 sm:p-4">
-                <div className="flex items-start gap-2 sm:gap-3">
-                  <Info
-                    size={16}
-                    className="text-blue-500 mt-0.5 flex-shrink-0"
-                  />
-                  <p className="text-gray-700 text-sm sm:text-base leading-relaxed">
-                    {pdf.description}
-                  </p>
-                </div>
-              </div> */}
             </div>
           </div>
         </div>
@@ -492,39 +530,85 @@ const PDFDetailsPage = () => {
           {/* Left Column - File Details & Progress */}
           <div className="space-y-4 sm:space-y-6">
             {/* File Metadata */}
-            <div className="bg-white rounded-xl sm:rounded-2xl shadow-sm border border-gray-100 p-4 sm:p-6">
-              <h2 className="text-lg sm:text-xl font-semibold text-gray-900 mb-4 sm:mb-6 flex items-center gap-2">
+            <div
+              className={`rounded-xl sm:rounded-2xl shadow-sm border p-4 sm:p-6 transition-colors duration-300 ${
+                isDark
+                  ? "bg-gray-800 border-gray-700"
+                  : "bg-white border-gray-100"
+              }`}
+            >
+              <h2
+                className={`text-lg sm:text-xl font-semibold mb-4 sm:mb-6 flex items-center gap-2 transition-colors duration-300 ${
+                  isDark ? "text-gray-100" : "text-gray-900"
+                }`}
+              >
                 <HardDrive size={18} className="text-blue-500" />
                 File Details
               </h2>
 
               <div className="space-y-3 sm:space-y-4">
-                <div className="flex justify-between items-center py-2 sm:py-3 border-b border-gray-100">
-                  <div className="flex items-center gap-2 text-gray-600">
+                <div
+                  className={`flex justify-between items-center py-2 sm:py-3 border-b transition-colors duration-300 ${
+                    isDark ? "border-gray-700" : "border-gray-100"
+                  }`}
+                >
+                  <div
+                    className={`flex items-center gap-2 text-sm sm:text-base transition-colors duration-300 ${
+                      isDark ? "text-gray-400" : "text-gray-600"
+                    }`}
+                  >
                     <Calendar size={14} />
-                    <span className="text-sm sm:text-base">Uploaded At</span>
+                    <span>Uploaded At</span>
                   </div>
-                  <span className="font-medium text-gray-900 text-sm sm:text-base">
+                  <span
+                    className={`font-medium text-sm sm:text-base transition-colors duration-300 ${
+                      isDark ? "text-gray-300" : "text-gray-900"
+                    }`}
+                  >
                     {formatDate(pdf.uploadedAt)}
                   </span>
                 </div>
 
-                <div className="flex justify-between items-center py-2 sm:py-3 border-b border-gray-100">
-                  <div className="flex items-center gap-2 text-gray-600">
+                <div
+                  className={`flex justify-between items-center py-2 sm:py-3 border-b transition-colors duration-300 ${
+                    isDark ? "border-gray-700" : "border-gray-100"
+                  }`}
+                >
+                  <div
+                    className={`flex items-center gap-2 text-sm sm:text-base transition-colors duration-300 ${
+                      isDark ? "text-gray-400" : "text-gray-600"
+                    }`}
+                  >
                     <User size={14} />
-                    <span className="text-sm sm:text-base">Uploaded By</span>
+                    <span>Uploaded By</span>
                   </div>
-                  <span className="font-medium text-gray-900 text-sm sm:text-base">
+                  <span
+                    className={`font-medium text-sm sm:text-base transition-colors duration-300 ${
+                      isDark ? "text-gray-300" : "text-gray-900"
+                    }`}
+                  >
                     {pdf.user?.userName}
                   </span>
                 </div>
 
-                <div className="flex justify-between items-center py-2 sm:py-3 border-b border-gray-100">
-                  <div className="flex items-center gap-2 text-gray-600">
+                <div
+                  className={`flex justify-between items-center py-2 sm:py-3 border-b transition-colors duration-300 ${
+                    isDark ? "border-gray-700" : "border-gray-100"
+                  }`}
+                >
+                  <div
+                    className={`flex items-center gap-2 text-sm sm:text-base transition-colors duration-300 ${
+                      isDark ? "text-gray-400" : "text-gray-600"
+                    }`}
+                  >
                     <BookOpen size={14} />
-                    <span className="text-sm sm:text-base">Pages</span>
+                    <span>Pages</span>
                   </div>
-                  <span className="font-medium text-gray-900 text-sm sm:text-base">
+                  <span
+                    className={`font-medium text-sm sm:text-base transition-colors duration-300 ${
+                      isDark ? "text-gray-300" : "text-gray-900"
+                    }`}
+                  >
                     {pdf?.totalPages}
                   </span>
                 </div>
@@ -532,8 +616,18 @@ const PDFDetailsPage = () => {
             </div>
 
             {/* Progress Section */}
-            <div className="bg-white rounded-xl sm:rounded-2xl shadow-sm border border-gray-100 p-4 sm:p-6">
-              <h2 className="text-lg sm:text-xl font-semibold text-gray-900 mb-4 sm:mb-6 flex items-center gap-2">
+            <div
+              className={`rounded-xl sm:rounded-2xl shadow-sm border p-4 sm:p-6 transition-colors duration-300 ${
+                isDark
+                  ? "bg-gray-800 border-gray-700"
+                  : "bg-white border-gray-100"
+              }`}
+            >
+              <h2
+                className={`text-lg sm:text-xl font-semibold mb-4 sm:mb-6 flex items-center gap-2 transition-colors duration-300 ${
+                  isDark ? "text-gray-100" : "text-gray-900"
+                }`}
+              >
                 <BarChart3 size={18} className="text-emerald-500" />
                 Reading Progress
               </h2>
@@ -542,14 +636,22 @@ const PDFDetailsPage = () => {
                 {/* Progress Bar */}
                 <div>
                   <div className="flex justify-between items-center mb-2">
-                    <span className="text-gray-600 text-sm sm:text-base">
+                    <span
+                      className={`text-sm sm:text-base transition-colors duration-300 ${
+                        isDark ? "text-gray-400" : "text-gray-600"
+                      }`}
+                    >
                       Overall Progress
                     </span>
                     <span className="font-bold text-emerald-600 text-sm sm:text-base">
                       {pdf.progress}%
                     </span>
                   </div>
-                  <div className="w-full bg-gray-200 rounded-full h-2 sm:h-3 overflow-hidden">
+                  <div
+                    className={`w-full rounded-full h-2 sm:h-3 overflow-hidden transition-colors duration-300 ${
+                      isDark ? "bg-gray-700" : "bg-gray-200"
+                    }`}
+                  >
                     <div
                       className="h-full bg-gradient-to-r from-emerald-400 to-emerald-600 rounded-full transition-all duration-500 ease-out"
                       style={{
@@ -560,12 +662,18 @@ const PDFDetailsPage = () => {
                 </div>
 
                 {/* Current Page */}
-                <div className="bg-emerald-50 rounded-lg sm:rounded-xl p-3 sm:p-4">
+                <div
+                  className={`rounded-lg sm:rounded-xl p-3 sm:p-4 transition-colors duration-300 ${
+                    isDark
+                      ? "bg-emerald-900/30 text-emerald-300"
+                      : "bg-emerald-50 text-emerald-700"
+                  }`}
+                >
                   <div className="flex justify-between items-center">
-                    <span className="text-emerald-700 font-medium text-sm sm:text-base">
+                    <span className="font-medium text-sm sm:text-base">
                       Current Page
                     </span>
-                    <span className="text-emerald-800 font-bold text-base sm:text-lg">
+                    <span className="font-bold text-base sm:text-lg">
                       {pdf.currentPage} / {pdf.totalPages}
                     </span>
                   </div>
@@ -589,9 +697,19 @@ const PDFDetailsPage = () => {
           {/* Right Column - AI Features */}
           <div className="lg:col-span-2 space-y-4 sm:space-y-6">
             {/* Summary Section */}
-            <div className="bg-white rounded-xl sm:rounded-2xl shadow-sm border border-gray-100 p-4 sm:p-6">
+            <div
+              className={`rounded-xl sm:rounded-2xl shadow-sm border p-4 sm:p-6 transition-colors duration-300 ${
+                isDark
+                  ? "bg-gray-800 border-gray-700"
+                  : "bg-white border-gray-100"
+              }`}
+            >
               <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 mb-4 sm:mb-6">
-                <h2 className="text-lg sm:text-xl font-semibold text-gray-900 flex items-center gap-2">
+                <h2
+                  className={`text-lg sm:text-xl font-semibold flex items-center gap-2 transition-colors duration-300 ${
+                    isDark ? "text-gray-100" : "text-gray-900"
+                  }`}
+                >
                   <Brain size={18} className="text-purple-500" />
                   AI Summary
                 </h2>
@@ -599,13 +717,21 @@ const PDFDetailsPage = () => {
                   <div className="flex gap-2 self-end sm:self-auto">
                     <button
                       onClick={() => copyToClipboard(pdf.summary || "")}
-                      className="p-2 bg-gray-100 text-gray-600 rounded-md hover:bg-gray-200 transition-colors"
+                      className={`p-2 rounded-md transition-colors duration-300 ${
+                        isDark
+                          ? "bg-gray-700 text-gray-300 hover:bg-gray-600"
+                          : "bg-gray-100 text-gray-600 hover:bg-gray-200"
+                      }`}
                       title="Copy Summary"
                     >
                       <Copy size={14} />
                     </button>
                     <button
-                      className="p-2 bg-gray-100 text-gray-600 rounded-md hover:bg-gray-200 transition-colors"
+                      className={`p-2 rounded-md transition-colors duration-300 ${
+                        isDark
+                          ? "bg-gray-700 text-gray-300 hover:bg-gray-600"
+                          : "bg-gray-100 text-gray-600 hover:bg-gray-200"
+                      }`}
                       title="Download as PDF"
                     >
                       <FileDown size={14} />
@@ -623,11 +749,17 @@ const PDFDetailsPage = () => {
                     </span>
                   </div>
 
-                  <div className="bg-gradient-to-br from-purple-50 to-blue-50 rounded-lg sm:rounded-xl p-3 sm:p-4 border border-purple-100">
+                  <div
+                    className={`rounded-lg sm:rounded-xl p-3 sm:p-4 border transition-colors duration-300 ${
+                      isDark
+                        ? "bg-gradient-to-br from-purple-900/30 to-blue-900/30 border-purple-700"
+                        : "bg-gradient-to-br from-purple-50 to-blue-50 border-purple-100"
+                    }`}
+                  >
                     <p
-                      className={`text-gray-700 text-sm sm:text-base leading-relaxed ${
-                        expandedSummary ? "" : "line-clamp-3"
-                      }`}
+                      className={`text-sm sm:text-base leading-relaxed transition-colors duration-300 ${
+                        isDark ? "text-gray-300" : "text-gray-700"
+                      } ${expandedSummary ? "" : "line-clamp-3"}`}
                     >
                       {pdf.summary}
                     </p>
@@ -643,9 +775,15 @@ const PDFDetailsPage = () => {
                 <div className="text-center py-6 sm:py-8">
                   <XCircle
                     size={40}
-                    className="text-gray-400 mx-auto mb-3 sm:mb-4"
+                    className={`mx-auto mb-3 sm:mb-4 transition-colors duration-300 ${
+                      isDark ? "text-gray-500" : "text-gray-400"
+                    }`}
                   />
-                  <p className="text-gray-500 mb-3 sm:mb-4 text-sm sm:text-base">
+                  <p
+                    className={`mb-3 sm:mb-4 text-sm sm:text-base transition-colors duration-300 ${
+                      isDark ? "text-gray-400" : "text-gray-500"
+                    }`}
+                  >
                     No summary generated yet
                   </p>
                   <button
@@ -672,8 +810,18 @@ const PDFDetailsPage = () => {
             {/* Flashcards & Quiz Section */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6">
               {/* Flashcards */}
-              <div className="bg-white rounded-xl sm:rounded-2xl shadow-sm border border-gray-100 p-4 sm:p-6">
-                <h3 className="text-base sm:text-lg font-semibold text-gray-900 mb-3 sm:mb-4 flex items-center gap-2">
+              <div
+                className={`rounded-xl sm:rounded-2xl shadow-sm border p-4 sm:p-6 transition-colors duration-300 ${
+                  isDark
+                    ? "bg-gray-800 border-gray-700"
+                    : "bg-white border-gray-100"
+                }`}
+              >
+                <h3
+                  className={`text-base sm:text-lg font-semibold mb-3 sm:mb-4 flex items-center gap-2 transition-colors duration-300 ${
+                    isDark ? "text-gray-100" : "text-gray-900"
+                  }`}
+                >
                   <Target size={16} className="text-orange-500" />
                   Flashcards
                 </h3>
@@ -687,7 +835,13 @@ const PDFDetailsPage = () => {
                       </span>
                     </div>
 
-                    <div className="bg-gradient-to-br from-orange-50 to-yellow-50 rounded-lg sm:rounded-xl p-3 sm:p-4 border border-orange-100">
+                    <div
+                      className={`rounded-lg sm:rounded-xl p-3 sm:p-4 border transition-colors duration-300 ${
+                        isDark
+                          ? "bg-gradient-to-br from-orange-900/30 to-yellow-900/30 border-orange-700"
+                          : "bg-gradient-to-br from-orange-50 to-yellow-50 border-orange-100"
+                      }`}
+                    >
                       <div className="text-center">
                         <div className="text-2xl sm:text-3xl font-bold text-orange-600 mb-1">
                           {pdf.flashcards?.length}
@@ -709,9 +863,15 @@ const PDFDetailsPage = () => {
                   <div className="text-center py-4 sm:py-6">
                     <XCircle
                       size={36}
-                      className="text-gray-400 mx-auto mb-2 sm:mb-3"
+                      className={`mx-auto mb-2 sm:mb-3 transition-colors duration-300 ${
+                        isDark ? "text-gray-500" : "text-gray-400"
+                      }`}
                     />
-                    <p className="text-gray-500 mb-3 sm:mb-4 text-sm sm:text-base">
+                    <p
+                      className={`mb-3 sm:mb-4 text-sm sm:text-base transition-colors duration-300 ${
+                        isDark ? "text-gray-400" : "text-gray-500"
+                      }`}
+                    >
                       No flashcards created
                     </p>
                     <button
@@ -736,8 +896,18 @@ const PDFDetailsPage = () => {
               </div>
 
               {/* Quiz */}
-              <div className="bg-white rounded-xl sm:rounded-2xl shadow-sm border border-gray-100 p-4 sm:p-6">
-                <h3 className="text-base sm:text-lg font-semibold text-gray-900 mb-3 sm:mb-4 flex items-center gap-2">
+              <div
+                className={`rounded-xl sm:rounded-2xl shadow-sm border p-4 sm:p-6 transition-colors duration-300 ${
+                  isDark
+                    ? "bg-gray-800 border-gray-700"
+                    : "bg-white border-gray-100"
+                }`}
+              >
+                <h3
+                  className={`text-base sm:text-lg font-semibold mb-3 sm:mb-4 flex items-center gap-2 transition-colors duration-300 ${
+                    isDark ? "text-gray-100" : "text-gray-900"
+                  }`}
+                >
                   <Brain size={16} className="text-indigo-500" />
                   Quiz
                 </h3>
@@ -751,7 +921,13 @@ const PDFDetailsPage = () => {
                       </span>
                     </div>
 
-                    <div className="bg-gradient-to-br from-indigo-50 to-purple-50 rounded-lg sm:rounded-xl p-3 sm:p-4 border border-indigo-100">
+                    <div
+                      className={`rounded-lg sm:rounded-xl p-3 sm:p-4 border transition-colors duration-300 ${
+                        isDark
+                          ? "bg-gradient-to-br from-indigo-900/30 to-purple-900/30 border-indigo-700"
+                          : "bg-gradient-to-br from-indigo-50 to-purple-50 border-indigo-100"
+                      }`}
+                    >
                       <div className="text-center">
                         <div className="text-2xl sm:text-3xl font-bold text-indigo-600 mb-1">
                           {pdf.quizzes?.length}
@@ -770,9 +946,15 @@ const PDFDetailsPage = () => {
                   <div className="text-center py-4 sm:py-6">
                     <XCircle
                       size={36}
-                      className="text-gray-400 mx-auto mb-2 sm:mb-3"
+                      className={`mx-auto mb-2 sm:mb-3 transition-colors duration-300 ${
+                        isDark ? "text-gray-500" : "text-gray-400"
+                      }`}
                     />
-                    <p className="text-gray-500 mb-3 sm:mb-4 text-sm sm:text-base">
+                    <p
+                      className={`mb-3 sm:mb-4 text-sm sm:text-base transition-colors duration-300 ${
+                        isDark ? "text-gray-400" : "text-gray-500"
+                      }`}
+                    >
                       No quiz available
                     </p>
                     <button
@@ -799,55 +981,82 @@ const PDFDetailsPage = () => {
           </div>
 
           {/* Learning Statistics */}
-          <div className="lg:col-span-3 bg-white rounded-xl sm:rounded-2xl shadow-sm border border-gray-100 p-4 sm:p-6">
-            <h3 className="text-base sm:text-lg font-semibold text-gray-900 mb-3 sm:mb-4 flex items-center gap-2">
+          <div
+            className={`lg:col-span-3 rounded-xl sm:rounded-2xl shadow-sm border p-4 sm:p-6 transition-colors duration-300 ${
+              isDark
+                ? "bg-gray-800 border-gray-700"
+                : "bg-white border-gray-100"
+            }`}
+          >
+            <h3
+              className={`text-base sm:text-lg font-semibold mb-3 sm:mb-4 flex items-center gap-2 transition-colors duration-300 ${
+                isDark ? "text-gray-100" : "text-gray-900"
+              }`}
+            >
               <BarChart3 size={16} className="text-blue-500" />
               Learning Stats
             </h3>
 
             <div className="grid grid-cols-2 gap-3 sm:gap-4">
-              <div className="text-center p-3 sm:p-4 bg-blue-50 rounded-lg sm:rounded-xl">
-                <div className="text-xl sm:text-2xl font-bold text-blue-600 mb-1">
-                  {pdf.isSummarized ? "✓" : "—"}
+              {[
+                {
+                  value: pdf.isSummarized ? "✓" : "—",
+                  label: "Summary",
+                  bg: isDark ? "bg-blue-900/30" : "bg-blue-50",
+                  text: isDark ? "text-blue-300" : "text-blue-700",
+                },
+                {
+                  value: pdf.isFlashcardGenerated ? "✓" : "—",
+                  label: "Flashcards",
+                  bg: isDark ? "bg-orange-900/30" : "bg-orange-50",
+                  text: isDark ? "text-orange-300" : "text-orange-700",
+                },
+                {
+                  value: pdf.isQuizGenerated ? "✓" : "—",
+                  label: "Quiz Questions",
+                  bg: isDark ? "bg-indigo-900/30" : "bg-indigo-50",
+                  text: isDark ? "text-indigo-300" : "text-indigo-700",
+                },
+                {
+                  value: pdf.progress?.timeSpent || "0h 0m",
+                  label: "Time Spent",
+                  bg: isDark ? "bg-emerald-900/30" : "bg-emerald-50",
+                  text: isDark ? "text-emerald-300" : "text-emerald-700",
+                },
+              ].map((stat, index) => (
+                <div
+                  key={index}
+                  className={`text-center p-3 sm:p-4 rounded-lg sm:rounded-xl transition-colors duration-300 ${stat.bg}`}
+                >
+                  <div
+                    className={`text-xl sm:text-2xl font-bold mb-1 ${stat.text}`}
+                  >
+                    {stat.value}
+                  </div>
+                  <div
+                    className={`text-xs sm:text-sm font-medium ${stat.text}`}
+                  >
+                    {stat.label}
+                  </div>
                 </div>
-                <div className="text-blue-700 text-xs sm:text-sm font-medium">
-                  Summary
-                </div>
-              </div>
-
-              <div className="text-center p-3 sm:p-4 bg-orange-50 rounded-lg sm:rounded-xl">
-                <div className="text-xl sm:text-2xl font-bold text-orange-600 mb-1">
-                  {pdf.isFlashcardGenerated ? "✓" : "—"}
-                </div>
-                <div className="text-orange-700 text-xs sm:text-sm font-medium">
-                  Flashcards
-                </div>
-              </div>
-
-              <div className="text-center p-3 sm:p-4 bg-indigo-50 rounded-lg sm:rounded-xl">
-                <div className="text-xl sm:text-2xl font-bold text-indigo-600 mb-1">
-                  {pdf.isQuizGenerated ? "✓" : "—"}
-                </div>
-                <div className="text-indigo-700 text-xs sm:text-sm font-medium">
-                  Quiz Questions
-                </div>
-              </div>
-
-              <div className="text-center p-3 sm:p-4 bg-emerald-50 rounded-lg sm:rounded-xl">
-                <div className="text-xl sm:text-2xl font-bold text-emerald-600 mb-1">
-                  {pdf.progress?.timeSpent || "0h 0m"}
-                </div>
-                <div className="text-emerald-700 text-xs sm:text-sm font-medium">
-                  Time Spent
-                </div>
-              </div>
+              ))}
             </div>
           </div>
 
           {/* Right Column - AI Learning Features */}
           <div className="lg:col-span-3">
-            <div className="bg-white rounded-xl sm:rounded-2xl shadow-sm border border-gray-100 p-4 sm:p-6 h-full">
-              <h2 className="text-lg sm:text-xl font-semibold text-gray-900 mb-4 sm:mb-6 flex items-center gap-2">
+            <div
+              className={`rounded-xl sm:rounded-2xl shadow-sm border p-4 sm:p-6 h-full transition-colors duration-300 ${
+                isDark
+                  ? "bg-gray-800 border-gray-700"
+                  : "bg-white border-gray-100"
+              }`}
+            >
+              <h2
+                className={`text-lg sm:text-xl font-semibold mb-4 sm:mb-6 flex items-center gap-2 transition-colors duration-300 ${
+                  isDark ? "text-gray-100" : "text-gray-900"
+                }`}
+              >
                 <Brain size={18} className="text-purple-500" />
                 AI Learning Features
               </h2>
@@ -855,109 +1064,84 @@ const PDFDetailsPage = () => {
               <div className="grid gap-4 sm:gap-6">
                 {/* Feature Status Grid */}
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-3 sm:gap-4">
-                  <div
-                    className={`p-3 sm:p-4 rounded-lg sm:rounded-xl border-2 transition-all duration-200 ${
-                      pdf.isSummarized
-                        ? "border-emerald-200 bg-emerald-50"
-                        : "border-gray-200 bg-gray-50"
-                    }`}
-                  >
-                    <div className="flex items-center gap-2 mb-2">
-                      {pdf.isSummarized ? (
-                        <CheckCircle size={18} className="text-emerald-600" />
-                      ) : (
-                        <XCircle size={18} className="text-gray-400" />
-                      )}
-                      <span
-                        className={`font-medium text-sm sm:text-base ${
-                          pdf.isSummarized
-                            ? "text-emerald-700"
-                            : "text-gray-500"
-                        }`}
-                      >
-                        Summary
-                      </span>
-                    </div>
-                    <p
-                      className={`text-xs sm:text-sm ${
-                        pdf.isSummarized ? "text-emerald-600" : "text-gray-400"
+                  {[
+                    {
+                      available: pdf.isSummarized,
+                      label: "Summary",
+                      darkBorder: "border-emerald-700",
+                      lightBorder: "border-emerald-200",
+                      darkBg: "bg-emerald-900/20",
+                      lightBg: "bg-emerald-50",
+                    },
+                    {
+                      available: pdf.isFlashcardGenerated,
+                      label: "Flashcards",
+                      darkBorder: "border-emerald-700",
+                      lightBorder: "border-emerald-200",
+                      darkBg: "bg-emerald-900/20",
+                      lightBg: "bg-emerald-50",
+                    },
+                    {
+                      available: pdf.isQuizGenerated,
+                      label: "Quiz",
+                      darkBorder: "border-emerald-700",
+                      lightBorder: "border-emerald-200",
+                      darkBg: "bg-emerald-900/20",
+                      lightBg: "bg-emerald-50",
+                    },
+                  ].map((feature, index) => (
+                    <div
+                      key={index}
+                      className={`p-3 sm:p-4 rounded-lg sm:rounded-xl border-2 transition-all duration-200 ${
+                        feature.available
+                          ? isDark
+                            ? `border-emerald-700 ${feature.darkBg}`
+                            : `border-emerald-200 ${feature.lightBg}`
+                          : isDark
+                          ? "border-gray-700 bg-gray-700/20"
+                          : "border-gray-200 bg-gray-50"
                       }`}
                     >
-                      {pdf.isSummarized ? "Available" : "Not Generated"}
-                    </p>
-                  </div>
-
-                  <div
-                    className={`p-3 sm:p-4 rounded-lg sm:rounded-xl border-2 transition-all duration-200 ${
-                      pdf.isFlashcardGenerated
-                        ? "border-emerald-200 bg-emerald-50"
-                        : "border-gray-200 bg-gray-50"
-                    }`}
-                  >
-                    <div className="flex items-center gap-2 mb-2">
-                      {pdf.isFlashcardGenerated ? (
-                        <CheckCircle size={18} className="text-emerald-600" />
-                      ) : (
-                        <XCircle size={18} className="text-gray-400" />
-                      )}
-                      <span
-                        className={`font-medium text-sm sm:text-base ${
-                          pdf.isFlashcardGenerated
-                            ? "text-emerald-700"
-                            : "text-gray-500"
+                      <div className="flex items-center gap-2 mb-2">
+                        {feature.available ? (
+                          <CheckCircle size={18} className="text-emerald-600" />
+                        ) : (
+                          <XCircle
+                            size={18}
+                            className={
+                              isDark ? "text-gray-500" : "text-gray-400"
+                            }
+                          />
+                        )}
+                        <span
+                          className={`font-medium text-sm sm:text-base ${
+                            feature.available
+                              ? isDark
+                                ? "text-emerald-300"
+                                : "text-emerald-700"
+                              : isDark
+                              ? "text-gray-400"
+                              : "text-gray-500"
+                          }`}
+                        >
+                          {feature.label}
+                        </span>
+                      </div>
+                      <p
+                        className={`text-xs sm:text-sm ${
+                          feature.available
+                            ? isDark
+                              ? "text-emerald-400"
+                              : "text-emerald-600"
+                            : isDark
+                            ? "text-gray-500"
+                            : "text-gray-400"
                         }`}
                       >
-                        Flashcards
-                      </span>
+                        {feature.available ? "Available" : "Not Generated"}
+                      </p>
                     </div>
-                    <p
-                      className={`text-xs sm:text-sm ${
-                        pdf.isFlashcardGenerated
-                          ? "text-emerald-600"
-                          : "text-gray-400"
-                      }`}
-                    >
-                      {pdf.isFlashcardGenerated
-                        ? `${pdf.flashcards?.length || 0} Cards`
-                        : "Not Generated"}
-                    </p>
-                  </div>
-
-                  <div
-                    className={`p-3 sm:p-4 rounded-lg sm:rounded-xl border-2 transition-all duration-200 ${
-                      pdf.isQuizGenerated
-                        ? "border-emerald-200 bg-emerald-50"
-                        : "border-gray-200 bg-gray-50"
-                    }`}
-                  >
-                    <div className="flex items-center gap-2 mb-2">
-                      {pdf.isQuizGenerated ? (
-                        <CheckCircle size={18} className="text-emerald-600" />
-                      ) : (
-                        <XCircle size={18} className="text-gray-400" />
-                      )}
-                      <span
-                        className={`font-medium text-sm sm:text-base ${
-                          pdf.isQuizGenerated
-                            ? "text-emerald-700"
-                            : "text-gray-500"
-                        }`}
-                      >
-                        Quiz
-                      </span>
-                    </div>
-                    <p
-                      className={`text-xs sm:text-sm ${
-                        pdf.isQuizGenerated
-                          ? "text-emerald-600"
-                          : "text-gray-400"
-                      }`}
-                    >
-                      {pdf.isQuizGenerated
-                        ? `${pdf.quizzes?.length || 0} Questions`
-                        : "Not Generated"}
-                    </p>
-                  </div>
+                  ))}
                 </div>
 
                 {/* Learning Actions */}
@@ -1006,17 +1190,31 @@ const PDFDetailsPage = () => {
           onClick={() => setShowDeleteConfirm(false)}
         >
           <div
-            className="bg-white rounded-2xl shadow-xl w-full max-w-md"
-            onClick={(e) => e.stopPropagation()} // Prevent click from bubbling to parent
+            className={`rounded-2xl shadow-xl w-full max-w-md transition-colors duration-300 ${
+              isDark ? "bg-gray-800" : "bg-white"
+            }`}
+            onClick={(e) => e.stopPropagation()}
           >
             <div className="p-6">
-              <div className="flex items-center justify-center w-16 h-16 bg-red-100 rounded-full mx-auto mb-4">
+              <div
+                className={`flex items-center justify-center w-16 h-16 rounded-full mx-auto mb-4 ${
+                  isDark ? "bg-red-900/30" : "bg-red-100"
+                }`}
+              >
                 <Trash2 className="w-8 h-8 text-red-600" />
               </div>
-              <h3 className="text-xl font-semibold text-gray-900 text-center mb-2">
+              <h3
+                className={`text-xl font-semibold text-center mb-2 transition-colors duration-300 ${
+                  isDark ? "text-gray-100" : "text-gray-900"
+                }`}
+              >
                 Delete PDF?
               </h3>
-              <p className="text-gray-500 text-center mb-6">
+              <p
+                className={`text-center mb-6 transition-colors duration-300 ${
+                  isDark ? "text-gray-400" : "text-gray-500"
+                }`}
+              >
                 Are you sure you want to delete "{pdfToDelete?.title}"? This
                 action cannot be undone.
               </p>
@@ -1024,13 +1222,17 @@ const PDFDetailsPage = () => {
               <div className="flex justify-center space-x-4">
                 <button
                   onClick={() => setShowDeleteConfirm(false)}
-                  className="px-6 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50"
+                  className={`px-6 py-2 border rounded-lg transition-colors duration-300 ${
+                    isDark
+                      ? "border-gray-600 text-gray-300 hover:bg-gray-700"
+                      : "border-gray-300 text-gray-700 hover:bg-gray-50"
+                  }`}
                 >
                   Cancel
                 </button>
                 <button
                   onClick={confirmDelete}
-                  className="px-6 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700"
+                  className="px-6 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors duration-300"
                 >
                   Delete
                 </button>

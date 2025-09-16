@@ -22,6 +22,7 @@ import {
 import useAuth from "../../hooks/useAuth";
 import { jwtDecode } from "jwt-decode";
 import SidebarUserNav from "../dashboard/helper/SidebarUserNav";
+import { useTheme } from "@/context/AdminThemeContext";
 
 export default function Sidebar() {
   const { user } = useAuth();
@@ -42,6 +43,7 @@ export default function Sidebar() {
   const sidebarRef = useRef(null);
   const scrollPositionRef = useRef(0);
   const isScrollRestorationScheduled = useRef(false);
+  const { isDark, toggleTheme } = useTheme(); // Get theme state and toggle function
 
   // Handle window resize
   useEffect(() => {
@@ -73,7 +75,7 @@ export default function Sidebar() {
     Dashboard: "/dashboard",
     "Upload PDFs": "/upload",
     "My Library": "/library",
-    "Summify": "/summify",
+    Summify: "/summify",
     "Quiz Master": "/quizmaster",
     Flashgenius: "/flashgenius",
     "Voice Assistant": "/voice-assistant",
@@ -228,13 +230,24 @@ export default function Sidebar() {
   ];
 
   // Mobile navbar component
+  // Mobile navbar component
   const MobileNavbar = () => (
-    <div className="lg:hidden fixed top-0 left-0 right-0 bg-gradient-to-br from-slate-50 to-blue-50/30 border-b border-gray-200/60 z-50">
+    <div
+      className={`lg:hidden fixed top-0 left-0 right-0 z-50 transition-colors duration-300 ${
+        isDark
+          ? "bg-gradient-to-br from-gray-900 to-gray-800 border-b border-gray-700/60"
+          : "bg-gradient-to-br from-slate-50 to-blue-50/30 border-b border-gray-200/60"
+      }`}
+    >
       <div className="flex items-center justify-between p-4">
         <div className="flex items-center justify-center">
           <button
             onClick={toggleMobileMenu}
-            className="p-2 rounded-lg bg-white/60 backdrop-blur-sm border border-white/20 shadow-lg"
+            className={`p-2 rounded-lg backdrop-blur-sm border shadow-lg transition-colors ${
+              isDark
+                ? "bg-gray-800/60 border-gray-700/20"
+                : "bg-white/60 border-white/20"
+            }`}
           >
             {isMobileMenuOpen ? (
               <X className="w-5 h-5" />
@@ -248,7 +261,13 @@ export default function Sidebar() {
           <div className="w-15 h-12 rounded-xl flex items-center justify-center">
             <img src={logo} alt="Recallr Logo" className="h-10" />
           </div>
-          <h1 className="font-bold text-2xl mt-2 text-gray-900">Recallr</h1>
+          <h1
+            className={`font-bold text-2xl mt-2 ${
+              isDark ? "text-white" : "text-gray-900"
+            }`}
+          >
+            Recallr
+          </h1>
         </div>
 
         <div className="flex items-center space-x-3">
@@ -265,17 +284,24 @@ export default function Sidebar() {
               </div>
             }
           />
-          
         </div>
       </div>
 
       {/* Mobile menu dropdown */}
       {isMobileMenuOpen && (
-        <div className="bg-white border-t border-gray-200 shadow-lg max-h-[70vh] overflow-y-auto">
+        <div
+          className={`border-t shadow-lg max-h-[70vh] overflow-y-auto transition-colors ${
+            isDark ? "bg-gray-900 border-gray-700" : "bg-white border-gray-200"
+          }`}
+        >
           <div className="p-4">
             {menuItems.map((section, sectionIndex) => (
               <div key={sectionIndex} className="mb-6">
-                <h3 className="text-xs font-bold text-gray-500 uppercase tracking-wider mb-3">
+                <h3
+                  className={`text-xs font-bold uppercase tracking-wider mb-3 ${
+                    isDark ? "text-gray-400" : "text-gray-500"
+                  }`}
+                >
                   {section.section}
                 </h3>
                 <div className="space-y-2">
@@ -290,6 +316,8 @@ export default function Sidebar() {
                         className={`w-full flex items-center space-x-3 p-3 rounded-xl transition-all duration-200 ${
                           isActive
                             ? `${item.bgAccent} shadow-md`
+                            : isDark
+                            ? "hover:bg-gray-800"
                             : "hover:bg-gray-100"
                         }`}
                       >
@@ -297,12 +325,18 @@ export default function Sidebar() {
                           className={`p-2 rounded-lg ${
                             isActive
                               ? `bg-gradient-to-r ${item.color} text-white`
+                              : isDark
+                              ? "bg-gray-700 text-gray-400"
                               : "bg-gray-200 text-gray-600"
                           }`}
                         >
                           <Icon className="w-4 h-4" />
                         </div>
-                        <span className="font-medium text-gray-800">
+                        <span
+                          className={`font-medium ${
+                            isDark ? "text-gray-200" : "text-gray-800"
+                          }`}
+                        >
                           {item.name}
                         </span>
                         {item.badge && (
@@ -312,6 +346,8 @@ export default function Sidebar() {
                                 ? "bg-gradient-to-r from-green-500 to-emerald-500 text-white"
                                 : item.badge === "BETA"
                                 ? "bg-gradient-to-r from-orange-500 to-red-500 text-white"
+                                : isDark
+                                ? "bg-gray-700 text-gray-300"
                                 : "bg-gray-200 text-gray-700"
                             }`}
                           >
@@ -334,7 +370,11 @@ export default function Sidebar() {
   const DesktopSidebar = () => (
     <div
       ref={sidebarRef}
-      className="hidden lg:flex fixed top-0 left-0 w-72 h-screen bg-gradient-to-br from-slate-50 to-blue-50/30 border-r border-gray-200/60 flex-col overflow-y-auto z-10"
+      className={`hidden lg:flex fixed top-0 left-0 w-72 h-screen flex-col overflow-y-auto z-10 transition-colors duration-300 ${
+        isDark
+          ? "bg-gradient-to-br from-gray-900 to-gray-800/30 border-r border-gray-700/60"
+          : "bg-gradient-to-br from-slate-50 to-blue-50/30 border-r border-gray-200/60"
+      }`}
     >
       {/* Header */}
       <div className="p-6 relative z-10 flex-shrink-0">
@@ -345,11 +385,23 @@ export default function Sidebar() {
             </div>
           </div>
           <div className="">
-            <h1 className="font-bold text-xl text-gray-900 bg-gradient-to-r from-gray-900 to-gray-700 bg-clip-text">
+            <h1
+              className={`font-bold text-xl bg-gradient-to-r bg-clip-text ${
+                isDark
+                  ? "from-gray-100 to-gray-300 text-transparent"
+                  : "from-gray-900 to-gray-700 text-transparent"
+              }`}
+            >
               Recallr
             </h1>
             <div className="flex items-center space-x-2">
-              <p className="text-sm text-gray-600">Don't store. Recall</p>
+              <p
+                className={`text-sm ${
+                  isDark ? "text-gray-400" : "text-gray-600"
+                }`}
+              >
+                Don't store. Recall
+              </p>
               <div className="flex space-x-0.5">
                 <div className="w-1 h-1 bg-gradient-to-r from-yellow-400 to-orange-500 rounded-full animate-pulse"></div>
                 <div className="w-1 h-1 bg-gradient-to-r from-pink-400 to-rose-500 rounded-full animate-pulse delay-100"></div>
@@ -365,10 +417,20 @@ export default function Sidebar() {
         {menuItems.map((section, sectionIndex) => (
           <div key={sectionIndex} className="mb-8">
             <div className="flex items-center space-x-2 px-4 mb-4">
-              <h3 className="text-xs font-bold text-gray-500 uppercase tracking-wider">
+              <h3
+                className={`text-xs font-bold uppercase tracking-wider ${
+                  isDark ? "text-gray-400" : "text-gray-500"
+                }`}
+              >
                 {section.section}
               </h3>
-              <div className="flex-1 h-px bg-gradient-to-r from-gray-200 to-transparent"></div>
+              <div
+                className={`flex-1 h-px bg-gradient-to-r ${
+                  isDark
+                    ? "from-gray-700 to-transparent"
+                    : "from-gray-200 to-transparent"
+                }`}
+              ></div>
             </div>
 
             <nav className="space-y-2">
@@ -390,9 +452,15 @@ export default function Sidebar() {
                     <div
                       className={`flex items-center space-x-4 px-4 py-3.5 rounded-2xl transition-all duration-300 ${
                         isActive
-                          ? `${item.bgAccent} shadow-lg shadow-black/5 border border-white/40`
+                          ? `${item.bgAccent} shadow-lg shadow-black/5 border ${
+                              isDark ? "border-gray-600/40" : "border-white/40"
+                            }`
                           : isHovered
-                          ? "bg-white/60 backdrop-blur-sm shadow-md shadow-black/5"
+                          ? isDark
+                            ? "bg-gray-800/60 backdrop-blur-sm shadow-md shadow-black/5"
+                            : "bg-white/60 backdrop-blur-sm shadow-md shadow-black/5"
+                          : isDark
+                          ? "hover:bg-gray-800/40"
                           : "hover:bg-white/40"
                       }`}
                     >
@@ -400,6 +468,8 @@ export default function Sidebar() {
                         className={`relative p-2.5 rounded-xl transition-all duration-300 ${
                           isActive || isHovered
                             ? `bg-gradient-to-r ${item.color} shadow-lg`
+                            : isDark
+                            ? "bg-gray-700"
                             : "bg-gray-100"
                         }`}
                       >
@@ -407,6 +477,8 @@ export default function Sidebar() {
                           className={`w-5 h-5 transition-all duration-300 ${
                             isActive || isHovered
                               ? "text-white"
+                              : isDark
+                              ? "text-gray-400"
                               : "text-gray-600"
                           }`}
                         />
@@ -417,7 +489,13 @@ export default function Sidebar() {
                       <div className="flex-1 flex items-center justify-between">
                         <span
                           className={`font-semibold transition-all duration-300 ${
-                            isActive ? "text-gray-900" : "text-gray-700"
+                            isActive
+                              ? isDark
+                                ? "text-gray-900"
+                                : "text-gray-900"
+                              : isDark
+                              ? "text-gray-300"
+                              : "text-gray-700"
                           }`}
                         >
                           {item.name}
@@ -430,6 +508,8 @@ export default function Sidebar() {
                                   ? "bg-gradient-to-r from-green-500 to-emerald-500 text-white animate-pulse"
                                   : item.badge === "BETA"
                                   ? "bg-gradient-to-r from-orange-500 to-red-500 text-white"
+                                  : isDark
+                                  ? "bg-gray-700 text-gray-300"
                                   : "bg-gray-200 text-gray-700"
                               }`}
                             >
@@ -437,7 +517,11 @@ export default function Sidebar() {
                             </span>
                           )}
                           {(isActive || isHovered) && (
-                            <ChevronRight className="w-4 h-4 text-gray-400 transition-transform duration-300 transform translate-x-0 group-hover:translate-x-1" />
+                            <ChevronRight
+                              className={`w-4 h-4 transition-transform duration-300 transform translate-x-0 group-hover:translate-x-1 ${
+                                isDark ? "text-gray-500" : "text-gray-400"
+                              }`}
+                            />
                           )}
                         </div>
                       </div>
@@ -461,7 +545,13 @@ export default function Sidebar() {
           user={user}
           trigger={
             <div className="p-4 relative z-10 cursor-pointer">
-              <div className="bg-white/60 backdrop-blur-sm rounded-2xl p-4 border border-white/20 shadow-lg">
+              <div
+                className={`backdrop-blur-sm rounded-2xl p-4 border shadow-lg transition-colors ${
+                  isDark
+                    ? "bg-gray-800/60 border-gray-700/20"
+                    : "bg-white/60 border-white/20"
+                }`}
+              >
                 <div className="flex items-center space-x-3">
                   <div className="relative">
                     <div className="w-12 h-12 rounded-2xl flex items-center justify-center shadow-lg overflow-hidden">
@@ -481,10 +571,18 @@ export default function Sidebar() {
                     <div className="absolute -bottom-1 -right-1 w-4 h-4 bg-green-500 border-2 border-white rounded-full"></div>
                   </div>
                   <div className="flex-1 min-w-0">
-                    <p className="text-sm font-bold text-gray-900 truncate">
+                    <p
+                      className={`text-sm font-bold truncate ${
+                        isDark ? "text-white" : "text-gray-900"
+                      }`}
+                    >
                       {user?.userName || "User"}
                     </p>
-                    <p className="text-xs text-gray-500 truncate">
+                    <p
+                      className={`text-xs truncate ${
+                        isDark ? "text-gray-400" : "text-gray-500"
+                      }`}
+                    >
                       {user?.email || "user@example.com"}
                     </p>
                   </div>
