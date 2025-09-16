@@ -113,58 +113,7 @@ const PDFDetailsPage = () => {
     });
   };
 
-  // const toggleFavorite = () => {
-  //   setPdfData((prev) => ({ ...prev, isFavorite: !prev.isFavorite }));
-  // };
-
-  // const handleGenerate = async (type) => {
-  //   try {
-  //     setIsGenerating(type);
-
-  //     let response;
-
-  //     if (type === "summary") {
-  //       response = await axios.post(`${API_URL}/pdf/summary-only`, {
-  //         pdfId: pdf._id,
-  //         fileUrl: pdf.cloudinaryUrl,
-  //         fileName: pdf.originalName,
-  //         customPrompt: "Summarize this for quick revision",
-  //       });
-  //     } else if (type === "flashcards") {
-  //       // response = await axios.post("/api/pdf/flashgenius-only", {
-  //       //   pdfId: pdfData._id,
-  //       //   fileUrl: pdfData.cloudinaryUrl,
-  //       // });
-  //     } else if (type === "quiz") {
-  //       response = await axios.post("/api/pdf/quiz-only", {
-  //         pdfId: pdfData._id,
-  //         fileUrl: pdfData.cloudinaryUrl,
-  //       });
-  //     }
-
-  //     // Update UI state after backend finishes
-  //     setPdfData((prev) => ({
-  //       ...prev,
-  //       [type === "summary"
-  //         ? "hasSummary"
-  //         : type === "flashcards"
-  //         ? "hasFlashcards"
-  //         : "hasQuiz"]: true,
-
-  //       ...(type === "flashcards" && {
-  //         flashcardsCount: response.data?.flashcards?.length || 0,
-  //       }),
-  //       ...(type === "quiz" && {
-  //         quizQuestionsCount: response.data.quiz?.length || 0,
-  //       }),
-  //     }));
-  //   } catch (err) {
-  //     console.error("❌ Error generating:", type, err);
-  //     // optionally toast error
-  //   } finally {
-  //     setIsGenerating(null);
-  //   }
-  // };
+ 
   const handleGenerate = async (type) => {
     try {
       setIsGenerating(type);
