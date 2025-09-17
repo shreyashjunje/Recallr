@@ -8,7 +8,7 @@ import {
   Copy,
   RefreshCw,
   BookOpen,
-  File,
+  // File,
   Zap,
   Brain,
   Search,
@@ -82,8 +82,9 @@ const AiSummaryHome = () => {
       });
 
       if (response.status === 200) {
+        console.log("pdf in library::",response.data.pdfs)
         setLibraryFiles(response.data.pdfs);
-        setFilteredLibraryFiles(response.data.files);
+        setFilteredLibraryFiles(response.data.pdfs);
       }
     } catch (error) {
       console.error("Error fetching PDF library:", error);
@@ -144,7 +145,7 @@ const AiSummaryHome = () => {
     setFileSource("library");
 
     // Create a file object from the library file to match the expected format
-    const fileObj = new File([], file.name, {
+    const fileObj = new File([], file.title, {
       type: "application/pdf",
       lastModified: new Date(file.uploadedAt).getTime(),
     });
@@ -351,10 +352,10 @@ const AiSummaryHome = () => {
                 ) : (
                   <div>
                     <select
-                      value={selectedLibraryFile?.id || ""}
+                      value={selectedLibraryFile?._id || ""}
                       onChange={(e) => {
                         const selected = filteredLibraryFiles.find(
-                          (file) => file.id.toString() === e.target.value
+                          (file) => file._id.toString() === e.target.value
                         );
                         if (selected) handleLibraryFileSelect(selected);
                       }}
@@ -362,8 +363,8 @@ const AiSummaryHome = () => {
                     >
                       <option value="">Select a PDF...</option>
                       {filteredLibraryFiles?.map((file) => (
-                        <option key={file.id} value={file.id}>
-                          {file.name}
+                        <option key={file._id} value={file._id}>
+                          {file.title}
                         </option>
                       ))}
                     </select>

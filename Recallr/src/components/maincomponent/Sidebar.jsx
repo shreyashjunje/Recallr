@@ -18,6 +18,8 @@ import {
   Trophy,
   Menu,
   X,
+  Sun,
+  Moon,
 } from "lucide-react";
 import useAuth from "../../hooks/useAuth";
 import { jwtDecode } from "jwt-decode";
@@ -231,6 +233,7 @@ export default function Sidebar() {
 
   // Mobile navbar component
   // Mobile navbar component
+
   const MobileNavbar = () => (
     <div
       className={`lg:hidden fixed top-0 left-0 right-0 z-50 transition-colors duration-300 ${
@@ -240,42 +243,55 @@ export default function Sidebar() {
       }`}
     >
       <div className="flex items-center justify-between p-4">
-        <div className="flex items-center justify-center">
-          <button
-            onClick={toggleMobileMenu}
-            className={`p-2 rounded-lg backdrop-blur-sm border shadow-lg transition-colors ${
-              isDark
-                ? "bg-gray-800/60 border-gray-700/20"
-                : "bg-white/60 border-white/20"
-            }`}
-          >
-            {isMobileMenuOpen ? (
-              <X className="w-5 h-5" />
-            ) : (
-              <Menu className="w-5 h-5" />
-            )}
-          </button>
-        </div>
-
-        <div className="flex items-center">
-          <div className="w-15 h-12 rounded-xl flex items-center justify-center">
-            <img src={logo} alt="Recallr Logo" className="h-10" />
+        <div className="flex">
+          <div className="flex items-center justify-center">
+            <button
+              onClick={toggleMobileMenu}
+              className={`pr-1 mt-2 rounded-lg backdrop-blur-sm border shadow-lg transition-colors ${
+                isDark
+                  ? "bg-gray-800/60 border-gray-700/20"
+                  : "bg-white/60 border-white/20"
+              }`}
+            >
+              {isMobileMenuOpen ? (
+                <X className="w-5 h-5" />
+              ) : (
+                <Menu className="w-6 h-6" />
+              )}
+            </button>
           </div>
-          <h1
-            className={`font-bold text-2xl mt-2 ${
-              isDark ? "text-white" : "text-gray-900"
-            }`}
-          >
-            Recallr
-          </h1>
+
+          <div className="flex items-center">
+            <div className="w-15 h-12 rounded-xl flex items-center justify-center">
+              <img src={logo} alt="Recallr Logo" className="h-10" />
+            </div>
+            <h1
+              className={`font-bold text-2xl mt-2 ${
+                isDark ? "text-white" : "text-gray-900"
+              }`}
+            >
+              Recallr
+            </h1>
+          </div>
         </div>
 
         <div className="flex items-center space-x-3">
-          <div className="flex space-x-1">
+          <button
+            onClick={toggleTheme}
+            className="p-2 rounded-full bg-gray-200 dark:bg-gray-700 shadow-md transition"
+            aria-label="Toggle Dark Mode"
+          >
+            {isDark ? (
+              <Sun className="w-4 h-4 text-yellow-400" />
+            ) : (
+              <Moon className="w-4 h-4 text-gray-800" />
+            )}
+          </button>
+          {/* <div className="flex space-x-1">
             <div className="w-1 h-1 bg-gradient-to-r from-yellow-400 to-orange-500 rounded-full animate-pulse"></div>
             <div className="w-1 h-1 bg-gradient-to-r from-pink-400 to-rose-500 rounded-full animate-pulse delay-100"></div>
             <div className="w-1 h-1 bg-gradient-to-r from-blue-400 to-cyan-500 rounded-full animate-pulse delay-200"></div>
-          </div>
+          </div> */}
           <SidebarUserNav
             user={user}
             trigger={
