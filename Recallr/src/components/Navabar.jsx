@@ -58,10 +58,10 @@ const Navbar = ({ isDark, toggleTheme }) => {
       } transition-all duration-300 ${isScrolled ? "shadow-md" : "shadow-sm"}`}
     >
       {/* Main Navbar */}
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div className="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-16">
           {/* Logo */}
-          <div className="flex-shrink-0 flex items-center space-x-2">
+          <div className="flex-shrink-0 flex items-center space-x-1">
             <img
               src={logo}
               alt="Recallr logo"
@@ -69,7 +69,7 @@ const Navbar = ({ isDark, toggleTheme }) => {
               onClick={() => navigate("/")}
             />
             <h1
-              className={`text-2xl sm:text-3xl font-bold ${
+              className={`text-2xl sm:text-4xl mt-2 font-bold ${
                 isDark ? "text-gray-300" : "text-gray-900"
               }`}
             >
@@ -162,14 +162,25 @@ const Navbar = ({ isDark, toggleTheme }) => {
           {/* Mobile menu button */}
           <div className="md:hidden flex items-center">
             <button
+              onClick={toggleTheme}
+              className="p-2 rounded-full bg-gray-200 dark:bg-gray-700 shadow-md transition"
+              aria-label="Toggle Dark Mode"
+            >
+              {isDark ? (
+                <Sun className="w-4 h-4 text-yellow-400" />
+              ) : (
+                <Moon className="w-4 h-4 text-gray-800" />
+              )}
+            </button>
+            <button
               onClick={toggleMenu}
               className="inline-flex items-center justify-center p-2 rounded-md text-gray-700 hover:text-gray-900 hover:bg-gray-100 transition-colors duration-200"
               aria-label="Toggle menu"
             >
               {isMenuOpen ? (
-                <X className="h-6 w-6" />
+                <X className="h-6 w-6 text-gray-800" />
               ) : (
-                <Menu className="h-6 w-6" />
+                <Menu className="h-6 w-6 text-gray-800" />
               )}
             </button>
           </div>
@@ -179,19 +190,21 @@ const Navbar = ({ isDark, toggleTheme }) => {
       {/* Mobile Menu - Improved UI */}
       {isMenuOpen && (
         <div className="mobile-menu-container fixed inset-0 z-40 bg-black bg-opacity-50 md:hidden">
-          <div className="absolute right-0 top-0 h-full w-80 bg-white shadow-xl transform transition-transform duration-300 ease-in-out">
+          <div className="absolute right-0 top-0 h-full w-80 bg-white dark:bg-gray-900 shadow-xl transform transition-transform duration-300 ease-in-out">
             {/* Header with close button */}
-            <div className="flex items-center justify-between p-4 border-b border-gray-200">
+            <div className="flex items-center justify-between p-4 border-b border-gray-200 dark:border-gray-700">
               <div className="flex items-center space-x-2">
                 <img src={logo} alt="Recallr logo" className="h-8 w-auto" />
-                <h2 className="text-xl font-bold text-gray-900">Recallr</h2>
+                <h2 className="text-xl font-bold text-gray-900 dark:text-gray-100">
+                  Recallr
+                </h2>
               </div>
               <button
                 onClick={closeMenu}
-                className="p-2 rounded-full hover:bg-gray-100 transition-colors"
+                className="p-2 rounded-full hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors"
                 aria-label="Close menu"
               >
-                <X className="h-5 w-5" />
+                <X className="h-5 w-5 text-gray-600 dark:text-gray-300" />
               </button>
             </div>
 
@@ -200,7 +213,7 @@ const Navbar = ({ isDark, toggleTheme }) => {
               <div className="space-y-2">
                 <a
                   href="#features"
-                  className="flex items-center justify-between p-3 rounded-lg text-gray-700 hover:bg-blue-50 hover:text-blue-600 transition-colors duration-200 group"
+                  className="flex items-center justify-between p-3 rounded-lg text-gray-700 dark:text-gray-200 hover:bg-blue-50 dark:hover:bg-gray-800 hover:text-blue-600 dark:hover:text-blue-400 transition-colors duration-200 group"
                   onClick={closeMenu}
                 >
                   <span className="font-medium">Features</span>
@@ -208,7 +221,7 @@ const Navbar = ({ isDark, toggleTheme }) => {
                 </a>
                 <a
                   href="#how-it-works"
-                  className="flex items-center justify-between p-3 rounded-lg text-gray-700 hover:bg-blue-50 hover:text-blue-600 transition-colors duration-200 group"
+                  className="flex items-center justify-between p-3 rounded-lg text-gray-700 dark:text-gray-200 hover:bg-blue-50 dark:hover:bg-gray-800 hover:text-blue-600 dark:hover:text-blue-400 transition-colors duration-200 group"
                   onClick={closeMenu}
                 >
                   <span className="font-medium">How it works</span>
@@ -216,7 +229,7 @@ const Navbar = ({ isDark, toggleTheme }) => {
                 </a>
                 <a
                   href="#demo"
-                  className="flex items-center justify-between p-3 rounded-lg text-gray-700 hover:bg-blue-50 hover:text-blue-600 transition-colors duration-200 group"
+                  className="flex items-center justify-between p-3 rounded-lg text-gray-700 dark:text-gray-200 hover:bg-blue-50 dark:hover:bg-gray-800 hover:text-blue-600 dark:hover:text-blue-400 transition-colors duration-200 group"
                   onClick={closeMenu}
                 >
                   <span className="font-medium">Demo</span>
@@ -232,8 +245,16 @@ const Navbar = ({ isDark, toggleTheme }) => {
                 Login to Your Account
               </button>
 
+              {/* Close button at bottom (extra) */}
+              <button
+                onClick={closeMenu}
+                className="w-full mt-4 border border-gray-300 dark:border-gray-700 text-gray-700 dark:text-gray-200 py-3 px-4 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors duration-300 font-medium"
+              >
+                Close Menu
+              </button>
+
               {/* Footer text */}
-              <p className="text-center text-sm text-gray-500 mt-8">
+              <p className="text-center text-sm text-gray-500 dark:text-gray-400 mt-8">
                 Don't store. Recall.
               </p>
             </div>
