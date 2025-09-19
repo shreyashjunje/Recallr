@@ -287,11 +287,7 @@ export default function Sidebar() {
               <Moon className="w-4 h-4 text-gray-800" />
             )}
           </button>
-          {/* <div className="flex space-x-1">
-            <div className="w-1 h-1 bg-gradient-to-r from-yellow-400 to-orange-500 rounded-full animate-pulse"></div>
-            <div className="w-1 h-1 bg-gradient-to-r from-pink-400 to-rose-500 rounded-full animate-pulse delay-100"></div>
-            <div className="w-1 h-1 bg-gradient-to-r from-blue-400 to-cyan-500 rounded-full animate-pulse delay-200"></div>
-          </div> */}
+          
           <SidebarUserNav
             user={user}
             trigger={
